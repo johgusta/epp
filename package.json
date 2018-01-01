@@ -1,0 +1,19 @@
+{
+  "name": "nzftw",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server --port 5000 --content-base build",
+    "prestart": "npm run build",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.26.0",
+    "express": "^4.14.0",
+    "phaser": "^2.6.2",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
+  }
+}
