@@ -31,6 +31,17 @@ function HexagonBoard(canvas, size) {
     }
 
     this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
+
+    function onClickHandler(event) {
+        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+
+        hexagon.selected = !hexagon.selected;
+        hexagon.hasFocus = false;
+        that.draw();
+    }
+
+    this.canvas.addEventListener('click', onClickHandler);
+
 }
 
 HexagonBoard.prototype.draw = function draw() {
@@ -148,6 +159,10 @@ function forEachHexagon(board, callback) {
 function breakfastHexagon(context, hexagon, x, y, size) {
     var color = hexagon.color !== undefined ? hexagon.color : 'green';
     var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'black';
+
+    if (hexagon.selected) {
+        color = 'blue';
+    }
 
     if (hexagon.hasFocus) {
         color = 'yellow';

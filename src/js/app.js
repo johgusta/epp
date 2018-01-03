@@ -16,7 +16,7 @@ canvas.style.padding = '1px';
 
 mainContent.appendChild(canvas);
 
-var size = 100;
+var size = 50;
 var hexagonBoard = new HexagonBoard(canvas, size);
 
 hexagonBoard.draw();
