@@ -44,5 +44,8 @@ body {
 }
 
 .colorsDiv > div {
+    margin: 2px;
+    padding: 2px;
+
     cursor: pointer;
 }

@@ -99,6 +99,10 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
 
     currentColorSelector.style.backgroundColor = currentColor;
 
+    currentColorSelector.addEventListener('click', function () {
+        changeColorCallback('blue');
+    });
+
     var currentColorText = document.createElement('span');
     currentColorText.innerText = 'Current color: ' + currentColor;
     currentColorSelector.appendChild(currentColorText);
