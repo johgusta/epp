@@ -1,5 +1,6 @@
-function HexagonBoard(canvas, size) {
+function HexagonBoard(canvas, colorsDiv, size) {
     this.canvas = canvas;
+    this.colorsDiv = colorsDiv
     this.size = size;
 
     this._board = [];
@@ -35,7 +36,9 @@ function HexagonBoard(canvas, size) {
     function onClickHandler(event) {
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        hexagon.selected = !hexagon.selected;
+        var currentColor = 'blue';
+
+        hexagon.color = hexagon.color === currentColor ? undefined : currentColor;
         hexagon.hasFocus = false;
         that.draw();
     }
@@ -45,8 +48,10 @@ function HexagonBoard(canvas, size) {
 }
 
 HexagonBoard.prototype.draw = function draw() {
+    this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
+    drawColorsDiv(this.colorsDiv, this._board);
 };
 
 
@@ -78,6 +83,37 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
             breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize);
         }
     }
+}
+
+function drawColorsDiv(colorsDiv, board) {
+    while(colorsDiv.firstChild){
+        colorsDiv.removeChild(colorsDiv.firstChild);
+    }
+
+    var colors = {};
+    forEachHexagon(board, function (hexagon) {
+        if (hexagon.color === undefined) {
+            return;
+        }
+        var color = colors[hexagon.color];
+        if(color === undefined) {
+            color = 0;
+        }
+        color++;
+        colors[hexagon.color] = color;
+    });
+
+
+    _.forIn(colors, function (value, key) {
+        var colorDiv = document.createElement('div');
+        colorDiv.style.background = key;
+
+        var countSpan = document.createElement('span');
+        countSpan.innerText = value;
+
+        colorDiv.appendChild(countSpan);
+        colorsDiv.appendChild(colorDiv);
+    });
 }
 
 function calculateBoardSize(width, height, size) {
@@ -157,12 +193,8 @@ function forEachHexagon(board, callback) {
 }
 
 function breakfastHexagon(context, hexagon, x, y, size) {
-    var color = hexagon.color !== undefined ? hexagon.color : 'green';
-    var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'black';
-
-    if (hexagon.selected) {
-        color = 'blue';
-    }
+    var color = hexagon.color !== undefined ? hexagon.color : 'white';
+    var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'rgba(0, 0, 0, 0.2)';
 
     if (hexagon.hasFocus) {
         color = 'yellow';

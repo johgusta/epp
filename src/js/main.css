@@ -10,3 +10,13 @@ body {
     height: 100%;
     background: blue;
 }
+
+.colorsDiv {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    width: 100px;
+    height: 200px;
+    background: #fbfbfb;
+    border: 1px solid #d4d3d3;
+}
