@@ -13,11 +13,11 @@ canvas.style.padding = '1px';
 
 mainContent.appendChild(canvas);
 
-var colorsDiv = document.createElement('div');
-colorsDiv.className = 'colorsDiv';
-mainContent.appendChild(colorsDiv);
+var overlayDiv = document.createElement('div');
+overlayDiv.className = 'overlayDiv';
+mainContent.appendChild(overlayDiv);
 
 var size = 50;
-var hexagonBoard = new HexagonBoard(canvas, colorsDiv, size);
+var hexagonBoard = new HexagonBoard(canvas, overlayDiv, size);
 
 hexagonBoard.draw();

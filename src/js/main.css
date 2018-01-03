@@ -11,12 +11,17 @@ body {
     background: blue;
 }
 
-.colorsDiv {
+.overlayDiv {
     position: absolute;
     left: 10px;
     bottom: 10px;
+}
+
+.colorsDiv {
     width: 100px;
-    height: 200px;
+    min-height: 100px;
+    padding: 2px;
+
     background: #fbfbfb;
     border: 1px solid #d4d3d3;
 }

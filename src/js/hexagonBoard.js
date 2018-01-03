@@ -1,6 +1,6 @@
-function HexagonBoard(canvas, colorsDiv, size) {
+function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas = canvas;
-    this.colorsDiv = colorsDiv
+    this.overlayDiv = overlayDiv;
     this.size = size;
 
     this._board = [];
@@ -51,7 +51,7 @@ HexagonBoard.prototype.draw = function draw() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
-    drawColorsDiv(this.colorsDiv, this._board);
+    drawOverlay(this.overlayDiv, this._board);
 };
 
 
@@ -85,10 +85,14 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
     }
 }
 
-function drawColorsDiv(colorsDiv, board) {
-    while(colorsDiv.firstChild){
-        colorsDiv.removeChild(colorsDiv.firstChild);
+function drawOverlay(overlayDiv, board) {
+    while(overlayDiv.firstChild){
+        overlayDiv.removeChild(overlayDiv.firstChild);
     }
+
+    var colorsDiv = document.createElement('div');
+    colorsDiv.className = 'colorsDiv';
+    overlayDiv.appendChild(colorsDiv);
 
     var colors = {};
     forEachHexagon(board, function (hexagon) {
