@@ -1,6 +1,8 @@
 require('./main.css');
 var Hexagons = require('./hexagons.js');
 
+var _ = require('lodash');
+
 var mainContent = document.getElementById('main-content');
 
 var span = document.createElement('span');
@@ -32,20 +34,6 @@ drawBoard(canvas.width, canvas.height, size);
 addResizeListener(canvas, size);
 
 function addResizeListener(canvas, size) {
-    window.addEventListener("resize", resizeThrottler, false);
-
-    var resizeTimeout;
-    function resizeThrottler() {
-        // ignore resize events as long as an actualResizeHandler execution is in the queue
-        if ( !resizeTimeout ) {
-            resizeTimeout = setTimeout(function() {
-                resizeTimeout = null;
-                actualResizeHandler();
-
-                // The actualResizeHandler will execute at a rate of 15fps
-            }, 66);
-        }
-    }
 
     function actualResizeHandler() {
         console.log('resizing');
@@ -54,6 +42,8 @@ function addResizeListener(canvas, size) {
         canvas.height = document.body.clientHeight - 2;
         drawBoard(canvas.width, canvas.height, size);
     }
+
+    window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 }
 
 function drawHexagon(context, x, y) {
