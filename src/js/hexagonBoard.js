@@ -50,7 +50,10 @@ HexagonBoard.prototype.draw = function draw() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
-    drawOverlay(this.overlayDiv, this._board, this._currentColor);
+    drawOverlay(this.overlayDiv, this._board, this._currentColor, function (newCurrentColor) {
+        this._currentColor = newCurrentColor;
+        this.draw();
+    }.bind(this));
 };
 
 
@@ -84,7 +87,7 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
     }
 }
 
-function drawOverlay(overlayDiv, board, currentColor) {
+function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
     while(overlayDiv.firstChild){
         overlayDiv.removeChild(overlayDiv.firstChild);
     }
@@ -125,6 +128,9 @@ function drawOverlay(overlayDiv, board, currentColor) {
         var countSpan = document.createElement('span');
         countSpan.innerText = value;
 
+        colorDiv.addEventListener('click', function () {
+            changeColorCallback(key);
+        });
         colorDiv.appendChild(countSpan);
         colorsDiv.appendChild(colorDiv);
     });
