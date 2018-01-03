@@ -6,13 +6,6 @@ function HexagonBoard(canvas, size) {
 
     this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, size);
 
-    var row = [];
-    row[2] = {
-        color: 'blue'
-    };
-
-    this._board[3] = row;
-
     var that = this;
 
     function actualResizeHandler() {
@@ -27,12 +20,12 @@ function HexagonBoard(canvas, size) {
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
     function mouseMoveHandler(event) {
-        var hexagon = findHexagon(that._board, that._boardSize.width, that._boardSize.height, that.size,
-            event.clientX, event.clientY);
-
         forEachHexagon(that._board, function (hexagon) {
             hexagon.hasFocus = false;
         });
+
+        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+
         hexagon.hasFocus = true;
         that.draw();
     }
@@ -93,14 +86,42 @@ function calculateBoardSize(width, height, size) {
     };
 }
 
-function findHexagon(board, boardWidth, boardHeight, hexagonSize, x, y) {
+function findHexagon(board, hexagonSize, x, y) {
     var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
-    var rowIndex = y % boardHeight;
-    var columnIndex = x % boardWidth;
+    var rowHeight = hexagonHeight - triangleHeight;
+
+    var rowIndex = Math.floor(y / rowHeight);
+
+    var isOffsetRow = rowIndex % 2 !== 0;
+    var xOffset = isOffsetRow ? hexagonSize / 2 : 0;
+    var columnIndex = Math.floor((x - xOffset) / hexagonSize);
+
+    var innerX = x - (columnIndex * hexagonSize + xOffset);
+    var innerY = y - (rowIndex * rowHeight);
+
+    var tangentForThirtyDeg = Math.tan(Math.PI / 6);
+
+    if (innerY < triangleHeight) {
+        if (innerX < hexagonSize / 2) {
+            if ((triangleHeight - innerY) / innerX > tangentForThirtyDeg) {
+                rowIndex--;
+                if (!isOffsetRow) {
+                    columnIndex--;
+                }
+            }
+        } else {
+            if ((triangleHeight - innerY) / (hexagonSize - innerX) > tangentForThirtyDeg) {
+                rowIndex--;
+                if (isOffsetRow) {
+                    columnIndex++;
+                }
+            }
+        }
+    }
 
     var row = board[rowIndex];
     if (row === undefined) {
