@@ -27,7 +27,14 @@ function HexagonBoard(canvas, size) {
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
     function mouseMoveHandler(event) {
-        console.log('mouse moved', event);
+        var hexagon = findHexagon(that._board, that._boardSize.width, that._boardSize.height, that.size,
+            event.clientX, event.clientY);
+
+        forEachHexagon(that._board, function (hexagon) {
+            hexagon.hasFocus = false;
+        });
+        hexagon.hasFocus = true;
+        that.draw();
     }
 
     this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
@@ -48,8 +55,6 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
 
     var row;
     var hexagon;
-    var color;
-    var borderColor;
     var xOffset = 0;
     for (var i = 0; i < boardHeight; i++) {
 
@@ -63,6 +68,9 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
 
         for (var j = 0; j < boardWidth; j++) {
             hexagon = row !== undefined ? row[j] : undefined;
+            if (hexagon === undefined) {
+                hexagon = {};
+            }
             breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - a), hexagonSize);
         }
     }
@@ -85,9 +93,41 @@ function calculateBoardSize(width, height, size) {
     };
 }
 
+function findHexagon(board, boardWidth, boardHeight, hexagonSize, x, y) {
+    var rowIndex = y % boardHeight;
+    var columnIndex = x % boardWidth;
+
+    
+
+    var row = board[rowIndex];
+    if (row === undefined) {
+        row = [];
+        board[rowIndex] = row;
+    }
+    var hexagon = row[columnIndex];
+    if (hexagon === undefined) {
+        hexagon = {};
+        row[columnIndex] = hexagon;
+    }
+
+    return hexagon;
+}
+
+function forEachHexagon(board, callback) {
+    board.forEach(function (row) {
+        if (Array.isArray(row)) {
+            row.forEach(callback);
+        }
+    })
+}
+
 function breakfastHexagon(context, hexagon, x, y, size) {
-    var color = hexagon && hexagon.color !== undefined ? hexagon.color : 'green';
-    var borderColor = hexagon && hexagon.borderColor !== undefined ? hexagon.borderColor : 'black';
+    var color = hexagon.color !== undefined ? hexagon.color : 'green';
+    var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'black';
+
+    if (hexagon.hasFocus) {
+        color = 'yellow';
+    }
 
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
     var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
