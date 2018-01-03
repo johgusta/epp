@@ -48,10 +48,10 @@ HexagonBoard.prototype.draw = function draw() {
 
 function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
 
-    var b = (hexagonSize / 2) / Math.cos(Math.PI / 6);
-    var a = Math.sin(Math.PI / 6) * b;
+    var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
+    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
-    var hexagonHeight = (2 * a + b);
+    var hexagonHeight = (2 * triangleHeight + sideLength);
 
     var row;
     var hexagon;
@@ -71,21 +71,21 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
             if (hexagon === undefined) {
                 hexagon = {};
             }
-            breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - a), hexagonSize);
+            breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize);
         }
     }
 }
 
 function calculateBoardSize(width, height, size) {
 
-    var b = (size / 2) / Math.cos(Math.PI / 6);
-    var a = Math.sin(Math.PI / 6) * b;
+    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
+    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
-    var hexagonHeight = (2 * a + b);
+    var hexagonHeight = (2 * triangleHeight + sideLength);
 
 
     var boardWidth = Math.floor((width - size / 2) / size);
-    var boardHeight = Math.floor((height - a) / (hexagonHeight - a));
+    var boardHeight = Math.floor((height - triangleHeight) / (hexagonHeight - triangleHeight));
 
     return {
         width: boardWidth,
@@ -94,10 +94,13 @@ function calculateBoardSize(width, height, size) {
 }
 
 function findHexagon(board, boardWidth, boardHeight, hexagonSize, x, y) {
+    var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
+    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+
+    var hexagonHeight = (2 * triangleHeight + sideLength);
+
     var rowIndex = y % boardHeight;
     var columnIndex = x % boardWidth;
-
-    
 
     var row = board[rowIndex];
     if (row === undefined) {
