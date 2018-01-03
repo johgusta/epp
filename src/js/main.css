@@ -15,10 +15,25 @@ body {
     position: absolute;
     left: 10px;
     bottom: 10px;
+
+    width: 100px;
+
+    font-family: Segoe UI,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-size: 12px;
+}
+
+.currentColorSelector {
+    width: calc(100% - 8px);
+    height: 25px;
+    margin: 0 4px 10px 4px;
+    padding: 2px;
+
+    background: #fbfbfb;
+    border: 1px solid #d4d3d3;
 }
 
 .colorsDiv {
-    width: 100px;
+    width: 100%;
     min-height: 100px;
     padding: 2px;
 

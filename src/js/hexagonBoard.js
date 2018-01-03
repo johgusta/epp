@@ -4,6 +4,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
     this.size = size;
 
     this._board = [];
+    this._currentColor = 'red';
 
     this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, size);
 
@@ -36,9 +37,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
     function onClickHandler(event) {
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        var currentColor = 'blue';
-
-        hexagon.color = hexagon.color === currentColor ? undefined : currentColor;
+        hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
         hexagon.hasFocus = false;
         that.draw();
     }
@@ -51,7 +50,7 @@ HexagonBoard.prototype.draw = function draw() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
-    drawOverlay(this.overlayDiv, this._board);
+    drawOverlay(this.overlayDiv, this._board, this._currentColor);
 };
 
 
@@ -85,10 +84,21 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
     }
 }
 
-function drawOverlay(overlayDiv, board) {
+function drawOverlay(overlayDiv, board, currentColor) {
     while(overlayDiv.firstChild){
         overlayDiv.removeChild(overlayDiv.firstChild);
     }
+
+    var currentColorSelector = document.createElement('div');
+
+    currentColorSelector.className = 'currentColorSelector';
+    overlayDiv.appendChild(currentColorSelector);
+
+    currentColorSelector.style.backgroundColor = currentColor;
+
+    var currentColorText = document.createElement('span');
+    currentColorText.innerText = 'Current color: ' + currentColor;
+    currentColorSelector.appendChild(currentColorText);
 
     var colorsDiv = document.createElement('div');
     colorsDiv.className = 'colorsDiv';
