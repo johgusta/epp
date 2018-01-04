@@ -1,3 +1,7 @@
+var $ = require('jquery');
+require('spectrum-colorpicker/spectrum.js');
+require('spectrum-colorpicker/spectrum.css');
+
 function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas = canvas;
     this.overlayDiv = overlayDiv;
@@ -96,6 +100,22 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
 
     currentColorSelector.className = 'currentColorSelector';
     overlayDiv.appendChild(currentColorSelector);
+
+
+    var colorInput = document.createElement('input');
+    colorInput.type = 'text';
+    colorInput.className = 'colorPicker';
+    setTimeout(function () {
+        $('.colorPicker').spectrum({
+            color: currentColor,
+            change: function(color) {
+                console.log('color changed!', color);
+                changeColorCallback(color.toHexString());
+            }
+        });
+    }, 0);
+
+    currentColorSelector.appendChild(colorInput);
 
     currentColorSelector.style.backgroundColor = currentColor;
 
