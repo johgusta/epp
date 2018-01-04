@@ -129,7 +129,8 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
             change: function(color) {
                 console.log('color changed!', color);
                 changeColorCallback(color.toHexString());
-            }
+            },
+            clickoutFiresChange: false
         });
     }, 0);
 
