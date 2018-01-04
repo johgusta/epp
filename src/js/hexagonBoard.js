@@ -39,11 +39,14 @@ function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
 
     function onClickHandler(event) {
-        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+        //TODO: Remove fix for changing color when color picker closes by clickig outside of it 
+        setTimeout(function () {
+            var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
-        hexagon.hasFocus = false;
-        that.draw();
+            hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
+            hexagon.hasFocus = false;
+            that.draw();
+        }, 0);
     }
 
     this.canvas.addEventListener('click', onClickHandler);
@@ -129,8 +132,7 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
             change: function(color) {
                 console.log('color changed!', color);
                 changeColorCallback(color.toHexString());
-            },
-            clickoutFiresChange: false
+            }
         });
     }, 0);
 
