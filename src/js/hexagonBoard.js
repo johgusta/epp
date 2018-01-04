@@ -39,7 +39,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
 
     function onClickHandler(event) {
-        //TODO: Remove fix for changing color when color picker closes by clickig outside of it 
+        //TODO: Remove fix for changing color when color picker closes by clickig outside of it
         setTimeout(function () {
             var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 

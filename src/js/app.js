@@ -17,7 +17,7 @@ var overlayDiv = document.createElement('div');
 overlayDiv.className = 'overlayDiv';
 mainContent.appendChild(overlayDiv);
 
-var size = 50;
+var size = 30;
 var hexagonBoard = new HexagonBoard(canvas, overlayDiv, size);
 
 hexagonBoard.draw();
