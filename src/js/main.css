@@ -24,14 +24,12 @@ body {
 
 .currentColorSelector {
     width: calc(100% - 8px);
-    height: 25px;
+    min-height: 25px;
     margin: 0 4px 10px 4px;
     padding: 2px;
 
     background: #fbfbfb;
     border: 1px solid #d4d3d3;
-
-    cursor: pointer;
 }
 
 .colorsDiv {

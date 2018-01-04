@@ -33,7 +33,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
         hexagon.hasFocus = true;
-        that.draw();
+        that._drawBoard();
     }
 
     this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
@@ -51,15 +51,16 @@ function HexagonBoard(canvas, overlayDiv, size) {
 }
 
 HexagonBoard.prototype.draw = function draw() {
+    this._drawBoard();
+    this._drawOverlay();
+};
+
+
+HexagonBoard.prototype._drawBoard = function _drawBoard() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
-    drawOverlay(this.overlayDiv, this._board, this._currentColor, function (newCurrentColor) {
-        this._currentColor = newCurrentColor;
-        this.draw();
-    }.bind(this));
 };
-
 
 function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
 
@@ -91,6 +92,13 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
     }
 }
 
+HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
+    drawOverlay(this.overlayDiv, this._board, this._currentColor, function (newCurrentColor) {
+        this._currentColor = newCurrentColor;
+        this.draw();
+    }.bind(this));
+};
+
 function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
     while(overlayDiv.firstChild){
         overlayDiv.removeChild(overlayDiv.firstChild);
@@ -102,10 +110,20 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
     overlayDiv.appendChild(currentColorSelector);
 
 
+
+    var currentColorText = document.createElement('span');
+    currentColorText.innerText = 'Current color:';
+    currentColorSelector.appendChild(currentColorText);
+
     var colorInput = document.createElement('input');
     colorInput.type = 'text';
     colorInput.className = 'colorPicker';
+    colorInput.style.display = 'none';
+
+    //TODO: Get rid of the stupid timeout
     setTimeout(function () {
+
+        colorInput.style.display = 'visible';
         $('.colorPicker').spectrum({
             color: currentColor,
             change: function(color) {
@@ -117,15 +135,6 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
 
     currentColorSelector.appendChild(colorInput);
 
-    currentColorSelector.style.backgroundColor = currentColor;
-
-    currentColorSelector.addEventListener('click', function () {
-        changeColorCallback('blue');
-    });
-
-    var currentColorText = document.createElement('span');
-    currentColorText.innerText = 'Current color: ' + currentColor;
-    currentColorSelector.appendChild(currentColorText);
 
     var colorsDiv = document.createElement('div');
     colorsDiv.className = 'colorsDiv';
