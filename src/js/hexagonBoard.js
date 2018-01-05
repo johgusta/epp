@@ -166,10 +166,14 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
 
     colorList.forEach(function (color) {
         var colorDiv = document.createElement('div');
-        colorDiv.style.background = color.name;
+
+        var hexagonCanvas = createSingleHexagonCanvas(16, color.name);
+
+        colorDiv.appendChild(hexagonCanvas);
 
         var countSpan = document.createElement('span');
-        countSpan.innerText = color.count;
+        countSpan.innerText = ' x ' + color.count;
+
 
         colorDiv.addEventListener('click', function () {
             changeColorCallback(color.name);
@@ -177,6 +181,35 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
         colorDiv.appendChild(countSpan);
         colorsDiv.appendChild(colorDiv);
     });
+}
+
+function createSingleHexagonCanvas(size, color) {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+
+    var triangleHeight = Math.tan(Math.PI / 6) * size / 2;
+    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
+
+    canvas.width = triangleHeight * 2 + sideLength + 2;
+    canvas.height = size + 2;
+
+    context.beginPath();
+    context.translate(1, 1);
+    context.moveTo(triangleHeight, 0);
+    context.lineTo(triangleHeight + sideLength, 0);
+    context.lineTo(triangleHeight * 2 + sideLength, size / 2);
+    context.lineTo(triangleHeight + sideLength, size);
+    context.lineTo(triangleHeight, size);
+    context.lineTo(0, size / 2);
+    context.lineTo(triangleHeight, 0);
+
+    context.fillStyle = color;
+    context.fill();
+
+    context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+    context.stroke();
+
+    return canvas;
 }
 
 function calculateBoardSize(width, height, size) {
