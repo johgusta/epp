@@ -29,16 +29,10 @@ function HexagonBoard(canvas, overlayDiv, size) {
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
     function mouseMoveHandler(event) {
-        forEachHexagon(that._board, function (hexagon) {
-            hexagon.focusColor = undefined;
-        });
+        var hexagonIndex = findHexagonIndex(that.size, event.clientX, event.clientY);
 
-        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+        that._focusIndex = hexagonIndex;
 
-
-        var currentColor = new Color(that._currentColor);
-        var rgbObject = currentColor.object();
-        hexagon.focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
         that._drawBoard();
     }
 
@@ -50,7 +44,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
             var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
-            hexagon.focusColor = undefined;
+            that._focusIndex = undefined;
             that.draw();
         }, 0);
     }
@@ -68,10 +62,14 @@ HexagonBoard.prototype.draw = function draw() {
 HexagonBoard.prototype._drawBoard = function _drawBoard() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
-    drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size);
+
+    var currentColor = new Color(this._currentColor);
+    var rgbObject = currentColor.object();
+    var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
+    drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size, this._focusIndex, focusColor);
 };
 
-function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
+function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize, focusIndex, focusColor) {
 
     var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
@@ -96,7 +94,8 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
             if (hexagon === undefined) {
                 hexagon = {};
             }
-            breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize);
+            var overrideColor = focusIndex && focusIndex.x === j && focusIndex.y === i ? focusColor : undefined;
+            breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize, overrideColor);
         }
     }
 }
@@ -236,6 +235,26 @@ function calculateBoardSize(width, height, size) {
 }
 
 function findHexagon(board, hexagonSize, x, y) {
+    var hexagonIndex = findHexagonIndex(hexagonSize, x, y);
+
+    var row = board[hexagonIndex.y];
+    if (row === undefined) {
+        row = [];
+        board[hexagonIndex.y] = row;
+    }
+    var hexagon = row[hexagonIndex.x];
+    if (hexagon === undefined) {
+        hexagon = {
+            x: hexagonIndex.x,
+            y: hexagonIndex.y
+        };
+        row[hexagonIndex.x] = hexagon;
+    }
+
+    return hexagon;
+}
+
+function findHexagonIndex(hexagonSize, x, y) {
     var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
@@ -272,18 +291,10 @@ function findHexagon(board, hexagonSize, x, y) {
         }
     }
 
-    var row = board[rowIndex];
-    if (row === undefined) {
-        row = [];
-        board[rowIndex] = row;
-    }
-    var hexagon = row[columnIndex];
-    if (hexagon === undefined) {
-        hexagon = {};
-        row[columnIndex] = hexagon;
-    }
-
-    return hexagon;
+    return {
+        x: columnIndex,
+        y: rowIndex
+    };
 }
 
 function forEachHexagon(board, callback) {
@@ -294,12 +305,12 @@ function forEachHexagon(board, callback) {
     })
 }
 
-function breakfastHexagon(context, hexagon, x, y, size) {
-    var color = hexagon.color !== undefined ? hexagon.color : 'white';
+function breakfastHexagon(context, hexagon, x, y, size, overrideColor) {
+    var color = hexagon.color !== undefined ? hexagon.color : '#ffffff';
     var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'rgba(0, 0, 0, 0.2)';
 
-    if (hexagon.focusColor !== undefined) {
-        color = hexagon.focusColor;
+    if (overrideColor !== undefined) {
+        color = overrideColor;
     }
 
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
