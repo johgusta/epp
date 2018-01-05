@@ -8,9 +8,11 @@ function HexagonBoard(canvas, overlayDiv, size) {
     this.size = size;
 
     this._board = [];
-    this._currentColor = 'red';
+    this._currentColor = '#ff0000';
 
     this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, size);
+
+    this._drawOverlayContainer(overlayDiv);
 
     var that = this;
 
@@ -95,24 +97,11 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize) {
     }
 }
 
-HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
-    drawOverlay(this.overlayDiv, this._board, this._currentColor, function (newCurrentColor) {
-        this._currentColor = newCurrentColor;
-        this.draw();
-    }.bind(this));
-};
-
-function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
-    while(overlayDiv.firstChild){
-        overlayDiv.removeChild(overlayDiv.firstChild);
-    }
-
+HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(overlayDiv) {
     var currentColorSelector = document.createElement('div');
 
     currentColorSelector.className = 'currentColorSelector';
     overlayDiv.appendChild(currentColorSelector);
-
-
 
     var currentColorText = document.createElement('span');
     currentColorText.innerText = 'Current color:';
@@ -121,27 +110,34 @@ function drawOverlay(overlayDiv, board, currentColor, changeColorCallback) {
     var colorInput = document.createElement('input');
     colorInput.type = 'text';
     colorInput.className = 'colorPicker';
-    colorInput.style.display = 'none';
-
-    //TODO: Get rid of the stupid timeout
-    setTimeout(function () {
-
-        colorInput.style.display = 'visible';
-        $('.colorPicker').spectrum({
-            color: currentColor,
-            change: function(color) {
-                console.log('color changed!', color);
-                changeColorCallback(color.toHexString());
-            }
-        });
-    }, 0);
 
     currentColorSelector.appendChild(colorInput);
-
 
     var colorsDiv = document.createElement('div');
     colorsDiv.className = 'colorsDiv';
     overlayDiv.appendChild(colorsDiv);
+
+    this.colorsDiv = colorsDiv;
+};
+
+HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
+    drawOverlay(this.colorsDiv, this._board, this._currentColor, function (newCurrentColor) {
+        this._currentColor = newCurrentColor;
+        this.draw();
+    }.bind(this));
+};
+
+function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
+    while(colorsDiv.firstChild){
+        colorsDiv.removeChild(colorsDiv.firstChild);
+    }
+
+    $('.colorPicker').spectrum({
+        color: currentColor,
+        change: function(color) {
+            changeColorCallback(color.toHexString());
+        }
+    });
 
     var colors = {};
     forEachHexagon(board, function (hexagon) {
