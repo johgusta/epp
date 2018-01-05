@@ -152,16 +152,27 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
         colors[hexagon.color] = color;
     });
 
-
+    var colorList = [];
     _.forIn(colors, function (value, key) {
+        colorList.push({
+            name: key,
+            count: value
+        });
+    });
+
+    colorList.sort(function (a, b) {
+        return b.count - a.count;
+    });
+
+    colorList.forEach(function (color) {
         var colorDiv = document.createElement('div');
-        colorDiv.style.background = key;
+        colorDiv.style.background = color.name;
 
         var countSpan = document.createElement('span');
-        countSpan.innerText = value;
+        countSpan.innerText = color.count;
 
         colorDiv.addEventListener('click', function () {
-            changeColorCallback(key);
+            changeColorCallback(color.name);
         });
         colorDiv.appendChild(countSpan);
         colorsDiv.appendChild(colorDiv);
