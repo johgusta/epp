@@ -50,7 +50,9 @@ function HexagonBoard(canvas, overlayDiv, size) {
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
             that._focusIndex = undefined;
             that.draw();
-            that.store();
+            requestAnimationFrame(function () {
+                that.store();
+            });
         }, 0);
     }
 
@@ -106,10 +108,31 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize, focusIndex,
 }
 
 HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(overlayDiv) {
+    var topLeftContainer = document.createElement('div');
+    topLeftContainer.className = 'topLeftContainer';
+
+    var clearAllButton = document.createElement('div');
+    clearAllButton.className = 'clearAllButton';
+    topLeftContainer.appendChild(clearAllButton);
+
+    var clearAllText = document.createElement('span');
+    clearAllText.innerText = 'Clear All';
+    clearAllButton.appendChild(clearAllText);
+
+    clearAllButton.addEventListener('click', function () {
+        this.reset();
+    }.bind(this));
+
+    overlayDiv.appendChild(topLeftContainer);
+
+    var bottomLeftContainer = document.createElement('div');
+    bottomLeftContainer.className = 'bottomLeftContainer';
+    overlayDiv.appendChild(bottomLeftContainer);
+
     var currentColorSelector = document.createElement('div');
 
     currentColorSelector.className = 'currentColorSelector';
-    overlayDiv.appendChild(currentColorSelector);
+    bottomLeftContainer.appendChild(currentColorSelector);
 
     var currentColorText = document.createElement('span');
     currentColorText.innerText = 'Current color:';
@@ -123,7 +146,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
 
     var colorsDiv = document.createElement('div');
     colorsDiv.className = 'colorsDiv';
-    overlayDiv.appendChild(colorsDiv);
+    bottomLeftContainer.appendChild(colorsDiv);
 
     this.colorsDiv = colorsDiv;
 };
@@ -360,6 +383,8 @@ HexagonBoard.prototype.reset = function reset() {
     }
 
     window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
+    this._board = [];
+    this.draw();
 };
 
 HexagonBoard.prototype._serialize = function _serialize() {
@@ -395,7 +420,11 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedString) {
         return;
     }
 
-    this._currentColor = serializedBoard.currentColor;
+
+    if (serializedBoard.currentColor) {
+        this._currentColor = serializedBoard.currentColor;
+    }
+
     if (Array.isArray(serializedBoard.hexagons)) {
         var currentBoard = this._board;
         serializedBoard.hexagons.forEach(function (hexagon) {
