@@ -20,4 +20,6 @@ mainContent.appendChild(overlayDiv);
 var size = 30;
 var hexagonBoard = new HexagonBoard(canvas, overlayDiv, size);
 
+window.Board = hexagonBoard;
+
 hexagonBoard.draw();
