@@ -134,6 +134,8 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
 
     $('.colorPicker').spectrum({
         color: currentColor,
+        showInitial: true,
+        replacerClassName: 'colorInput',
         change: function(color) {
             changeColorCallback(color.toHexString());
         }

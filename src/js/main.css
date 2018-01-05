@@ -28,7 +28,7 @@ body {
     margin-bottom: 6px;
     padding: 4px;
 
-    background: #f8f8f8;
+    background: #f6f6f6;
     border: 1px solid #c2c2c2;
 }
 
@@ -37,7 +37,7 @@ body {
     min-height: 100px;
     padding: 2px;
 
-    background: #f8f8f8;
+    background: #f6f6f6;
     border: 1px solid #c2c2c2;
     font-size: 20px;
 }
@@ -50,4 +50,9 @@ body {
     border: 1px solid #c2c2c2;
     border-radius: 4px;
     background: #fdfdfd;
+}
+
+div.colorInput {
+    background: #ffffff;
+    border-color: #c2c2c2;
 }
