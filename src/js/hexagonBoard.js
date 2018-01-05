@@ -3,6 +3,8 @@ var Color = require('color');
 require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
 
+var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
+
 function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas = canvas;
     this.overlayDiv = overlayDiv;
@@ -10,6 +12,8 @@ function HexagonBoard(canvas, overlayDiv, size) {
 
     this._board = [];
     this._currentColor = '#ff0000';
+
+    this.load();
 
     this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, size);
 
@@ -46,6 +50,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
             that._focusIndex = undefined;
             that.draw();
+            that.store();
         }, 0);
     }
 
@@ -331,5 +336,78 @@ function breakfastHexagon(context, hexagon, x, y, size, overrideColor) {
     context.strokeStyle = borderColor;
     context.stroke();
 }
+
+HexagonBoard.prototype.store = function store() {
+    if (!window.localStorage) {
+        return;
+    }
+    var serializedBoard = this._serialize();
+    window.localStorage.setItem(HEXAGON_BOARD_STORAGE_KEY, serializedBoard);
+};
+
+HexagonBoard.prototype.load = function load() {
+    if (!window.localStorage) {
+        return;
+    }
+
+    var serializedBoard = window.localStorage.getItem(HEXAGON_BOARD_STORAGE_KEY);
+    this._loadBoard(serializedBoard);
+};
+
+HexagonBoard.prototype.reset = function reset() {
+    if (!window.localStorage) {
+        return;
+    }
+
+    window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
+};
+
+HexagonBoard.prototype._serialize = function _serialize() {
+    var hexagons = [];
+    forEachHexagon(this._board, function (hexagon) {
+        hexagons.push(hexagon);
+    });
+
+    var serializedObject = {
+        board: {
+            currentColor: this._currentColor,
+            hexagons: hexagons
+        }
+    };
+    return JSON.stringify(serializedObject);
+};
+
+HexagonBoard.prototype._loadBoard = function _loadBoard(serializedString) {
+
+    var serializedObject;
+    try {
+        serializedObject= JSON.parse(serializedString);
+    } catch (e) {
+        console.error('Error loading stored board!', e);
+        return;
+    }
+    if (!serializedObject) {
+        return;
+    }
+    var serializedBoard = serializedObject.board;
+
+    if (!serializedBoard) {
+        return;
+    }
+
+    this._currentColor = serializedBoard.currentColor;
+    if (Array.isArray(serializedBoard.hexagons)) {
+        var currentBoard = this._board;
+        serializedBoard.hexagons.forEach(function (hexagon) {
+            var row = currentBoard[hexagon.y];
+            if (row === undefined) {
+                row = [];
+                currentBoard[hexagon.y] = row;
+            }
+
+            row[hexagon.x] = hexagon;
+        });
+    }
+};
 
 module.exports = HexagonBoard;
