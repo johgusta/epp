@@ -8,6 +8,7 @@
     "start": "node server/server.js"
   },
   "dependencies": {
+    "color": "^2.0.1",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.26.0",
     "express": "^4.14.0",

@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var Color = require('color');
 require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
 
@@ -29,12 +30,15 @@ function HexagonBoard(canvas, overlayDiv, size) {
 
     function mouseMoveHandler(event) {
         forEachHexagon(that._board, function (hexagon) {
-            hexagon.hasFocus = false;
+            hexagon.focusColor = undefined;
         });
 
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        hexagon.hasFocus = true;
+
+        var currentColor = new Color(that._currentColor);
+        var rgbObject = currentColor.object();
+        hexagon.focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
         that._drawBoard();
     }
 
@@ -46,7 +50,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
             var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
-            hexagon.hasFocus = false;
+            hexagon.focusColor = undefined;
             that.draw();
         }, 0);
     }
@@ -294,8 +298,8 @@ function breakfastHexagon(context, hexagon, x, y, size) {
     var color = hexagon.color !== undefined ? hexagon.color : 'white';
     var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'rgba(0, 0, 0, 0.2)';
 
-    if (hexagon.hasFocus) {
-        color = 'yellow';
+    if (hexagon.focusColor !== undefined) {
+        color = hexagon.focusColor;
     }
 
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
