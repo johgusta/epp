@@ -149,6 +149,53 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     bottomLeftContainer.appendChild(colorsDiv);
 
     this.colorsDiv = colorsDiv;
+
+    var saveDialogContainer = document.createElement('div');
+    saveDialogContainer.className = 'saveDialogContainer';
+    overlayDiv.appendChild(saveDialogContainer);
+
+
+    var innerSaveContainer = document.createElement('div');
+    innerSaveContainer.className = 'innerSaveContainer';
+    saveDialogContainer.appendChild(innerSaveContainer);
+
+    var saveNameInput = document.createElement('input');
+    saveNameInput.className = 'saveName';
+    saveNameInput.name = 'saveName';
+    saveNameInput.type = 'text';
+    saveNameInput.value = 'Pattern-1';
+    innerSaveContainer.appendChild(saveNameInput);
+
+    var saveButton = document.createElement('div');
+    saveButton.className = 'saveButton';
+    var saveButtonText = document.createElement('span');
+    saveButtonText.innerText = 'Save';
+    saveButton.appendChild(saveButtonText);
+    innerSaveContainer.appendChild(saveButton);
+
+    var innerLoadContainer = document.createElement('div');
+    innerLoadContainer.className = 'innerLoadContainer';
+    saveDialogContainer.appendChild(innerLoadContainer);
+
+    var loadDropDown = document.createElement('select');
+    loadDropDown.name = 'loadPattern';
+    loadDropDown.className = 'loadPatternDropDown';
+
+    var firstOption = document.createElement('option');
+    firstOption.innerText = 'First';
+    loadDropDown.appendChild(firstOption);
+    var secondOption = document.createElement('option');
+    secondOption.innerText = 'Secasdasdasdasdasdasdasdasddasdond';
+    loadDropDown.appendChild(secondOption);
+
+    innerLoadContainer.appendChild(loadDropDown);
+
+    var loadButton = document.createElement('div');
+    loadButton.className = 'loadButton';
+    var loadButtonText = document.createElement('span');
+    loadButtonText.innerText = 'Load';
+    loadButton.appendChild(loadButtonText);
+    innerLoadContainer.appendChild(loadButton);
 };
 
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
@@ -200,7 +247,7 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
     colorList.forEach(function (color) {
         var colorDiv = document.createElement('div');
 
-        var hexagonCanvas = createSingleHexagonCanvas(16, color.name);
+        var hexagonCanvas = createSingleHexagonCanvas(12, color.name);
 
         colorDiv.appendChild(hexagonCanvas);
 
