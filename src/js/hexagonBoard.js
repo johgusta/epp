@@ -113,7 +113,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     topLeftContainer.className = 'topLeftContainer';
 
     var clearAllButton = document.createElement('div');
-    clearAllButton.className = 'clearAllButton';
+    clearAllButton.className = 'clear-all button';
     topLeftContainer.appendChild(clearAllButton);
 
     var clearAllText = document.createElement('span');
@@ -168,7 +168,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     innerSaveContainer.appendChild(saveNameInput);
 
     var saveButton = document.createElement('div');
-    saveButton.className = 'saveButton';
+    saveButton.className = 'save button';
     var saveButtonText = document.createElement('span');
     saveButtonText.innerText = 'Save';
     saveButton.appendChild(saveButtonText);
@@ -186,7 +186,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     innerLoadContainer.appendChild(loadDropDown);
 
     var loadButton = document.createElement('div');
-    loadButton.className = 'loadButton';
+    loadButton.className = 'load button';
     var loadButtonText = document.createElement('span');
     loadButtonText.innerText = 'Load';
     loadButton.appendChild(loadButtonText);
@@ -267,7 +267,7 @@ HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
         {name: 'Secasdasdasdasdasdasdasdasddasdond'}
     ];
 
-    savedPatterns = [];
+    //savedPatterns = [];
 
     var loadDropDown = this._loadDropDown;
     while(loadDropDown.firstChild){

@@ -96,33 +96,7 @@ div.colorInput {
     border-radius: 4px;
 }
 
-.clearAllButton {
-    width: calc(100% - 4px);
-    padding: 4px;
-
-    cursor: pointer;
-    background: #f6f6f6;
-    border: 1px solid #c2c2c2;
-    font-size: 18px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.saveButton {
-    width: 80px;
-    padding: 4px;
-    margin: 4px 8px 4px 0;
-    display: inline-block;
-
-    cursor: pointer;
-    background: #fdfdfd;
-    border: 1px solid #c2c2c2;
-    font-size: 18px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.loadButton {
+.button {
     width: 80px;
     padding: 4px;
     margin: 4px;
@@ -134,10 +108,17 @@ div.colorInput {
     font-size: 18px;
     border-radius: 4px;
     text-align: center;
+
+    user-select: none;
 }
 
-.loadButton, .disabled {
+.button:active {
+    background: #eaeaea;
+}
+
+.button.disabled {
     background: #f6f6f6;
+    color: #888888;
     cursor: default;
 }
 
