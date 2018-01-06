@@ -63,6 +63,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
 HexagonBoard.prototype.draw = function draw() {
     this._drawBoard();
     this._drawOverlay();
+    this._drawLoadInfo();
 };
 
 
@@ -180,13 +181,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     var loadDropDown = document.createElement('select');
     loadDropDown.name = 'loadPattern';
     loadDropDown.className = 'loadPatternDropDown';
-
-    var firstOption = document.createElement('option');
-    firstOption.innerText = 'First';
-    loadDropDown.appendChild(firstOption);
-    var secondOption = document.createElement('option');
-    secondOption.innerText = 'Secasdasdasdasdasdasdasdasddasdond';
-    loadDropDown.appendChild(secondOption);
+    this._loadDropDown = loadDropDown;
 
     innerLoadContainer.appendChild(loadDropDown);
 
@@ -195,6 +190,8 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     var loadButtonText = document.createElement('span');
     loadButtonText.innerText = 'Load';
     loadButton.appendChild(loadButtonText);
+    this._loadButton = loadButton;
+
     innerLoadContainer.appendChild(loadButton);
 };
 
@@ -262,6 +259,35 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
         colorsDiv.appendChild(colorDiv);
     });
 }
+
+HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
+
+    var savedPatterns = [
+        {name: 'First'},
+        {name: 'Secasdasdasdasdasdasdasdasddasdond'}
+    ];
+
+    savedPatterns = [];
+
+    var loadDropDown = this._loadDropDown;
+    while(loadDropDown.firstChild){
+        loadDropDown.removeChild(loadDropDown.firstChild);
+    }
+
+    savedPatterns.forEach(function (pattern) {
+        var option = document.createElement('option');
+        option.innerText = pattern.name;
+        loadDropDown.appendChild(option);
+    });
+
+    if (savedPatterns.length === 0) {
+        loadDropDown.setAttribute('disabled', true);
+        this._loadButton.classList.add('disabled');
+    } else {
+        loadDropDown.removeAttribute('disabled');
+        this._loadButton.classList.remove('disabled');
+    }
+};
 
 function createSingleHexagonCanvas(size, color) {
     var canvas = document.createElement('canvas');
