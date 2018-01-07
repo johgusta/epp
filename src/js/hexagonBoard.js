@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var Color = require('color');
+var Hamster = require('hamsterjs');
 require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
 
@@ -7,19 +8,23 @@ var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
 var SAVED_PATTERNS_KEY = 'HexagonPatterns';
 var SAVED_PATTERN_PREFIX = 'HexagonPattern-';
 
+var DEFAULT_SIZE = 24;
+var DEFAULT_COLOR = '#ff0000';
+
 function HexagonBoard(canvas, overlayDiv) {
     this.canvas = canvas;
-    this.size = 24;
+    this.size = DEFAULT_SIZE;
 
     this._board = [];
-    this._currentColor = '#ff0000';
+    this._currentColor = DEFAULT_COLOR;
     this._currentPatternName = '';
+
+    this._drawOverlayContainer(overlayDiv);
 
     this.load();
 
-    this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, this.size);
+    this.draw();
 
-    this._drawOverlayContainer(overlayDiv);
 
     var that = this;
 
@@ -28,7 +33,6 @@ function HexagonBoard(canvas, overlayDiv) {
         that.canvas.width = document.body.clientWidth - 2;
         that.canvas.height = document.body.clientHeight - 2;
 
-        that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
         that.draw();
     }
 
@@ -67,9 +71,25 @@ function HexagonBoard(canvas, overlayDiv) {
 
     this.canvas.addEventListener('click', onClickHandler);
 
+    function scrollHandler(event, delta) {
+        console.log('scrolling ' + delta);
+        that.size += delta / 10;
+
+        if (that.size <= 10) {
+            that.size = 10;
+        } else if (that.size > 100) {
+            that.size = 100;
+        }
+        that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, Math.floor(that.size));
+
+        that._drawBoard();
+    }
+    Hamster(this.canvas).wheel(_.throttle(scrollHandler, 40));
 }
 
 HexagonBoard.prototype.draw = function draw() {
+
+    this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, this.size);
     this._drawBoard();
     this._drawOverlay();
     this._drawLoadInfo();
@@ -83,6 +103,7 @@ HexagonBoard.prototype._drawBoard = function _drawBoard() {
     var currentColor = new Color(this._currentColor);
     var rgbObject = currentColor.object();
     var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
+    var size = Math.floor(this.size);
     drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size, this._focusIndex, focusColor);
 };
 
@@ -231,7 +252,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     drawOverlay(this.colorsDiv, this._board, this._currentColor, function (newCurrentColor) {
         this._currentColor = newCurrentColor;
-        this.draw();
+        this._drawBoard();
     }.bind(this));
 };
 
@@ -609,6 +630,7 @@ HexagonBoard.prototype.reset = function reset() {
     window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
     this._board = [];
     this._currentPatternName = '';
+    this.size = DEFAULT_SIZE;
     this.draw();
 };
 
