@@ -40,7 +40,6 @@ body {
 
     width: 100px;
     pointer-events: auto;
-    font-size: 14px;
 }
 
 .saveDialogContainer {
@@ -97,7 +96,6 @@ div.colorInput {
 }
 
 .button {
-    width: 80px;
     padding: 4px;
     margin: 4px;
     display: inline-block;
@@ -105,7 +103,7 @@ div.colorInput {
     cursor: pointer;
     background: #fdfdfd;
     border: 1px solid #c2c2c2;
-    font-size: 18px;
+    font-size: 14px;
     border-radius: 4px;
     text-align: center;
 
@@ -124,10 +122,8 @@ div.colorInput {
 
 .saveName {
     width: 120px;
-    height: 30px;
+    height: 26px;
     margin: 4px;
-
-    font-size: 14px;
 }
 
 .innerSaveContainer {
@@ -143,7 +139,8 @@ div.colorInput {
 }
 
 .loadPatternDropDown {
-    height: 30px;
-    font-size: 14px;
+    position: relative;
+    top: -1px;
+    height: 26px;
     max-width: 116px;
 }
