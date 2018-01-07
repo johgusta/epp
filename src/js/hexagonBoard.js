@@ -196,11 +196,24 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     loadButton.appendChild(loadButtonText);
 
     loadButton.addEventListener('click', function () {
-        this._loadPattern(loadDropDown.value, loadDropDown.key);
+        this._loadPattern(loadDropDown.value);
     }.bind(this));
     this._loadButton = loadButton;
 
     innerLoadContainer.appendChild(loadButton);
+
+    var deleteButton = document.createElement('div');
+    deleteButton.className = 'delete button';
+    var deleteButtonText = document.createElement('span');
+    deleteButtonText.innerText = 'Delete';
+    deleteButton.appendChild(deleteButtonText);
+
+    deleteButton.addEventListener('click', function () {
+        this._deletePattern(loadDropDown.value);
+    }.bind(this));
+    this._deleteButton = deleteButton;
+
+    innerLoadContainer.appendChild(deleteButton);
 };
 
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
@@ -290,9 +303,11 @@ HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
     if (savedPatterns.length === 0) {
         loadDropDown.setAttribute('disabled', true);
         this._loadButton.classList.add('disabled');
+        this._deleteButton.classList.add('disabled');
     } else {
         loadDropDown.removeAttribute('disabled');
         this._loadButton.classList.remove('disabled');
+        this._deleteButton.classList.remove('disabled');
     }
 };
 
@@ -342,6 +357,20 @@ HexagonBoard.prototype._savePattern = function _savePattern(name) {
 
 HexagonBoard.prototype._loadPattern = function _loadPattern(key) {
     console.log('load pattern: ' + key);
+};
+
+HexagonBoard.prototype._deletePattern = function _deletePattern(key) {
+    console.log('delete pattern: ' + key);
+    var oldPatterns = this.getSavedPatterns();
+    var newPatterns = [];
+    oldPatterns.forEach(function (pattern) {
+        if (pattern.id != key) {
+            newPatterns.push(pattern);
+        }
+    });
+
+    this.storeSavedPatterns(newPatterns);
+    this._drawLoadInfo();
 };
 
 function createSingleHexagonCanvas(size, color) {
