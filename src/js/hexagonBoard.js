@@ -251,6 +251,7 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
 
     colorList.forEach(function (color) {
         var colorDiv = document.createElement('div');
+        colorDiv.className = 'button';
 
         var hexagonCanvas = createSingleHexagonCanvas(12, color.name);
 

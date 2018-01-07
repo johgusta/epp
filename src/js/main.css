@@ -29,7 +29,6 @@ body {
     left: 10px;
     top: 10px;
 
-    width: 100px;
     pointer-events: auto;
 }
 
@@ -37,8 +36,6 @@ body {
     position: absolute;
     left: 10px;
     bottom: 10px;
-
-    width: 100px;
     pointer-events: auto;
 }
 
@@ -75,13 +72,7 @@ body {
 }
 
 .colorsDiv > div {
-    margin: 2px;
-    padding: 2px;
-    cursor: pointer;
-
-    border: 1px solid #c2c2c2;
-    border-radius: 4px;
-    background: #fdfdfd;
+    display: block;
 }
 
 .colorsDiv canvas {
@@ -90,6 +81,7 @@ body {
 }
 
 div.colorInput {
+    display: table;
     background: #ffffff;
     border-color: #c2c2c2;
     border-radius: 4px;
