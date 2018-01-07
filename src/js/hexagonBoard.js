@@ -37,7 +37,11 @@ function HexagonBoard(canvas, overlayDiv, size) {
     function mouseMoveHandler(event) {
         var hexagonIndex = findHexagonIndex(that.size, event.clientX, event.clientY);
 
-        that._focusIndex = hexagonIndex;
+        if (hexagonIndex.x >= that._boardSize.width || hexagonIndex.y >= that._boardSize.height) {
+            that._focusIndex = undefined;
+        } else {
+            that._focusIndex = hexagonIndex;
+        }
 
         that._drawBoard();
     }
@@ -49,6 +53,9 @@ function HexagonBoard(canvas, overlayDiv, size) {
         setTimeout(function () {
             var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
+            if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height) {
+                return;
+            }
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
             that._focusIndex = undefined;
             that.draw();
