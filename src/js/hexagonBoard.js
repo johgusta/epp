@@ -6,18 +6,17 @@ require('spectrum-colorpicker/spectrum.css');
 var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
 var SAVED_PATTERNS_KEY = 'HexagonPatterns';
 
-function HexagonBoard(canvas, overlayDiv, size) {
+function HexagonBoard(canvas, overlayDiv) {
     this.canvas = canvas;
-    this.overlayDiv = overlayDiv;
-    this.size = size;
+    this.size = 24;
 
     this._board = [];
     this._currentColor = '#ff0000';
-    this._currentPatternName = 'Pattern-1';
+    this._currentPatternName = '';
 
     this.load();
 
-    this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, size);
+    this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, this.size);
 
     this._drawOverlayContainer(overlayDiv);
 
@@ -173,7 +172,9 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     saveNameInput.className = 'saveName';
     saveNameInput.name = 'saveName';
     saveNameInput.type = 'text';
+    saveNameInput.placeholder = 'Enter name';
     saveNameInput.value = this._currentPatternName;
+    saveNameInput.required = true;
     this._saveNameInput = saveNameInput;
 
     innerSaveContainer.appendChild(saveNameInput);
@@ -552,8 +553,16 @@ HexagonBoard.prototype.load = function load() {
         return;
     }
 
-    var serializedBoard = window.localStorage.getItem(HEXAGON_BOARD_STORAGE_KEY);
-    this._loadBoard(serializedBoard);
+    var serializedString = window.localStorage.getItem(HEXAGON_BOARD_STORAGE_KEY);
+    var serializedObject;
+    try {
+        serializedObject= JSON.parse(serializedString);
+    } catch (e) {
+        console.error('Error loading stored board!', e);
+        window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
+        return;
+    }
+    this._loadBoard(serializedObject);
 };
 
 HexagonBoard.prototype.reset = function reset() {
@@ -563,6 +572,7 @@ HexagonBoard.prototype.reset = function reset() {
 
     window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
     this._board = [];
+    this._currentPatternName = '';
     this.draw();
 };
 
@@ -581,15 +591,7 @@ HexagonBoard.prototype._serialize = function _serialize() {
     return JSON.stringify(serializedObject);
 };
 
-HexagonBoard.prototype._loadBoard = function _loadBoard(serializedString) {
-
-    var serializedObject;
-    try {
-        serializedObject= JSON.parse(serializedString);
-    } catch (e) {
-        console.error('Error loading stored board!', e);
-        return;
-    }
+HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
     if (!serializedObject) {
         return;
     }
@@ -599,6 +601,13 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedString) {
         return;
     }
 
+    if (serializedBoard.name) {
+        this._currentPatternName = serializedBoard.name;
+    }
+
+    if (serializedBoard.size) {
+        this.size = serializedBoard.size;
+    }
 
     if (serializedBoard.currentColor) {
         this._currentColor = serializedBoard.currentColor;
