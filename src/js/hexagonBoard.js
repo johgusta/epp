@@ -5,6 +5,7 @@ require('spectrum-colorpicker/spectrum.css');
 
 var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
 var SAVED_PATTERNS_KEY = 'HexagonPatterns';
+var SAVED_PATTERN_PREFIX = 'HexagonPattern-';
 
 function HexagonBoard(canvas, overlayDiv) {
     this.canvas = canvas;
@@ -322,6 +323,8 @@ HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
         this._loadButton.classList.remove('disabled');
         this._deleteButton.classList.remove('disabled');
     }
+
+    this._saveNameInput.value = this._currentPatternName;
 };
 
 HexagonBoard.prototype.getSavedPatterns = function getSavedPatterns() {
@@ -356,6 +359,10 @@ HexagonBoard.prototype.storeSavedPatterns = function storeSavedPatterns(savedPat
 };
 
 HexagonBoard.prototype._savePattern = function _savePattern(name) {
+    if (!window.localStorage) {
+        return;
+    }
+
     console.log('save pattern as: ' + name);
     var savedPatterns = this.getSavedPatterns();
 
@@ -373,26 +380,55 @@ HexagonBoard.prototype._savePattern = function _savePattern(name) {
     this._currentPatternName = name;
 
     this.storeSavedPatterns(newPatterns);
+
+    var serializedPattern = this._serialize(true);
+
+    window.localStorage.setItem(SAVED_PATTERN_PREFIX + name, serializedPattern);
+
     this._drawLoadInfo();
 };
 
 HexagonBoard.prototype._loadPattern = function _loadPattern(name) {
+    if (!window.localStorage) {
+        return;
+    }
+
     console.log('load pattern: ' + name);
 
+    var serializedString = window.localStorage.getItem(SAVED_PATTERN_PREFIX + name);
+    var serializedObject;
+    try {
+        serializedObject= JSON.parse(serializedString);
+    } catch (e) {
+        console.error('Error loading stored pattern!', e);
+        window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
+        return;
+    }
+    this._loadBoard(serializedObject);
+
     this._saveNameInput.value = name;
+    this.draw();
+    this.store();
 };
 
-HexagonBoard.prototype._deletePattern = function _deletePattern(key) {
-    console.log('delete pattern: ' + key);
+HexagonBoard.prototype._deletePattern = function _deletePattern(name) {
+    if (!window.localStorage) {
+        return;
+    }
+
+    console.log('delete pattern: ' + name);
     var oldPatterns = this.getSavedPatterns();
     var newPatterns = [];
     oldPatterns.forEach(function (pattern) {
-        if (pattern.name !== key) {
+        if (pattern.name !== name) {
             newPatterns.push(pattern);
         }
     });
 
     this.storeSavedPatterns(newPatterns);
+
+    window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
+
     this._drawLoadInfo();
 };
 
@@ -544,7 +580,7 @@ HexagonBoard.prototype.store = function store() {
     if (!window.localStorage) {
         return;
     }
-    var serializedBoard = this._serialize();
+    var serializedBoard = this._serialize(false);
     window.localStorage.setItem(HEXAGON_BOARD_STORAGE_KEY, serializedBoard);
 };
 
@@ -576,7 +612,7 @@ HexagonBoard.prototype.reset = function reset() {
     this.draw();
 };
 
-HexagonBoard.prototype._serialize = function _serialize() {
+HexagonBoard.prototype._serialize = function _serialize(isFullSerialization) {
     var hexagons = [];
     forEachHexagon(this._board, function (hexagon) {
         hexagons.push(hexagon);
@@ -588,6 +624,11 @@ HexagonBoard.prototype._serialize = function _serialize() {
             hexagons: hexagons
         }
     };
+
+    if (isFullSerialization) {
+        serializedObject.board.name = this._currentPatternName;
+        serializedObject.board.size = this.size;
+    }
     return JSON.stringify(serializedObject);
 };
 
@@ -613,18 +654,19 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
         this._currentColor = serializedBoard.currentColor;
     }
 
+    var board = [];
     if (Array.isArray(serializedBoard.hexagons)) {
-        var currentBoard = this._board;
         serializedBoard.hexagons.forEach(function (hexagon) {
-            var row = currentBoard[hexagon.y];
+            var row = board[hexagon.y];
             if (row === undefined) {
                 row = [];
-                currentBoard[hexagon.y] = row;
+                board[hexagon.y] = row;
             }
 
             row[hexagon.x] = hexagon;
         });
     }
+    this._board = board;
 };
 
 module.exports = HexagonBoard;
