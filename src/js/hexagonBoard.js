@@ -4,6 +4,7 @@ require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
 
 var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
+var SAVED_PATTERNS_KEY = 'HexagonPatterns';
 
 function HexagonBoard(canvas, overlayDiv, size) {
     this.canvas = canvas;
@@ -172,6 +173,9 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     var saveButtonText = document.createElement('span');
     saveButtonText.innerText = 'Save';
     saveButton.appendChild(saveButtonText);
+    saveButton.addEventListener('click', function () {
+        this._savePattern(saveNameInput.value);
+    }.bind(this));
     innerSaveContainer.appendChild(saveButton);
 
     var innerLoadContainer = document.createElement('div');
@@ -190,6 +194,10 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     var loadButtonText = document.createElement('span');
     loadButtonText.innerText = 'Load';
     loadButton.appendChild(loadButtonText);
+
+    loadButton.addEventListener('click', function () {
+        this._loadPattern(loadDropDown.value, loadDropDown.key);
+    }.bind(this));
     this._loadButton = loadButton;
 
     innerLoadContainer.appendChild(loadButton);
@@ -262,10 +270,7 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
 
-    var savedPatterns = [
-        {name: 'First'},
-        {name: 'Secasdasdasdasdasdasdasdasddasdond'}
-    ];
+    var savedPatterns = this.getSavedPatterns();
 
     //savedPatterns = [];
 
@@ -277,6 +282,7 @@ HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
     savedPatterns.forEach(function (pattern) {
         var option = document.createElement('option');
         option.innerText = pattern.name;
+        option.value = pattern.id;
         loadDropDown.appendChild(option);
     });
 
@@ -287,6 +293,54 @@ HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
         loadDropDown.removeAttribute('disabled');
         this._loadButton.classList.remove('disabled');
     }
+};
+
+HexagonBoard.prototype.getSavedPatterns = function getSavedPatterns() {
+    if (!window.localStorage) {
+        return [];
+    }
+
+    var savedPatternsString = window.localStorage.getItem(SAVED_PATTERNS_KEY);
+    var savedPatterns = [];
+
+    try {
+        savedPatterns = JSON.parse(savedPatternsString);
+    } catch (e) {
+        console.error('Error parsing saved patterns', e);
+        return [];
+    }
+
+    if (!Array.isArray(savedPatterns)) {
+        savedPatterns = [];
+    }
+
+    return savedPatterns;
+};
+
+HexagonBoard.prototype.storeSavedPatterns = function storeSavedPatterns(savedPatterns) {
+    if (!window.localStorage) {
+        return;
+    }
+
+    var savedPatternsString = JSON.stringify(savedPatterns);
+    window.localStorage.setItem(SAVED_PATTERNS_KEY, savedPatternsString);
+};
+
+HexagonBoard.prototype._savePattern = function _savePattern(name) {
+    console.log('save pattern as: ' + name);
+    var savedPatterns = this.getSavedPatterns();
+    var lastPattern = savedPatterns[savedPatterns.length - 1];
+    var newId = lastPattern !== undefined ? lastPattern.id + 1 : 0;
+    savedPatterns.push({
+        name: name,
+        id: newId
+    });
+
+    this.storeSavedPatterns(savedPatterns);
+};
+
+HexagonBoard.prototype._loadPattern = function _loadPattern(key) {
+    console.log('load pattern: ' + key);
 };
 
 function createSingleHexagonCanvas(size, color) {
