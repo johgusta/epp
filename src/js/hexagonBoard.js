@@ -13,6 +13,7 @@ function HexagonBoard(canvas, overlayDiv, size) {
 
     this._board = [];
     this._currentColor = '#ff0000';
+    this._currentPatternName = 'Pattern-1';
 
     this.load();
 
@@ -157,7 +158,7 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     overlayDiv.appendChild(saveDialogContainer);
 
 
-    var innerSaveContainer = document.createElement('div');
+    var innerSaveContainer = document.createElement('form');
     innerSaveContainer.className = 'innerSaveContainer';
     saveDialogContainer.appendChild(innerSaveContainer);
 
@@ -165,15 +166,17 @@ HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(ov
     saveNameInput.className = 'saveName';
     saveNameInput.name = 'saveName';
     saveNameInput.type = 'text';
-    saveNameInput.value = 'Pattern-1';
+    saveNameInput.value = this._currentPatternName;
+    this._saveNameInput = saveNameInput;
+
     innerSaveContainer.appendChild(saveNameInput);
 
-    var saveButton = document.createElement('div');
+    var saveButton = document.createElement('input');
+    saveButton.type = 'submit';
     saveButton.className = 'save button';
-    var saveButtonText = document.createElement('span');
-    saveButtonText.innerText = 'Save';
-    saveButton.appendChild(saveButtonText);
-    saveButton.addEventListener('click', function () {
+    saveButton.value = 'Save';
+    innerSaveContainer.addEventListener('submit', function (event) {
+        event.preventDefault();
         this._savePattern(saveNameInput.value);
     }.bind(this));
     innerSaveContainer.appendChild(saveButton);
@@ -283,20 +286,22 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
 }
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
-
     var savedPatterns = this.getSavedPatterns();
-
-    //savedPatterns = [];
 
     var loadDropDown = this._loadDropDown;
     while(loadDropDown.firstChild){
         loadDropDown.removeChild(loadDropDown.firstChild);
     }
 
+    var currentPatternName = this._currentPatternName;
+
     savedPatterns.forEach(function (pattern) {
         var option = document.createElement('option');
         option.innerText = pattern.name;
-        option.value = pattern.id;
+        option.value = pattern.name;
+        if (currentPatternName === pattern.name) {
+            option.selected = true;
+        }
         loadDropDown.appendChild(option);
     });
 
@@ -345,18 +350,28 @@ HexagonBoard.prototype.storeSavedPatterns = function storeSavedPatterns(savedPat
 HexagonBoard.prototype._savePattern = function _savePattern(name) {
     console.log('save pattern as: ' + name);
     var savedPatterns = this.getSavedPatterns();
-    var lastPattern = savedPatterns[savedPatterns.length - 1];
-    var newId = lastPattern !== undefined ? lastPattern.id + 1 : 0;
-    savedPatterns.push({
-        name: name,
-        id: newId
+
+    var newPatterns = [];
+    //Remove duplicates
+    savedPatterns.forEach(function (pattern) {
+        if (pattern.name !== name) {
+            newPatterns.push(pattern);
+        }
+    });
+    newPatterns.push({
+        name: name
     });
 
-    this.storeSavedPatterns(savedPatterns);
+    this._currentPatternName = name;
+
+    this.storeSavedPatterns(newPatterns);
+    this._drawLoadInfo();
 };
 
-HexagonBoard.prototype._loadPattern = function _loadPattern(key) {
-    console.log('load pattern: ' + key);
+HexagonBoard.prototype._loadPattern = function _loadPattern(name) {
+    console.log('load pattern: ' + name);
+
+    this._saveNameInput.value = name;
 };
 
 HexagonBoard.prototype._deletePattern = function _deletePattern(key) {
@@ -364,7 +379,7 @@ HexagonBoard.prototype._deletePattern = function _deletePattern(key) {
     var oldPatterns = this.getSavedPatterns();
     var newPatterns = [];
     oldPatterns.forEach(function (pattern) {
-        if (pattern.id != key) {
+        if (pattern.name !== key) {
             newPatterns.push(pattern);
         }
     });
