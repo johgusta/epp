@@ -19,11 +19,18 @@ function HexagonBoard(canvas, overlayDiv) {
     this._currentColor = DEFAULT_COLOR;
     this._currentPatternName = '';
 
+    this._boardOffset = {
+        x: 0,
+        y: 0,
+        zoom: 0
+    };
+
     this._drawOverlayContainer(overlayDiv);
 
     this.load();
 
     this.draw();
+    this.canvas.style.position = 'absolute';
 
 
     var that = this;
@@ -72,8 +79,10 @@ function HexagonBoard(canvas, overlayDiv) {
     this.canvas.addEventListener('click', onClickHandler);
 
     function scrollHandler(event, delta) {
+        event.preventDefault();
+        event.stopPropagation();
         console.log('scrolling ' + delta);
-        that.size += delta / 10;
+        //that.size += delta / 10;
 
         if (that.size <= 10) {
             that.size = 10;
@@ -82,9 +91,15 @@ function HexagonBoard(canvas, overlayDiv) {
         }
         that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, Math.floor(that.size));
 
+        that._boardOffset.x -= delta;
+        that._boardOffset.y -= delta;
+        that._boardOffset.zoom += delta;
+        //that.canvas.style.left = that._boardOffset.x;
+        //that.canvas.style.top = that._boardOffset.y;
+
         that._drawBoard();
     }
-    Hamster(this.canvas).wheel(_.throttle(scrollHandler, 40));
+    Hamster(window.document).wheel(_.throttle(scrollHandler, 40));
 }
 
 HexagonBoard.prototype.draw = function draw() {
