@@ -27,7 +27,6 @@ function HexagonBoard(mainContainer) {
 
     this.load();
 
-    this.draw();
     this.canvas.style.position = 'absolute';
 
 
