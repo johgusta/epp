@@ -206,8 +206,7 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
     var savedPatterns = this.patternHandler.getSavedPatterns();
-    this.overlay.updateLoadInfo(savedPatterns);
-    this.overlay.setCurrentName(this._currentPatternName);
+    this.overlay.updateLoadInfo(savedPatterns, this._currentPatternName);
 };
 
 HexagonBoard.prototype.savePattern = function savePattern(name) {
@@ -228,7 +227,7 @@ HexagonBoard.prototype.loadPattern = function loadPattern(name) {
     var serializedObject = this.patternHandler.loadPattern(name);
     this._loadBoard(serializedObject);
 
-    this.overlay.setCurrentName(name);
+    this._currentPatternName = name;
 
     this.draw();
     this.store();

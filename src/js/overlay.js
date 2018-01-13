@@ -66,7 +66,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     saveNameInput.name = 'saveName';
     saveNameInput.type = 'text';
     saveNameInput.placeholder = 'Enter name';
-    saveNameInput.value = this._currentPatternName;
+    saveNameInput.value = '';
     saveNameInput.required = true;
     this._saveNameInput = saveNameInput;
 
@@ -120,24 +120,19 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     innerLoadContainer.appendChild(deleteButton);
 };
 
-Overlay.prototype.setCurrentName = function setCurrentName(name) {
-    this._saveNameInput.value = name;
-};
-
-Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns) {
+Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, currentName) {
+    this._saveNameInput.value = currentName;
 
     var loadDropDown = this._loadDropDown;
     while(loadDropDown.firstChild){
         loadDropDown.removeChild(loadDropDown.firstChild);
     }
 
-    var currentPatternName = this._currentPatternName;
-
     savedPatterns.forEach(function (pattern) {
         var option = document.createElement('option');
         option.innerText = pattern.name;
         option.value = pattern.name;
-        if (currentPatternName === pattern.name) {
+        if (currentName === pattern.name) {
             option.selected = true;
         }
         loadDropDown.appendChild(option);
