@@ -1,19 +1,17 @@
-var $ = require('jquery');
+"use strict";
+
 var Color = require('color');
 var Hamster = require('hamsterjs');
-require('spectrum-colorpicker/spectrum.js');
-require('spectrum-colorpicker/spectrum.css');
 
-var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
-var SAVED_PATTERNS_KEY = 'HexagonPatterns';
-var SAVED_PATTERN_PREFIX = 'HexagonPattern-';
+var Overlay = require('./overlay.js');
+var PatternHandler = require('./patternHandler.js');
 
 var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
 
 function HexagonBoard(mainContainer) {
 
-    this._createHtmlStructure(mainContainer);
+    this._init(mainContainer);
 
     this.size = DEFAULT_SIZE;
 
@@ -102,7 +100,7 @@ function HexagonBoard(mainContainer) {
     Hamster(window.document).wheel(_.throttle(scrollHandler, 40));
 }
 
-HexagonBoard.prototype._createHtmlStructure = function _createHtmlStructure(mainContainer) {
+HexagonBoard.prototype._init = function _init(mainContainer) {
     var canvas = document.createElement('canvas');
     canvas.width = document.body.clientWidth - 2;
     canvas.height = document.body.clientHeight - 2;
@@ -117,8 +115,8 @@ HexagonBoard.prototype._createHtmlStructure = function _createHtmlStructure(main
 
     this.canvas = canvas;
 
-    this._drawOverlayContainer(overlayDiv);
-
+    this.patternHandler = new PatternHandler();
+    this.overlay = new Overlay(overlayDiv, this);
 };
 
 HexagonBoard.prototype.draw = function draw() {
@@ -172,140 +170,14 @@ function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize, focusIndex,
     }
 }
 
-HexagonBoard.prototype._drawOverlayContainer = function _drawOverlayContainer(overlayDiv) {
-    var topLeftContainer = document.createElement('div');
-    topLeftContainer.className = 'topLeftContainer';
-
-    var clearAllButton = document.createElement('div');
-    clearAllButton.className = 'clear-all button';
-    topLeftContainer.appendChild(clearAllButton);
-
-    var clearAllText = document.createElement('span');
-    clearAllText.innerText = 'Clear All';
-    clearAllButton.appendChild(clearAllText);
-
-    clearAllButton.addEventListener('click', function () {
-        this.reset();
-    }.bind(this));
-
-    overlayDiv.appendChild(topLeftContainer);
-
-    var bottomLeftContainer = document.createElement('div');
-    bottomLeftContainer.className = 'bottomLeftContainer';
-    overlayDiv.appendChild(bottomLeftContainer);
-
-    var currentColorSelector = document.createElement('div');
-
-    currentColorSelector.className = 'currentColorSelector';
-    bottomLeftContainer.appendChild(currentColorSelector);
-
-    var currentColorText = document.createElement('span');
-    currentColorText.innerText = 'Current color:';
-    currentColorSelector.appendChild(currentColorText);
-
-    var colorInput = document.createElement('input');
-    colorInput.type = 'text';
-    colorInput.className = 'colorPicker';
-
-    currentColorSelector.appendChild(colorInput);
-
-    var colorsDiv = document.createElement('div');
-    colorsDiv.className = 'colorsDiv';
-    bottomLeftContainer.appendChild(colorsDiv);
-
-    this.colorsDiv = colorsDiv;
-
-    var saveDialogContainer = document.createElement('div');
-    saveDialogContainer.className = 'saveDialogContainer';
-    overlayDiv.appendChild(saveDialogContainer);
-
-
-    var innerSaveContainer = document.createElement('form');
-    innerSaveContainer.className = 'innerSaveContainer';
-    saveDialogContainer.appendChild(innerSaveContainer);
-
-    var saveNameInput = document.createElement('input');
-    saveNameInput.className = 'saveName';
-    saveNameInput.name = 'saveName';
-    saveNameInput.type = 'text';
-    saveNameInput.placeholder = 'Enter name';
-    saveNameInput.value = this._currentPatternName;
-    saveNameInput.required = true;
-    this._saveNameInput = saveNameInput;
-
-    innerSaveContainer.appendChild(saveNameInput);
-
-    var saveButton = document.createElement('input');
-    saveButton.type = 'submit';
-    saveButton.className = 'save button';
-    saveButton.value = 'Save';
-    innerSaveContainer.addEventListener('submit', function (event) {
-        event.preventDefault();
-        this._savePattern(saveNameInput.value);
-    }.bind(this));
-    innerSaveContainer.appendChild(saveButton);
-
-    var innerLoadContainer = document.createElement('div');
-    innerLoadContainer.className = 'innerLoadContainer';
-    saveDialogContainer.appendChild(innerLoadContainer);
-
-    var loadDropDown = document.createElement('select');
-    loadDropDown.name = 'loadPattern';
-    loadDropDown.className = 'loadPatternDropDown';
-    this._loadDropDown = loadDropDown;
-
-    innerLoadContainer.appendChild(loadDropDown);
-
-    var loadButton = document.createElement('div');
-    loadButton.className = 'load button';
-    var loadButtonText = document.createElement('span');
-    loadButtonText.innerText = 'Load';
-    loadButton.appendChild(loadButtonText);
-
-    loadButton.addEventListener('click', function () {
-        this._loadPattern(loadDropDown.value);
-    }.bind(this));
-    this._loadButton = loadButton;
-
-    innerLoadContainer.appendChild(loadButton);
-
-    var deleteButton = document.createElement('div');
-    deleteButton.className = 'delete button';
-    var deleteButtonText = document.createElement('span');
-    deleteButtonText.innerText = 'Delete';
-    deleteButton.appendChild(deleteButtonText);
-
-    deleteButton.addEventListener('click', function () {
-        this._deletePattern(loadDropDown.value);
-    }.bind(this));
-    this._deleteButton = deleteButton;
-
-    innerLoadContainer.appendChild(deleteButton);
-};
-
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
-    drawOverlay(this.colorsDiv, this._board, this._currentColor, function (newCurrentColor) {
+    var changeColorCallback = function changeColorCallback (newCurrentColor) {
         this._currentColor = newCurrentColor;
         this._drawBoard();
-    }.bind(this));
-};
-
-function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
-    while(colorsDiv.firstChild){
-        colorsDiv.removeChild(colorsDiv.firstChild);
-    }
-
-    $('.colorPicker').spectrum({
-        color: currentColor,
-        showInitial: true,
-        replacerClassName: 'colorInput',
-        change: function(color) {
-            changeColorCallback(color.toHexString());
-        }
-    });
+    }.bind(this);
 
     var colors = {};
-    forEachHexagon(board, function (hexagon) {
+    forEachHexagon(this._board, function (hexagon) {
         if (hexagon.color === undefined) {
             return;
         }
@@ -329,192 +201,46 @@ function drawOverlay(colorsDiv, board, currentColor, changeColorCallback) {
         return b.count - a.count;
     });
 
-    colorList.forEach(function (color) {
-        var colorDiv = document.createElement('div');
-        colorDiv.className = 'button';
-
-        var hexagonCanvas = createSingleHexagonCanvas(12, color.name);
-
-        colorDiv.appendChild(hexagonCanvas);
-
-        var countSpan = document.createElement('span');
-        countSpan.innerText = ' x ' + color.count;
-
-
-        colorDiv.addEventListener('click', function () {
-            changeColorCallback(color.name);
-        });
-        colorDiv.appendChild(countSpan);
-        colorsDiv.appendChild(colorDiv);
-    });
-}
+    this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
+};
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
-    var savedPatterns = this.getSavedPatterns();
-
-    var loadDropDown = this._loadDropDown;
-    while(loadDropDown.firstChild){
-        loadDropDown.removeChild(loadDropDown.firstChild);
-    }
-
-    var currentPatternName = this._currentPatternName;
-
-    savedPatterns.forEach(function (pattern) {
-        var option = document.createElement('option');
-        option.innerText = pattern.name;
-        option.value = pattern.name;
-        if (currentPatternName === pattern.name) {
-            option.selected = true;
-        }
-        loadDropDown.appendChild(option);
-    });
-
-    if (savedPatterns.length === 0) {
-        loadDropDown.setAttribute('disabled', true);
-        this._loadButton.classList.add('disabled');
-        this._deleteButton.classList.add('disabled');
-    } else {
-        loadDropDown.removeAttribute('disabled');
-        this._loadButton.classList.remove('disabled');
-        this._deleteButton.classList.remove('disabled');
-    }
-
-    this._saveNameInput.value = this._currentPatternName;
+    var savedPatterns = this.patternHandler.getSavedPatterns();
+    this.overlay.updateLoadInfo(savedPatterns);
+    this.overlay.setCurrentName(this._currentPatternName);
 };
 
-HexagonBoard.prototype.getSavedPatterns = function getSavedPatterns() {
-    if (!window.localStorage) {
-        return [];
-    }
-
-    var savedPatternsString = window.localStorage.getItem(SAVED_PATTERNS_KEY);
-    var savedPatterns = [];
-
-    try {
-        savedPatterns = JSON.parse(savedPatternsString);
-    } catch (e) {
-        console.error('Error parsing saved patterns', e);
-        return [];
-    }
-
-    if (!Array.isArray(savedPatterns)) {
-        savedPatterns = [];
-    }
-
-    return savedPatterns;
-};
-
-HexagonBoard.prototype.storeSavedPatterns = function storeSavedPatterns(savedPatterns) {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var savedPatternsString = JSON.stringify(savedPatterns);
-    window.localStorage.setItem(SAVED_PATTERNS_KEY, savedPatternsString);
-};
-
-HexagonBoard.prototype._savePattern = function _savePattern(name) {
-    if (!window.localStorage) {
-        return;
-    }
-
+HexagonBoard.prototype.savePattern = function savePattern(name) {
     console.log('save pattern as: ' + name);
-    var savedPatterns = this.getSavedPatterns();
-
-    var newPatterns = [];
-    //Remove duplicates
-    savedPatterns.forEach(function (pattern) {
-        if (pattern.name !== name) {
-            newPatterns.push(pattern);
-        }
-    });
-    newPatterns.push({
-        name: name
-    });
-
-    this._currentPatternName = name;
-
-    this.storeSavedPatterns(newPatterns);
 
     var serializedPattern = this._serialize(true);
 
-    window.localStorage.setItem(SAVED_PATTERN_PREFIX + name, serializedPattern);
+    this.patternHandler.savePattern(name, serializedPattern);
+
+    this._currentPatternName = name;
 
     this._drawLoadInfo();
 };
 
-HexagonBoard.prototype._loadPattern = function _loadPattern(name) {
-    if (!window.localStorage) {
-        return;
-    }
-
+HexagonBoard.prototype.loadPattern = function loadPattern(name) {
     console.log('load pattern: ' + name);
 
-    var serializedString = window.localStorage.getItem(SAVED_PATTERN_PREFIX + name);
-    var serializedObject;
-    try {
-        serializedObject= JSON.parse(serializedString);
-    } catch (e) {
-        console.error('Error loading stored pattern!', e);
-        window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
-        return;
-    }
+    var serializedObject = this.patternHandler.loadPattern(name);
     this._loadBoard(serializedObject);
 
-    this._saveNameInput.value = name;
+    this.overlay.setCurrentName(name);
+
     this.draw();
     this.store();
 };
 
-HexagonBoard.prototype._deletePattern = function _deletePattern(name) {
-    if (!window.localStorage) {
-        return;
-    }
-
+HexagonBoard.prototype.deletePattern = function deletePattern(name) {
     console.log('delete pattern: ' + name);
-    var oldPatterns = this.getSavedPatterns();
-    var newPatterns = [];
-    oldPatterns.forEach(function (pattern) {
-        if (pattern.name !== name) {
-            newPatterns.push(pattern);
-        }
-    });
 
-    this.storeSavedPatterns(newPatterns);
-
-    window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
+    this.patternHandler.deletePattern(name);
 
     this._drawLoadInfo();
 };
-
-function createSingleHexagonCanvas(size, color) {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-
-    var triangleHeight = Math.tan(Math.PI / 6) * size / 2;
-    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
-
-    canvas.width = triangleHeight * 2 + sideLength + 2;
-    canvas.height = size + 2;
-
-    context.beginPath();
-    context.translate(1, 1);
-    context.moveTo(triangleHeight, 0);
-    context.lineTo(triangleHeight + sideLength, 0);
-    context.lineTo(triangleHeight * 2 + sideLength, size / 2);
-    context.lineTo(triangleHeight + sideLength, size);
-    context.lineTo(triangleHeight, size);
-    context.lineTo(0, size / 2);
-    context.lineTo(triangleHeight, 0);
-
-    context.fillStyle = color;
-    context.fill();
-
-    context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-    context.stroke();
-
-    return canvas;
-}
 
 function calculateBoardSize(width, height, size) {
 
@@ -632,36 +358,18 @@ function breakfastHexagon(context, hexagon, x, y, size, overrideColor) {
 }
 
 HexagonBoard.prototype.store = function store() {
-    if (!window.localStorage) {
-        return;
-    }
     var serializedBoard = this._serialize(false);
-    window.localStorage.setItem(HEXAGON_BOARD_STORAGE_KEY, serializedBoard);
+    this.patternHandler.storeCurrent(serializedBoard);
 };
 
 HexagonBoard.prototype.load = function load() {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var serializedString = window.localStorage.getItem(HEXAGON_BOARD_STORAGE_KEY);
-    var serializedObject;
-    try {
-        serializedObject= JSON.parse(serializedString);
-    } catch (e) {
-        console.error('Error loading stored board!', e);
-        window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
-        return;
-    }
-    this._loadBoard(serializedObject);
+    var serializedPattern = this.patternHandler.loadCurrent();
+    this._loadBoard(serializedPattern);
 };
 
 HexagonBoard.prototype.reset = function reset() {
-    if (!window.localStorage) {
-        return;
-    }
+    this.patternHandler.clearCurrent();
 
-    window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
     this._board = [];
     this._currentPatternName = '';
     this.size = DEFAULT_SIZE;
@@ -685,7 +393,7 @@ HexagonBoard.prototype._serialize = function _serialize(isFullSerialization) {
         serializedObject.board.name = this._currentPatternName;
         serializedObject.board.size = this.size;
     }
-    return JSON.stringify(serializedObject);
+    return serializedObject;
 };
 
 HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
