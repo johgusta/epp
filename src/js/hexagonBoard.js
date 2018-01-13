@@ -42,7 +42,8 @@ function HexagonBoard(mainContainer) {
     function mouseMoveHandler(event) {
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height) {
+        if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height ||
+                hexagon.x < 0 || hexagon.y < 0) {
             that._clearFocus();
         } else {
             var currentColor = new Color(that._currentColor);
@@ -65,7 +66,8 @@ function HexagonBoard(mainContainer) {
         setTimeout(function () {
             var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-            if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height) {
+            if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height ||
+                    hexagon.x < 0 || hexagon.y < 0) {
                 return;
             }
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
