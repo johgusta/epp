@@ -9,6 +9,7 @@ var PatternHandler = require('./patternHandler.js');
 
 var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
+var DEFAULT_BORDER_COLOR = 'rgba(0, 0, 0, 0.2)';
 
 function HexagonBoard(mainContainer) {
 
@@ -18,6 +19,7 @@ function HexagonBoard(mainContainer) {
 
     this._board = [];
     this._currentColor = DEFAULT_COLOR;
+    this._borderColor = DEFAULT_BORDER_COLOR;
     this._currentPatternName = '';
 
     this._boardOffset = {
@@ -38,12 +40,19 @@ function HexagonBoard(mainContainer) {
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
     function mouseMoveHandler(event) {
-        var hexagonIndex = findHexagonIndex(that.size, event.clientX, event.clientY);
+        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
-        if (hexagonIndex.x >= that._boardSize.width || hexagonIndex.y >= that._boardSize.height) {
-            that._focusIndex = undefined;
+        if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height) {
+            that.foregroundCanvas.width = that.foregroundCanvas.width;
         } else {
-            that._focusIndex = hexagonIndex;
+            var currentColor = new Color(that._currentColor);
+            var rgbObject = currentColor.object();
+            var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.6)';
+            var borderColor = '#000000';
+
+            var context = that.foregroundCanvas.getContext('2d');
+            that.foregroundCanvas.width = that.foregroundCanvas.width;
+            that._drawHexagon(context, focusColor, borderColor, hexagon);
         }
 
         that._drawBoard();
@@ -60,7 +69,7 @@ function HexagonBoard(mainContainer) {
                 return;
             }
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
-            that._focusIndex = undefined;
+            that.foregroundCanvas.width = that.foregroundCanvas.width;
             that.draw();
             requestAnimationFrame(function () {
                 that.store();
@@ -165,47 +174,53 @@ HexagonBoard.prototype._drawBackground = function _drawBackground() {
 
 HexagonBoard.prototype._drawBoard = function _drawBoard() {
     this._drawBackground();
+    this._drawHexagons();
+};
 
+HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
 
-    var currentColor = new Color(this._currentColor);
-    var rgbObject = currentColor.object();
-    var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
-    var size = Math.floor(this.size);
-    //drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size, this._focusIndex, focusColor);
+    forEachHexagon(this._board, this._drawHexagon.bind(this, ctx, undefined, this._borderColor));
 };
 
-function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize, focusIndex, focusColor) {
+HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, overrideColor, borderColor, hexagon) {
+    var color = overrideColor !== undefined ? overrideColor : hexagon.color;
+    if (!color) {
+        //console.warn('no color for hexagon', hexagon);
+        return;
+    }
 
-    var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
+    var size = this.size;
+
+    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
-    var row;
-    var hexagon;
-    var xOffset = 0;
-    for (var i = 0; i < boardHeight; i++) {
+    var xOffset =  hexagon.y % 2 !== 0 ? size /2 : 0;
 
-        if (i % 2 !== 0) {
-            xOffset = hexagonSize /2;
-        } else {
-            xOffset = 0;
-        }
+    var x = hexagon.x * size  + xOffset;
+    var y = hexagon.y * (hexagonHeight - triangleHeight);
 
-        row = board[i];
+    var topHeight = Math.tan(Math.PI / 6) * size / 2;
+    var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
 
-        for (var j = 0; j < boardWidth; j++) {
-            hexagon = row !== undefined ? row[j] : undefined;
-            if (hexagon === undefined) {
-                hexagon = {};
-            }
-            var overrideColor = focusIndex && focusIndex.x === j && focusIndex.y === i ? focusColor : undefined;
-            breakfastHexagon(ctx, hexagon, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize, overrideColor);
-        }
-    }
-}
+    context.beginPath();
+    context.moveTo(x + size / 2, y);
+    context.lineTo(x + size, y + topHeight);
+    context.lineTo(x + size, y + topHeight + hypotenuse);
+    context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
+    context.lineTo(x, y + topHeight + hypotenuse);
+    context.lineTo(x, y + topHeight);
+    context.lineTo(x + size / 2, y);
+
+    context.fillStyle = color;
+    context.fill();
+
+    context.strokeStyle = borderColor;
+    context.stroke();
+};
 
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     var changeColorCallback = function changeColorCallback (newCurrentColor) {
@@ -364,33 +379,6 @@ function forEachHexagon(board, callback) {
             row.forEach(callback);
         }
     })
-}
-
-function breakfastHexagon(context, hexagon, x, y, size, overrideColor) {
-    var color = hexagon.color !== undefined ? hexagon.color : '#ffffff';
-    var borderColor = hexagon.borderColor !== undefined ? hexagon.borderColor : 'rgba(0, 0, 0, 0.2)';
-
-    if (overrideColor !== undefined) {
-        color = overrideColor;
-    }
-
-    var topHeight = Math.tan(Math.PI / 6) * size / 2;
-    var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
-
-    context.beginPath();
-    context.moveTo(x + size / 2, y);
-    context.lineTo(x + size, y + topHeight);
-    context.lineTo(x + size, y + topHeight + hypotenuse);
-    context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
-    context.lineTo(x, y + topHeight + hypotenuse);
-    context.lineTo(x, y + topHeight);
-    context.lineTo(x + size / 2, y);
-
-    context.fillStyle = color;
-    context.fill();
-
-    context.strokeStyle = borderColor;
-    context.stroke();
 }
 
 HexagonBoard.prototype.store = function store() {
