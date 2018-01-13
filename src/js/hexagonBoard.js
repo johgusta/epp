@@ -27,16 +27,10 @@ function HexagonBoard(mainContainer) {
 
     this.load();
 
-    this.canvas.style.position = 'absolute';
-
-
     var that = this;
 
     function actualResizeHandler() {
-
-        that.canvas.width = document.body.clientWidth - 2;
-        that.canvas.height = document.body.clientHeight - 2;
-
+        that.updateBoardSize();
         that.draw();
     }
 
@@ -54,7 +48,7 @@ function HexagonBoard(mainContainer) {
         that._drawBoard();
     }
 
-    this.canvas.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
+    this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
 
     function onClickHandler(event) {
         //TODO: Remove fix for changing color when color picker closes by clickig outside of it
@@ -73,7 +67,7 @@ function HexagonBoard(mainContainer) {
         }, 0);
     }
 
-    this.canvas.addEventListener('click', onClickHandler);
+    this.boardContainer.addEventListener('click', onClickHandler);
 
     function scrollHandler(event, delta) {
         event.preventDefault();
@@ -100,13 +94,30 @@ function HexagonBoard(mainContainer) {
 }
 
 HexagonBoard.prototype._init = function _init(mainContainer) {
+    var boardContainer = document.createElement('div');
+    boardContainer.id = 'board-container';
+    this.boardContainer = boardContainer;
+    mainContainer.appendChild(boardContainer);
+
+    var backgroundCanvas = document.createElement('canvas');
+    backgroundCanvas.id = 'background-canvas';
+    backgroundCanvas.width = boardContainer.clientWidth;
+    backgroundCanvas.height = boardContainer.clientHeight;
+    this.backgroundCanvas = backgroundCanvas;
+    boardContainer.appendChild(backgroundCanvas);
+
     var canvas = document.createElement('canvas');
-    canvas.width = document.body.clientWidth - 2;
-    canvas.height = document.body.clientHeight - 2;
+    canvas.id = 'main-canvas';
+    canvas.width = boardContainer.clientWidth;
+    canvas.height = boardContainer.clientHeight;
+    boardContainer.appendChild(canvas);
 
-    canvas.style.padding = '1px';
-
-    mainContainer.appendChild(canvas);
+    var foregroundCanvas = document.createElement('canvas');
+    foregroundCanvas.id = 'foreground-canvas';
+    foregroundCanvas.width = boardContainer.clientWidth;
+    foregroundCanvas.height = boardContainer.clientHeight;
+    this.foregroundCanvas = foregroundCanvas;
+    boardContainer.appendChild(foregroundCanvas);
 
     var overlayDiv = document.createElement('div');
     overlayDiv.className = 'overlayDiv';
@@ -116,6 +127,17 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
 
     this.patternHandler = new PatternHandler();
     this.overlay = new Overlay(overlayDiv, this);
+};
+
+HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
+    this.backgroundCanvas.width = this.boardContainer.clientWidth;
+    this.backgroundCanvas.height = this.boardContainer.clientHeight;
+
+    this.canvas.width = this.boardContainer.clientWidth;
+    this.canvas.height = this.boardContainer.clientHeight;
+
+    this.foregroundCanvas.width = this.boardContainer.clientWidth;
+    this.foregroundCanvas.height = this.boardContainer.clientHeight;
 };
 
 HexagonBoard.prototype.draw = function draw() {
