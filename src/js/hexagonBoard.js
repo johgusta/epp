@@ -43,7 +43,7 @@ function HexagonBoard(mainContainer) {
         var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
 
         if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height) {
-            that.foregroundCanvas.width = that.foregroundCanvas.width;
+            that._clearFocus();
         } else {
             var currentColor = new Color(that._currentColor);
             var rgbObject = currentColor.object();
@@ -51,7 +51,7 @@ function HexagonBoard(mainContainer) {
             var borderColor = '#000000';
 
             var context = that.foregroundCanvas.getContext('2d');
-            that.foregroundCanvas.width = that.foregroundCanvas.width;
+            that._clearFocus();
             that._drawHexagon(context, focusColor, borderColor, hexagon);
         }
 
@@ -69,7 +69,7 @@ function HexagonBoard(mainContainer) {
                 return;
             }
             hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
-            that.foregroundCanvas.width = that.foregroundCanvas.width;
+            that._clearFocus();
             that.draw();
             requestAnimationFrame(function () {
                 that.store();
@@ -226,6 +226,7 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     var changeColorCallback = function changeColorCallback (newCurrentColor) {
         this._currentColor = newCurrentColor;
         this._drawBoard();
+        this._drawOverlay();
     }.bind(this);
 
     var colors = {};
@@ -259,6 +260,10 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
     var savedPatterns = this.patternHandler.getSavedPatterns();
     this.overlay.updateLoadInfo(savedPatterns, this._currentPatternName);
+};
+
+HexagonBoard.prototype._clearFocus = function _clearFocus() {
+    this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
 HexagonBoard.prototype.savePattern = function savePattern(name) {
