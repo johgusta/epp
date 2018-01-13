@@ -3,6 +3,7 @@
 var Color = require('color');
 var Hamster = require('hamsterjs');
 
+var Background = require('./background.js');
 var Overlay = require('./overlay.js');
 var PatternHandler = require('./patternHandler.js');
 
@@ -99,23 +100,28 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.boardContainer = boardContainer;
     mainContainer.appendChild(boardContainer);
 
+
+    var canvasSize = {
+        width: boardContainer.clientWidth,
+        height: boardContainer.clientHeight
+    };
+
     var backgroundCanvas = document.createElement('canvas');
     backgroundCanvas.id = 'background-canvas';
-    backgroundCanvas.width = boardContainer.clientWidth;
-    backgroundCanvas.height = boardContainer.clientHeight;
-    this.backgroundCanvas = backgroundCanvas;
+    backgroundCanvas.width = canvasSize.width;
+    backgroundCanvas.height = canvasSize.height;
     boardContainer.appendChild(backgroundCanvas);
 
     var canvas = document.createElement('canvas');
     canvas.id = 'main-canvas';
-    canvas.width = boardContainer.clientWidth;
-    canvas.height = boardContainer.clientHeight;
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
     boardContainer.appendChild(canvas);
 
     var foregroundCanvas = document.createElement('canvas');
     foregroundCanvas.id = 'foreground-canvas';
-    foregroundCanvas.width = boardContainer.clientWidth;
-    foregroundCanvas.height = boardContainer.clientHeight;
+    foregroundCanvas.width = canvasSize.width;
+    foregroundCanvas.height = canvasSize.height;
     this.foregroundCanvas = foregroundCanvas;
     boardContainer.appendChild(foregroundCanvas);
 
@@ -124,20 +130,25 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     mainContainer.appendChild(overlayDiv);
 
     this.canvas = canvas;
+    this.background = new Background(backgroundCanvas);
 
     this.patternHandler = new PatternHandler();
     this.overlay = new Overlay(overlayDiv, this);
 };
 
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
-    this.backgroundCanvas.width = this.boardContainer.clientWidth;
-    this.backgroundCanvas.height = this.boardContainer.clientHeight;
 
-    this.canvas.width = this.boardContainer.clientWidth;
-    this.canvas.height = this.boardContainer.clientHeight;
+    var newSize = {
+        width: this.boardContainer.clientWidth - 4,
+        height:this.boardContainer.clientHeight - 4
+    };
+    this.background.setSize(newSize.width, newSize.height);
 
-    this.foregroundCanvas.width = this.boardContainer.clientWidth;
-    this.foregroundCanvas.height = this.boardContainer.clientHeight;
+    this.canvas.width = newSize.width;
+    this.canvas.height = newSize.height;
+
+    this.foregroundCanvas.width = newSize.width;
+    this.foregroundCanvas.height = newSize.height;
 };
 
 HexagonBoard.prototype.draw = function draw() {
@@ -148,8 +159,13 @@ HexagonBoard.prototype.draw = function draw() {
     this._drawLoadInfo();
 };
 
+HexagonBoard.prototype._drawBackground = function _drawBackground() {
+    this.background.draw(this._boardSize, this.size);
+};
 
 HexagonBoard.prototype._drawBoard = function _drawBoard() {
+    this._drawBackground();
+
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
 
@@ -157,7 +173,7 @@ HexagonBoard.prototype._drawBoard = function _drawBoard() {
     var rgbObject = currentColor.object();
     var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.2)';
     var size = Math.floor(this.size);
-    drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size, this._focusIndex, focusColor);
+    //drawBoard(ctx, this._board, this._boardSize.width, this._boardSize.height, this.size, this._focusIndex, focusColor);
 };
 
 function drawBoard(ctx, board, boardWidth, boardHeight, hexagonSize, focusIndex, focusColor) {
