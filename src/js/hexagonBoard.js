@@ -81,28 +81,48 @@ function HexagonBoard(mainContainer) {
 
     this.boardContainer.addEventListener('click', onClickHandler);
 
+    var throttledRedraw = _.throttle(function (oldSize, newSize) {
+        if (oldSize === newSize) {
+            return;
+        }
+
+        that._drawBoard();
+        that._clearFocus();
+    }, 40);
+
     function scrollHandler(event, delta) {
         event.preventDefault();
         event.stopPropagation();
-        console.log('scrolling ' + delta);
-        //that.size += delta / 10;
 
-        if (that.size <= 10) {
-            that.size = 10;
-        } else if (that.size > 100) {
-            that.size = 100;
+        var newZoom = that._boardOffset.zoom - delta;
+
+        var startWidth = that.canvas.width;
+        var startHeight = that.canvas.height;
+        var startSize = that.size;
+
+        var ratio = startWidth / startHeight;
+        var width = startWidth + newZoom;
+        var height = Math.round(startWidth / ratio);
+
+        var sizeDifference = startWidth / width;
+
+        var size = Math.round(DEFAULT_SIZE * sizeDifference);
+
+        if (size < 10) {
+            size = 10;
+        } else if (size > 100) {
+            size = 100;
+        } else {
+            that._boardOffset.zoom = newZoom;
         }
-        that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, Math.floor(that.size));
 
-        that._boardOffset.x -= delta;
-        that._boardOffset.y -= delta;
-        that._boardOffset.zoom += delta;
-        //that.canvas.style.left = that._boardOffset.x;
-        //that.canvas.style.top = that._boardOffset.y;
+        that.size = size;
 
-        that._drawBoard();
+        that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
+
+        throttledRedraw(startSize, size);
     }
-    Hamster(window.document).wheel(_.throttle(scrollHandler, 40));
+    Hamster(window.document).wheel(scrollHandler);
 }
 
 HexagonBoard.prototype._init = function _init(mainContainer) {
