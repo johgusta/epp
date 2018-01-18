@@ -4,6 +4,7 @@ var Color = require('color');
 var Hamster = require('hamsterjs');
 
 var Background = require('./background.js');
+var HexagonMatrix = require('./hexagonMatrix.js');
 var Overlay = require('./overlay.js');
 var PatternHandler = require('./patternHandler.js');
 
@@ -17,7 +18,8 @@ function HexagonBoard(mainContainer) {
 
     this.size = DEFAULT_SIZE;
 
-    this._board = [];
+    var hexagonMatrix = new HexagonMatrix();
+    this._hexagonMatrix = hexagonMatrix;
     this._currentColor = DEFAULT_COLOR;
     this._borderColor = DEFAULT_BORDER_COLOR;
     this._currentPatternName = '';
@@ -70,14 +72,19 @@ function HexagonBoard(mainContainer) {
                 return;
             }
 
-            var hexagon = that.findHexagon(hexagonIndex);
+            var hexagon = hexagonMatrix.find(hexagonIndex);
             if (hexagon === undefined) {
-
                 console.log('create hexagon', hexagonIndex);
-                hexagon = that.createHexagon(hexagonIndex);
+
+                hexagon = {
+                    x: hexagonIndex.x,
+                    y: hexagonIndex.y,
+                    color: that._currentColor
+                };
+                hexagonMatrix.add(hexagon);
             } else if (hexagon.color === that._currentColor) {
                 console.log('delete hexagon', hexagonIndex);
-                that.deleteHexagon(hexagonIndex);
+                hexagonMatrix.remove(hexagonIndex);
             } else {
                 console.log('change hexagon color', hexagonIndex);
                 hexagon.color = that._currentColor;
@@ -214,7 +221,7 @@ HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
 
-    forEachHexagon(this._board, function (hexagon) {
+    this._hexagonMatrix.forEach(function (hexagon) {
         var color = hexagon.color;
 
         var hexagonPosition = this._getHexagonPosition(hexagon);
@@ -284,44 +291,6 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
         x: x,
         y: y
     };
-};
-
-HexagonBoard.prototype.createHexagon = function createHexagon(hexagonIndex) {
-    var row = this._board[hexagonIndex.y];
-
-    if (row === undefined) {
-        row = [];
-        this._board[hexagonIndex.y] = row;
-    }
-
-    var hexagon = {
-        x: hexagonIndex.x,
-        y: hexagonIndex.y,
-        color: this._currentColor
-    };
-
-    row[hexagonIndex.x] = hexagon;
-    return hexagon;
-};
-
-HexagonBoard.prototype.deleteHexagon = function deleteHexagon(hexagonIndex) {
-    var row = this._board[hexagonIndex.y];
-
-    if (!Array.isArray(row)) {
-        return;
-    }
-
-    delete row[hexagonIndex.x];
-};
-
-HexagonBoard.prototype.findHexagon = function findHexagon(hexagonIndex) {
-    var row = this._board[hexagonIndex.y];
-
-    var hexagon = undefined;
-    if (row !== undefined) {
-        hexagon = row[hexagonIndex.x];
-    }
-    return hexagon;
 };
 
 HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
@@ -394,7 +363,8 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     }.bind(this);
 
     var colors = {};
-    forEachHexagon(this._board, function (hexagon) {
+
+    this._hexagonMatrix.forEach(function (hexagon) {
         if (hexagon.color === undefined) {
             return;
         }
@@ -479,14 +449,6 @@ function calculateBoardSize(width, height, size) {
     };
 }
 
-function forEachHexagon(board, callback) {
-    board.forEach(function (row) {
-        if (Array.isArray(row)) {
-            row.forEach(callback);
-        }
-    })
-}
-
 HexagonBoard.prototype.store = function store() {
     var serializedBoard = this._serialize(false);
     this.patternHandler.storeCurrent(serializedBoard);
@@ -500,7 +462,7 @@ HexagonBoard.prototype.load = function load() {
 HexagonBoard.prototype.reset = function reset() {
     this.patternHandler.clearCurrent();
 
-    this._board = [];
+    this._hexagonMatrix.reset();
     this._currentPatternName = '';
     this.size = DEFAULT_SIZE;
     this.draw();
@@ -508,7 +470,7 @@ HexagonBoard.prototype.reset = function reset() {
 
 HexagonBoard.prototype._serialize = function _serialize(isFullSerialization) {
     var hexagons = [];
-    forEachHexagon(this._board, function (hexagon) {
+    this._hexagonMatrix.forEach(function (hexagon) {
         hexagons.push(hexagon);
     });
 
@@ -548,19 +510,13 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
         this._currentColor = serializedBoard.currentColor;
     }
 
-    var board = [];
+    var hexagonMatrix = this._hexagonMatrix;
+    hexagonMatrix.reset();
     if (Array.isArray(serializedBoard.hexagons)) {
         serializedBoard.hexagons.forEach(function (hexagon) {
-            var row = board[hexagon.y];
-            if (row === undefined) {
-                row = [];
-                board[hexagon.y] = row;
-            }
-
-            row[hexagon.x] = hexagon;
+            hexagonMatrix.add(hexagon);
         });
     }
-    this._board = board;
 };
 
 module.exports = HexagonBoard;
