@@ -215,15 +215,10 @@ HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, overrideCol
 
     var size = this.size;
 
-    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
-    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+    var hexagonLocation = this._getHexagonBoardIndex(hexagon);
 
-    var hexagonHeight = (2 * triangleHeight + sideLength);
-
-    var xOffset =  hexagon.y % 2 !== 0 ? size /2 : 0;
-
-    var x = hexagon.x * size  + xOffset;
-    var y = hexagon.y * (hexagonHeight - triangleHeight);
+    var x = hexagonLocation.x;
+    var y = hexagonLocation.y;
 
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
     var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
@@ -242,6 +237,33 @@ HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, overrideCol
 
     context.strokeStyle = borderColor;
     context.stroke();
+};
+
+HexagonBoard.prototype._getHexagonBoardIndex = function _getHexagonBoardIndex(hexagon) {
+    var xIndexOffset = Math.floor(this._boardSize.width / 2);
+    var yIndexOffset = Math.floor(this._boardSize.height / 2);
+
+    xIndexOffset += Math.round((this._boardOffset.x / this.canvas.width) * this._boardSize.width);
+    yIndexOffset += Math.round((this._boardOffset.y / this.canvas.height) * this._boardSize.height);
+
+    var xIndex = xIndexOffset + hexagon.x;
+    var yIndex = yIndexOffset + hexagon.y;
+
+    var size = this.size;
+
+    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
+    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+    var hexagonHeight = (2 * triangleHeight + sideLength);
+
+    var xOffset =  yIndex % 2 !== 0 ? size /2 : 0;
+
+    var x = xIndex * size  + xOffset;
+    var y = yIndex * (hexagonHeight - triangleHeight);
+
+    return {
+        x: x,
+        y: y
+    };
 };
 
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
