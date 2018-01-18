@@ -40,23 +40,23 @@ function HexagonBoard(mainContainer) {
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
     function mouseMoveHandler(event) {
-        var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-        if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height ||
-                hexagon.x < 0 || hexagon.y < 0) {
+        if (!that.isHexagonVisible(hexagonIndex)) {
             that._clearFocus();
-        } else {
-            var currentColor = new Color(that._currentColor);
-            var rgbObject = currentColor.object();
-            var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.6)';
-            var borderColor = '#000000';
-
-            var context = that.foregroundCanvas.getContext('2d');
-            that._clearFocus();
-            that._drawHexagon(context, focusColor, borderColor, hexagon);
+            return;
         }
 
-        that._drawBoard();
+        var currentColor = new Color(that._currentColor);
+        var rgbObject = currentColor.object();
+        var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.6)';
+        var borderColor = '#000000';
+
+        var context = that.foregroundCanvas.getContext('2d');
+
+        var hexagonPosition = that._getHexagonPosition(hexagonIndex);
+        that._clearFocus();
+        that._drawHexagon(context, hexagonPosition, focusColor, borderColor);
     }
 
     this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
@@ -64,13 +64,24 @@ function HexagonBoard(mainContainer) {
     function onClickHandler(event) {
         //TODO: Remove fix for changing color when color picker closes by clickig outside of it
         setTimeout(function () {
-            var hexagon = findHexagon(that._board, that.size, event.clientX, event.clientY);
+            var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-            if (hexagon.x >= that._boardSize.width || hexagon.y >= that._boardSize.height ||
-                    hexagon.x < 0 || hexagon.y < 0) {
+            if (!that.isHexagonVisible(hexagonIndex)) {
                 return;
             }
-            hexagon.color = hexagon.color === that._currentColor ? undefined : that._currentColor;
+
+            var hexagon = that.findHexagon(hexagonIndex);
+            if (hexagon === undefined) {
+
+                console.log('create hexagon', hexagonIndex);
+                hexagon = that.createHexagon(hexagonIndex);
+            } else if (hexagon.color === that._currentColor) {
+                console.log('delete hexagon', hexagonIndex);
+                that.deleteHexagon(hexagonIndex);
+            } else {
+                console.log('change hexagon color', hexagonIndex);
+                hexagon.color = that._currentColor;
+            }
             that._clearFocus();
             that.draw();
             requestAnimationFrame(function () {
@@ -203,22 +214,19 @@ HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
     this.canvas.width = this.canvas.width;
     var ctx = this.canvas.getContext('2d');
 
-    forEachHexagon(this._board, this._drawHexagon.bind(this, ctx, undefined, this._borderColor));
+    forEachHexagon(this._board, function (hexagon) {
+        var color = hexagon.color;
+
+        var hexagonPosition = this._getHexagonPosition(hexagon);
+        this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
+    }.bind(this));
 };
 
-HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, overrideColor, borderColor, hexagon) {
-    var color = overrideColor !== undefined ? overrideColor : hexagon.color;
-    if (!color) {
-        //console.warn('no color for hexagon', hexagon);
-        return;
-    }
-
+HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, hexagonPosition, color, borderColor) {
     var size = this.size;
 
-    var hexagonLocation = this._getHexagonBoardIndex(hexagon);
-
-    var x = hexagonLocation.x;
-    var y = hexagonLocation.y;
+    var x = hexagonPosition.x;
+    var y = hexagonPosition.y;
 
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
     var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
@@ -239,15 +247,27 @@ HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, overrideCol
     context.stroke();
 };
 
-HexagonBoard.prototype._getHexagonBoardIndex = function _getHexagonBoardIndex(hexagon) {
-    var xIndexOffset = Math.floor(this._boardSize.width / 2);
-    var yIndexOffset = Math.floor(this._boardSize.height / 2);
+HexagonBoard.prototype.isHexagonVisible = function isHexagonVisible(hexagonIndex) {
+    var boardOffset = this.getBoardIndexOffset();
 
-    xIndexOffset += Math.round((this._boardOffset.x / this.canvas.width) * this._boardSize.width);
-    yIndexOffset += Math.round((this._boardOffset.y / this.canvas.height) * this._boardSize.height);
+    var isVisible = true;
+    if (hexagonIndex.x < -boardOffset.x) {
+        isVisible = false;
+    } else if (hexagonIndex.x >= this._boardSize.width - boardOffset.x) {
+        isVisible = false;
+    } else if (hexagonIndex.y < -boardOffset.y) {
+        isVisible = false;
+    } else if (hexagonIndex.y >= this._boardSize.height - boardOffset.y) {
+        isVisible = false;
+    }
 
-    var xIndex = xIndexOffset + hexagon.x;
-    var yIndex = yIndexOffset + hexagon.y;
+    return isVisible;
+};
+
+HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexagonIndex) {
+    var boardIndexOffset = this.getBoardIndexOffset();
+    var xIndex = hexagonIndex.x + boardIndexOffset.x;
+    var yIndex = hexagonIndex.y + boardIndexOffset.y;
 
     var size = this.size;
 
@@ -263,6 +283,106 @@ HexagonBoard.prototype._getHexagonBoardIndex = function _getHexagonBoardIndex(he
     return {
         x: x,
         y: y
+    };
+};
+
+HexagonBoard.prototype.createHexagon = function createHexagon(hexagonIndex) {
+    var row = this._board[hexagonIndex.y];
+
+    if (row === undefined) {
+        row = [];
+        this._board[hexagonIndex.y] = row;
+    }
+
+    var hexagon = {
+        x: hexagonIndex.x,
+        y: hexagonIndex.y,
+        color: this._currentColor
+    };
+
+    row[hexagonIndex.x] = hexagon;
+    return hexagon;
+};
+
+HexagonBoard.prototype.deleteHexagon = function deleteHexagon(hexagonIndex) {
+    var row = this._board[hexagonIndex.y];
+
+    if (!Array.isArray(row)) {
+        return;
+    }
+
+    delete row[hexagonIndex.x];
+};
+
+HexagonBoard.prototype.findHexagon = function findHexagon(hexagonIndex) {
+    var row = this._board[hexagonIndex.y];
+
+    var hexagon = undefined;
+    if (row !== undefined) {
+        hexagon = row[hexagonIndex.x];
+    }
+    return hexagon;
+};
+
+HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
+    var hexagonSize = this.size;
+    var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
+    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+
+    var hexagonHeight = (2 * triangleHeight + sideLength);
+
+    var rowHeight = hexagonHeight - triangleHeight;
+
+    var rowIndex = Math.floor(y / rowHeight);
+
+    var isOffsetRow = rowIndex % 2 !== 0;
+    var xOffset = isOffsetRow ? hexagonSize / 2 : 0;
+    var columnIndex = Math.floor((x - xOffset) / hexagonSize);
+
+    var innerX = x - (columnIndex * hexagonSize + xOffset);
+    var innerY = y - (rowIndex * rowHeight);
+
+    var tangentForThirtyDeg = Math.tan(Math.PI / 6);
+
+    if (innerY < triangleHeight) {
+        if (innerX < hexagonSize / 2) {
+            if ((triangleHeight - innerY) / innerX > tangentForThirtyDeg) {
+                rowIndex--;
+                if (!isOffsetRow) {
+                    columnIndex--;
+                }
+            }
+        } else {
+            if ((triangleHeight - innerY) / (hexagonSize - innerX) > tangentForThirtyDeg) {
+                rowIndex--;
+                if (isOffsetRow) {
+                    columnIndex++;
+                }
+            }
+        }
+    }
+
+    var boardIndexOffset = this.getBoardIndexOffset();
+
+    var xIndex = columnIndex - boardIndexOffset.x;
+    var yIndex = rowIndex - boardIndexOffset.y;
+
+    return {
+        x: xIndex,
+        y: yIndex
+    };
+};
+
+HexagonBoard.prototype.getBoardIndexOffset = function getBoardIndexOffset() {
+    var xIndexOffset = Math.floor(this._boardSize.width / 2);
+    var yIndexOffset = Math.floor(this._boardSize.height / 2);
+
+    xIndexOffset += Math.round((this._boardOffset.x / this.canvas.width) * this._boardSize.width);
+    yIndexOffset += Math.round((this._boardOffset.y / this.canvas.height) * this._boardSize.height);
+
+    return {
+        x: xIndexOffset,
+        y: yIndexOffset
     };
 };
 
@@ -356,69 +476,6 @@ function calculateBoardSize(width, height, size) {
     return {
         width: boardWidth,
         height: boardHeight
-    };
-}
-
-function findHexagon(board, hexagonSize, x, y) {
-    var hexagonIndex = findHexagonIndex(hexagonSize, x, y);
-
-    var row = board[hexagonIndex.y];
-    if (row === undefined) {
-        row = [];
-        board[hexagonIndex.y] = row;
-    }
-    var hexagon = row[hexagonIndex.x];
-    if (hexagon === undefined) {
-        hexagon = {
-            x: hexagonIndex.x,
-            y: hexagonIndex.y
-        };
-        row[hexagonIndex.x] = hexagon;
-    }
-
-    return hexagon;
-}
-
-function findHexagonIndex(hexagonSize, x, y) {
-    var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
-    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
-
-    var hexagonHeight = (2 * triangleHeight + sideLength);
-
-    var rowHeight = hexagonHeight - triangleHeight;
-
-    var rowIndex = Math.floor(y / rowHeight);
-
-    var isOffsetRow = rowIndex % 2 !== 0;
-    var xOffset = isOffsetRow ? hexagonSize / 2 : 0;
-    var columnIndex = Math.floor((x - xOffset) / hexagonSize);
-
-    var innerX = x - (columnIndex * hexagonSize + xOffset);
-    var innerY = y - (rowIndex * rowHeight);
-
-    var tangentForThirtyDeg = Math.tan(Math.PI / 6);
-
-    if (innerY < triangleHeight) {
-        if (innerX < hexagonSize / 2) {
-            if ((triangleHeight - innerY) / innerX > tangentForThirtyDeg) {
-                rowIndex--;
-                if (!isOffsetRow) {
-                    columnIndex--;
-                }
-            }
-        } else {
-            if ((triangleHeight - innerY) / (hexagonSize - innerX) > tangentForThirtyDeg) {
-                rowIndex--;
-                if (isOffsetRow) {
-                    columnIndex++;
-                }
-            }
-        }
-    }
-
-    return {
-        x: columnIndex,
-        y: rowIndex
     };
 }
 
