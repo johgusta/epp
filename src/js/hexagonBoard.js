@@ -99,11 +99,7 @@ function HexagonBoard(mainContainer) {
 
     this.boardContainer.addEventListener('click', onClickHandler);
 
-    var throttledRedraw = _.throttle(function (oldSize, newSize) {
-        if (oldSize === newSize) {
-            return;
-        }
-
+    var throttledRedraw = _.throttle(function () {
         that._drawBoard();
         that._clearFocus();
     }, 40);
@@ -116,7 +112,6 @@ function HexagonBoard(mainContainer) {
 
         var startWidth = that.canvas.width;
         var startHeight = that.canvas.height;
-        var startSize = that.size;
 
         var ratio = startWidth / startHeight;
         var width = startWidth + newZoom;
@@ -134,11 +129,11 @@ function HexagonBoard(mainContainer) {
             that._boardOffset.zoom = newZoom;
         }
 
-        that.size = size;
-
-        that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
-
-        throttledRedraw(startSize, size);
+        if (that.size !== size) {
+            that.size = size;
+            that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
+            throttledRedraw();
+        }
     }
     Hamster(window.document).wheel(scrollHandler);
 }
