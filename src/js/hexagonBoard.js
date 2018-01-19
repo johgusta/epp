@@ -511,7 +511,9 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
     hexagonMatrix.reset();
     if (Array.isArray(serializedBoard.hexagons)) {
         serializedBoard.hexagons.forEach(function (hexagon) {
-            hexagonMatrix.add(hexagon);
+            if (hexagon.color !== undefined) {
+                hexagonMatrix.add(hexagon);
+            }
         });
     }
 };
