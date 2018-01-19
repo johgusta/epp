@@ -10,7 +10,7 @@ Background.prototype.setSize = function setSize(width, height) {
     this.canvas.height = height;
 };
 
-Background.prototype.draw = function draw(boardSize, hexagonSize) {
+Background.prototype.draw = function draw(boardSize, hexagonSize, boardIndexOffset) {
     this.canvas.width = this.canvas.width;
 
     var boardWidth = boardSize.width;
@@ -24,10 +24,11 @@ Background.prototype.draw = function draw(boardSize, hexagonSize) {
 
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
+    var shouldBeEven = boardIndexOffset.y % 2 === 0 ? 0 : 1;
     var xOffset = 0;
     for (var i = 0; i < boardHeight; i++) {
 
-        if (i % 2 !== 0) {
+        if (i % 2 !== shouldBeEven) {
             xOffset = hexagonSize /2;
         } else {
             xOffset = 0;

@@ -209,7 +209,7 @@ HexagonBoard.prototype.draw = function draw() {
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
-    this.background.draw(this._boardSize, this.size);
+    this.background.draw(this._boardSize, this.size, this.getBoardIndexOffset());
 };
 
 HexagonBoard.prototype._drawBoard = function _drawBoard() {
@@ -282,7 +282,8 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
-    var xOffset =  yIndex % 2 !== 0 ? size /2 : 0;
+    var shouldBeEven = boardIndexOffset.y % 2 === 0 ? 0 : 1;
+    var xOffset = yIndex % 2 !== shouldBeEven ? size /2 : 0;
 
     var x = xIndex * size  + xOffset;
     var y = yIndex * (hexagonHeight - triangleHeight);
@@ -304,8 +305,11 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
 
     var rowIndex = Math.floor(y / rowHeight);
 
-    var isOffsetRow = rowIndex % 2 !== 0;
+    var boardIndexOffset = this.getBoardIndexOffset();
+    var shouldBeEven = boardIndexOffset.y % 2 === 0 ? 0 : 1;
+    var isOffsetRow = rowIndex % 2 !== shouldBeEven;
     var xOffset = isOffsetRow ? hexagonSize / 2 : 0;
+
     var columnIndex = Math.floor((x - xOffset) / hexagonSize);
 
     var innerX = x - (columnIndex * hexagonSize + xOffset);
@@ -330,8 +334,6 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
             }
         }
     }
-
-    var boardIndexOffset = this.getBoardIndexOffset();
 
     var xIndex = columnIndex - boardIndexOffset.x;
     var yIndex = rowIndex - boardIndexOffset.y;
