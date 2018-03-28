@@ -42,62 +42,6 @@ function HexagonBoard(mainContainer) {
 
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
-    function mouseMoveHandler(event) {
-        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
-
-        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
-            that._clearFocus();
-            return;
-        }
-
-        var borderColor = '#000000';
-
-        var context = that.foregroundCanvas.getContext('2d');
-
-        var hexagonPosition = that._getHexagonPosition(hexagonIndex);
-        that._clearFocus();
-        that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
-    }
-
-    this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
-
-    this.boardContainer.addEventListener('mouseleave', function () {
-        that._clearFocus();
-    });
-
-    function onClickHandler(event) {
-        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
-
-        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
-            return;
-        }
-
-        var hexagon = hexagonMatrix.find(hexagonIndex);
-        if (hexagon === undefined) {
-            console.log('create hexagon', hexagonIndex);
-
-            hexagon = {
-                x: hexagonIndex.x,
-                y: hexagonIndex.y,
-                color: that._currentColor
-            };
-            hexagonMatrix.add(hexagon);
-        } else if (hexagon.color === that._currentColor) {
-            console.log('delete hexagon', hexagonIndex);
-            hexagonMatrix.remove(hexagonIndex);
-        } else {
-            console.log('change hexagon color', hexagonIndex);
-            hexagon.color = that._currentColor;
-        }
-        that._clearFocus();
-        that.draw();
-        requestAnimationFrame(function () {
-            that.store();
-        });
-    }
-
-    this.boardContainer.addEventListener('click', onClickHandler);
-
     var throttledRedraw = _.throttle(function () {
         that._drawBoard();
         that._clearFocus();
@@ -135,6 +79,67 @@ function HexagonBoard(mainContainer) {
         }
     }
     Hamster(window.document).wheel(scrollHandler);
+
+    mouseHandler(this);
+}
+
+function mouseHandler(that) {
+    function mouseMoveHandler(event) {
+        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
+
+        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
+            that._clearFocus();
+            return;
+        }
+
+        var borderColor = '#000000';
+
+        var context = that.foregroundCanvas.getContext('2d');
+
+        var hexagonPosition = that._getHexagonPosition(hexagonIndex);
+        that._clearFocus();
+        that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
+    }
+
+    that.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
+
+    that.boardContainer.addEventListener('mouseleave', function () {
+        that._clearFocus();
+    });
+
+    function onClickHandler(event) {
+        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
+
+        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
+            return;
+        }
+
+        var hexagonMatrix = that._hexagonMatrix;
+        var hexagon = hexagonMatrix.find(hexagonIndex);
+        if (hexagon === undefined) {
+            console.log('create hexagon', hexagonIndex);
+
+            hexagon = {
+                x: hexagonIndex.x,
+                y: hexagonIndex.y,
+                color: that._currentColor
+            };
+            hexagonMatrix.add(hexagon);
+        } else if (hexagon.color === that._currentColor) {
+            console.log('delete hexagon', hexagonIndex);
+            hexagonMatrix.remove(hexagonIndex);
+        } else {
+            console.log('change hexagon color', hexagonIndex);
+            hexagon.color = that._currentColor;
+        }
+        that._clearFocus();
+        that.draw();
+        requestAnimationFrame(function () {
+            that.store();
+        });
+    }
+
+    that.boardContainer.addEventListener('click', onClickHandler);
 }
 
 HexagonBoard.prototype._init = function _init(mainContainer) {
