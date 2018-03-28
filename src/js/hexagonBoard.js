@@ -156,6 +156,7 @@ function mouseHandler(that) {
         isMouseDown = false;
         mouseStartPosition = undefined;
         hasPerformedPanning = false;
+        that.overlay.colorPickerOpen = false;
     }
 
     function focusHandler(event) {
