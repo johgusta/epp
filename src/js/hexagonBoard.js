@@ -5,12 +5,13 @@ var Hamster = require('hamsterjs');
 
 var Background = require('./background.js');
 var HexagonMatrix = require('./hexagonMatrix.js');
+var Hexagon = require('./hexagon.js');
 var Overlay = require('./overlay.js');
 var PatternHandler = require('./patternHandler.js');
 
 var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
-var DEFAULT_BORDER_COLOR = 'rgba(0, 0, 0, 0.2)';
+var DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer) {
 
@@ -228,23 +229,7 @@ HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, hexagonPosi
     var x = hexagonPosition.x;
     var y = hexagonPosition.y;
 
-    var topHeight = Math.tan(Math.PI / 6) * size / 2;
-    var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
-
-    context.beginPath();
-    context.moveTo(x + size / 2, y);
-    context.lineTo(x + size, y + topHeight);
-    context.lineTo(x + size, y + topHeight + hypotenuse);
-    context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
-    context.lineTo(x, y + topHeight + hypotenuse);
-    context.lineTo(x, y + topHeight);
-    context.lineTo(x + size / 2, y);
-
-    context.fillStyle = color;
-    context.fill();
-
-    context.strokeStyle = borderColor;
-    context.stroke();
+    Hexagon.drawHexagon(context, x, y, size, borderColor, color);
 };
 
 HexagonBoard.prototype.isHexagonVisible = function isHexagonVisible(hexagonIndex) {

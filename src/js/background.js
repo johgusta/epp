@@ -1,8 +1,10 @@
 "use strict";
 
+var Hexagon = require('./hexagon.js');
+
 function Background(canvas) {
     this.canvas = canvas;
-    this._borderColor = 'rgba(0, 0, 0, 0.2)';
+    this._borderColor = '#cccccc';
 }
 
 Background.prototype.setSize = function setSize(width, height) {
@@ -35,28 +37,9 @@ Background.prototype.draw = function draw(boardSize, hexagonSize, boardIndexOffs
         }
 
         for (var j = 0; j < boardWidth; j++) {
-            drawHexagonOutline(ctx, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize, borderColor);
+            Hexagon.drawHexagon(ctx, j * hexagonSize  + xOffset, i * (hexagonHeight - triangleHeight), hexagonSize, borderColor);
         }
     }
 };
-
-
-function drawHexagonOutline(context, x, y, size, borderColor) {
-    var topHeight = Math.tan(Math.PI / 6) * size / 2;
-    var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
-
-    context.beginPath();
-    context.moveTo(x + size / 2, y);
-    context.lineTo(x + size, y + topHeight);
-    context.lineTo(x + size, y + topHeight + hypotenuse);
-    context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
-    context.lineTo(x, y + topHeight + hypotenuse);
-    context.lineTo(x, y + topHeight);
-    context.lineTo(x + size / 2, y);
-
-    context.strokeStyle = borderColor;
-    context.stroke();
-}
-
 
 module.exports = Background;
