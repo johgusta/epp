@@ -49,16 +49,13 @@ function HexagonBoard(mainContainer) {
             return;
         }
 
-        var currentColor = new Color(that._currentColor);
-        var rgbObject = currentColor.object();
-        var focusColor = 'rgba(' + rgbObject.r + ',' + rgbObject.g + ',' + rgbObject.b + ',0.6)';
         var borderColor = '#000000';
 
         var context = that.foregroundCanvas.getContext('2d');
 
         var hexagonPosition = that._getHexagonPosition(hexagonIndex);
         that._clearFocus();
-        that._drawHexagon(context, hexagonPosition, focusColor, borderColor);
+        that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
     }
 
     this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
