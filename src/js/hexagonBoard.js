@@ -63,6 +63,10 @@ function HexagonBoard(mainContainer) {
 
     this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
 
+    this.boardContainer.addEventListener('mouseleave', function () {
+        that._clearFocus();
+    });
+
     function onClickHandler(event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
