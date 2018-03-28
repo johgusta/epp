@@ -3,6 +3,10 @@
 function drawHexagon(context, x, y, size, borderColor, color) {
     var topHeight = Math.tan(Math.PI / 6) * size / 2;
     var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
+    
+    //Correct fuzzy lines when stroking by offseting half a pixel for odd line widths;
+    x += 0.5;
+    y += 0.5;
 
     context.save();
 
