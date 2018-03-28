@@ -86,7 +86,9 @@ function HexagonBoard(mainContainer) {
 function mouseHandler(that) {
 
     that.boardContainer.addEventListener('mousedown', mouseDownHandler);
+    that.boardContainer.addEventListener('mousemove', mouseMoveHandler);
     that.boardContainer.addEventListener('mouseup', mouseUpHandler);
+    that.boardContainer.addEventListener('mouseleave', mouseLeaveHandler);
 
     var panThreshold = 10;
 
@@ -96,22 +98,22 @@ function mouseHandler(that) {
     var hasPerformedPanning = false;
 
     function mouseDownHandler(event) {
-        console.log('mouse down', event);
         isMouseDown = true;
         mouseStartPosition = {
             x: event.clientX,
             y: event.clientY
         };
-
-        that.boardContainer.addEventListener('mousemove', mousePanHandler);
-
     }
 
-    function mousePanHandler(event) {
+    function mouseMoveHandler(event) {
         if (!mouseStartPosition || !isMouseDown) {
-            return;
+            focusHandler(event);
+        } else {
+            handlePanningMovement(event);
         }
+    }
 
+    function handlePanningMovement(event) {
         var currentPosition = {
             x: event.clientX,
             y: event.clientY
@@ -120,8 +122,6 @@ function mouseHandler(that) {
         if (Math.abs(mouseStartPosition.x - currentPosition.x) > panThreshold ||
                 Math.abs(mouseStartPosition.y - currentPosition.y) > panThreshold) {
             hasPerformedPanning = true;
-
-            console.log('panning around');
 
             var xDiff = currentPosition.x - mouseStartPosition.x;
             var yDiff = currentPosition.y - mouseStartPosition.y;
@@ -140,8 +140,6 @@ function mouseHandler(that) {
     }
 
     function mouseUpHandler(event) {
-        console.log('mouse up');
-
         if (isMouseDown && !hasPerformedPanning) {
             onClickHandler(that, event);
         }
@@ -158,7 +156,6 @@ function mouseHandler(that) {
         isMouseDown = false;
         mouseStartPosition = undefined;
         hasPerformedPanning = false;
-        that.boardContainer.removeEventListener('mousemove', mousePanHandler);
     }
 
     function focusHandler(event) {
@@ -174,13 +171,14 @@ function mouseHandler(that) {
         var context = that.foregroundCanvas.getContext('2d');
 
         var hexagonPosition = that._getHexagonPosition(hexagonIndex);
-        that._clearFocus();
-        that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
+        requestAnimationFrame(function () {
+            that._clearFocus();
+            that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
+        });
     }
 
     that.boardContainer.addEventListener('mousemove', _.throttle(focusHandler, 20));
 
-    that.boardContainer.addEventListener('mouseleave', mouseLeaveHandler);
 
     function onClickHandler(that, event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
@@ -207,10 +205,12 @@ function mouseHandler(that) {
             console.log('change hexagon color', hexagonIndex);
             hexagon.color = that._currentColor;
         }
-        that._clearFocus();
-        that.draw();
         requestAnimationFrame(function () {
-            that.store();
+            that._clearFocus();
+            that.draw();
+            requestAnimationFrame(function () {
+                that.store();
+            });
         });
     }
 }
