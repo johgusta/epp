@@ -140,7 +140,7 @@ function mouseHandler(that) {
     function focusHandler(event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen || hasPerformedPanning) {
+        if (that.overlay.colorPickerOpen || hasPerformedPanning) {
             that._clearFocus();
             return;
         }
@@ -163,7 +163,7 @@ function mouseHandler(that) {
     function onClickHandler(that, event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
+        if (that.overlay.colorPickerOpen) {
             return;
         }
 
@@ -259,7 +259,7 @@ HexagonBoard.prototype.draw = function draw() {
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
-    this.background.draw(this._boardSize, this.size, this.getBoardIndexOffset());
+    this.background.draw(this._boardSize, this.size, this._boardOffset);
 };
 
 HexagonBoard.prototype._drawBoard = function _drawBoard() {
@@ -288,27 +288,9 @@ HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, hexagonPosi
     Hexagon.drawHexagon(context, x, y, size, borderColor, color);
 };
 
-HexagonBoard.prototype.isHexagonVisible = function isHexagonVisible(hexagonIndex) {
-    var boardOffset = this.getBoardIndexOffset();
-
-    var isVisible = true;
-    if (hexagonIndex.x < -boardOffset.x) {
-        isVisible = false;
-    } else if (hexagonIndex.x >= this._boardSize.width - boardOffset.x) {
-        isVisible = false;
-    } else if (hexagonIndex.y < -boardOffset.y) {
-        isVisible = false;
-    } else if (hexagonIndex.y >= this._boardSize.height - boardOffset.y) {
-        isVisible = false;
-    }
-
-    return isVisible;
-};
-
 HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexagonIndex) {
-    var boardIndexOffset = this.getBoardIndexOffset();
-    var xIndex = hexagonIndex.x + boardIndexOffset.x;
-    var yIndex = hexagonIndex.y + boardIndexOffset.y;
+    var xIndex = hexagonIndex.x;
+    var yIndex = hexagonIndex.y;
 
     var size = this.size;
 
@@ -316,11 +298,10 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
-    var shouldBeEven = boardIndexOffset.y % 2 === 0 ? 0 : 1;
-    var xOffset = yIndex % 2 !== shouldBeEven ? size /2 : 0;
+    var xOffset = yIndex % 2 !== 0 ? size /2 : 0;
 
-    var x = xIndex * size  + xOffset;
-    var y = yIndex * (hexagonHeight - triangleHeight);
+    var x = xIndex * size + xOffset + this._boardOffset.x;
+    var y = yIndex * (hexagonHeight - triangleHeight) + this._boardOffset.y;
 
     return {
         x: x,
@@ -328,10 +309,13 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
     };
 };
 
-HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
+HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(clientX, clientY) {
     var hexagonSize = this.size;
     var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+
+    var x = clientX - this._boardOffset.x;
+    var y = clientY - this._boardOffset.y;
 
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
@@ -339,9 +323,7 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
 
     var rowIndex = Math.floor(y / rowHeight);
 
-    var boardIndexOffset = this.getBoardIndexOffset();
-    var shouldBeEven = boardIndexOffset.y % 2 === 0 ? 0 : 1;
-    var isOffsetRow = rowIndex % 2 !== shouldBeEven;
+    var isOffsetRow = rowIndex % 2 !== 0;
     var xOffset = isOffsetRow ? hexagonSize / 2 : 0;
 
     var columnIndex = Math.floor((x - xOffset) / hexagonSize);
@@ -369,25 +351,9 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(x, y) {
         }
     }
 
-    var xIndex = columnIndex - boardIndexOffset.x;
-    var yIndex = rowIndex - boardIndexOffset.y;
-
     return {
-        x: xIndex,
-        y: yIndex
-    };
-};
-
-HexagonBoard.prototype.getBoardIndexOffset = function getBoardIndexOffset() {
-    var xIndexOffset = Math.floor(this._boardSize.width / 2);
-    var yIndexOffset = Math.floor(this._boardSize.height / 2);
-
-    xIndexOffset += Math.round((this._boardOffset.x / this.canvas.width) * this._boardSize.width);
-    yIndexOffset += Math.round((this._boardOffset.y / this.canvas.height) * this._boardSize.height);
-
-    return {
-        x: xIndexOffset,
-        y: yIndexOffset
+        x: columnIndex,
+        y: rowIndex
     };
 };
 
