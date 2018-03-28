@@ -84,10 +84,63 @@ function HexagonBoard(mainContainer) {
 }
 
 function mouseHandler(that) {
-    function mouseMoveHandler(event) {
+
+    that.boardContainer.addEventListener('mousedown', mouseDownHandler);
+    that.boardContainer.addEventListener('mouseup', mouseUpHandler);
+
+    var panThreshold = 10;
+
+    var isMouseDown = false;
+    var mouseStartPosition;
+
+    var hasPerformedPanning = false;
+
+    function mouseDownHandler(event) {
+//        console.log('mouse down', event);
+        isMouseDown = true;
+        mouseStartPosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+
+        that.boardContainer.addEventListener('mousemove', mousePanHandler);
+
+    }
+
+    function mousePanHandler(event) {
+        var currentPosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+
+        if (Math.abs(mouseStartPosition.x - currentPosition.x) > panThreshold ||
+                Math.abs(mouseStartPosition.y - currentPosition.y) > panThreshold) {
+            hasPerformedPanning = true;
+        }
+
+        if (hasPerformedPanning) {
+//            console.log('panning around');
+        }
+    }
+
+    function mouseUpHandler(event) {
+//        console.log('mouse up');
+
+        if (isMouseDown && !hasPerformedPanning) {
+            onClickHandler(that, event);
+        }
+
+        isMouseDown = false;
+        mouseStartPosition = undefined;
+        hasPerformedPanning = false;
+        that.boardContainer.removeEventListener('mousemove', mousePanHandler);
+
+    }
+
+    function focusHandler(event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
+        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen || hasPerformedPanning) {
             that._clearFocus();
             return;
         }
@@ -101,13 +154,13 @@ function mouseHandler(that) {
         that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
     }
 
-    that.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
+    that.boardContainer.addEventListener('mousemove', _.throttle(focusHandler, 20));
 
     that.boardContainer.addEventListener('mouseleave', function () {
         that._clearFocus();
     });
 
-    function onClickHandler(event) {
+    function onClickHandler(that, event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
         if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
@@ -138,8 +191,6 @@ function mouseHandler(that) {
             that.store();
         });
     }
-
-    that.boardContainer.addEventListener('click', onClickHandler);
 }
 
 HexagonBoard.prototype._init = function _init(mainContainer) {
