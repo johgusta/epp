@@ -44,7 +44,7 @@ function HexagonBoard(mainContainer) {
     function mouseMoveHandler(event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-        if (!that.isHexagonVisible(hexagonIndex)) {
+        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
             that._clearFocus();
             return;
         }
@@ -64,37 +64,34 @@ function HexagonBoard(mainContainer) {
     this.boardContainer.addEventListener('mousemove', _.throttle(mouseMoveHandler, 20));
 
     function onClickHandler(event) {
-        //TODO: Remove fix for changing color when color picker closes by clickig outside of it
-        setTimeout(function () {
-            var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
+        var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
-            if (!that.isHexagonVisible(hexagonIndex)) {
-                return;
-            }
+        if (!that.isHexagonVisible(hexagonIndex) || that.overlay.colorPickerOpen) {
+            return;
+        }
 
-            var hexagon = hexagonMatrix.find(hexagonIndex);
-            if (hexagon === undefined) {
-                console.log('create hexagon', hexagonIndex);
+        var hexagon = hexagonMatrix.find(hexagonIndex);
+        if (hexagon === undefined) {
+            console.log('create hexagon', hexagonIndex);
 
-                hexagon = {
-                    x: hexagonIndex.x,
-                    y: hexagonIndex.y,
-                    color: that._currentColor
-                };
-                hexagonMatrix.add(hexagon);
-            } else if (hexagon.color === that._currentColor) {
-                console.log('delete hexagon', hexagonIndex);
-                hexagonMatrix.remove(hexagonIndex);
-            } else {
-                console.log('change hexagon color', hexagonIndex);
-                hexagon.color = that._currentColor;
-            }
-            that._clearFocus();
-            that.draw();
-            requestAnimationFrame(function () {
-                that.store();
-            });
-        }, 0);
+            hexagon = {
+                x: hexagonIndex.x,
+                y: hexagonIndex.y,
+                color: that._currentColor
+            };
+            hexagonMatrix.add(hexagon);
+        } else if (hexagon.color === that._currentColor) {
+            console.log('delete hexagon', hexagonIndex);
+            hexagonMatrix.remove(hexagonIndex);
+        } else {
+            console.log('change hexagon color', hexagonIndex);
+            hexagon.color = that._currentColor;
+        }
+        that._clearFocus();
+        that.draw();
+        requestAnimationFrame(function () {
+            that.store();
+        });
     }
 
     this.boardContainer.addEventListener('click', onClickHandler);

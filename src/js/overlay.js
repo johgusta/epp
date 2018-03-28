@@ -156,12 +156,17 @@ Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentC
         colorsDiv.removeChild(colorsDiv.firstChild);
     }
 
+    var that = this;
     $('.colorPicker').spectrum({
         color: currentColor,
         showInitial: true,
         replacerClassName: 'colorInput',
+        show: function () {
+            that.colorPickerOpen = true;
+        },
         change: function(color) {
             changeColorCallback(color.toHexString());
+            that.colorPickerOpen = false;
         }
     });
 
