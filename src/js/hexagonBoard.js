@@ -96,7 +96,7 @@ function mouseHandler(that) {
     var hasPerformedPanning = false;
 
     function mouseDownHandler(event) {
-//        console.log('mouse down', event);
+        console.log('mouse down', event);
         isMouseDown = true;
         mouseStartPosition = {
             x: event.clientX,
@@ -108,6 +108,10 @@ function mouseHandler(that) {
     }
 
     function mousePanHandler(event) {
+        if (!mouseStartPosition || !isMouseDown) {
+            return;
+        }
+
         var currentPosition = {
             x: event.clientX,
             y: event.clientY
@@ -116,25 +120,45 @@ function mouseHandler(that) {
         if (Math.abs(mouseStartPosition.x - currentPosition.x) > panThreshold ||
                 Math.abs(mouseStartPosition.y - currentPosition.y) > panThreshold) {
             hasPerformedPanning = true;
-        }
 
-        if (hasPerformedPanning) {
-//            console.log('panning around');
+            console.log('panning around');
+
+            var xDiff = currentPosition.x - mouseStartPosition.x;
+            var yDiff = currentPosition.y - mouseStartPosition.y;
+
+            that._boardOffset.x += xDiff;
+            that._boardOffset.y += yDiff;
+
+            mouseStartPosition = {
+                x: currentPosition.x,
+                y: currentPosition.y
+            };
+            requestAnimationFrame(function () {
+                that.draw();
+            });
         }
     }
 
     function mouseUpHandler(event) {
-//        console.log('mouse up');
+        console.log('mouse up');
 
         if (isMouseDown && !hasPerformedPanning) {
             onClickHandler(that, event);
         }
 
+        endPanning();
+    }
+
+    function mouseLeaveHandler() {
+        that._clearFocus()
+        endPanning();
+    }
+
+    function endPanning() {
         isMouseDown = false;
         mouseStartPosition = undefined;
         hasPerformedPanning = false;
         that.boardContainer.removeEventListener('mousemove', mousePanHandler);
-
     }
 
     function focusHandler(event) {
@@ -156,9 +180,7 @@ function mouseHandler(that) {
 
     that.boardContainer.addEventListener('mousemove', _.throttle(focusHandler, 20));
 
-    that.boardContainer.addEventListener('mouseleave', function () {
-        that._clearFocus();
-    });
+    that.boardContainer.addEventListener('mouseleave', mouseLeaveHandler);
 
     function onClickHandler(that, event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
