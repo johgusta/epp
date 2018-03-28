@@ -145,10 +145,11 @@ function mouseHandler(that) {
         }
 
         endPanning();
+        that.overlay.colorPickerOpen = false;
     }
 
     function mouseLeaveHandler() {
-        that._clearFocus()
+        that._clearFocus();
         endPanning();
     }
 
@@ -156,7 +157,6 @@ function mouseHandler(that) {
         isMouseDown = false;
         mouseStartPosition = undefined;
         hasPerformedPanning = false;
-        that.overlay.colorPickerOpen = false;
     }
 
     function focusHandler(event) {
