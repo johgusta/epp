@@ -28,7 +28,14 @@ Background.prototype.draw = function draw(boardSize, hexagonSize, boardOffset) {
 
     var xOffset = 0;
 
-    for (var i = -1; i < boardHeight + 1; i++) {
+    var rowHeight = (hexagonHeight - triangleHeight);
+
+    var cappedBoardOffset = {
+        x: boardOffset.x % hexagonSize,
+        y: boardOffset.y % (rowHeight * 2)
+    };
+
+    for (var i = -2; i < boardHeight + 3; i++) {
 
         if (i % 2 !== 0) {
             xOffset = hexagonSize /2;
@@ -38,10 +45,10 @@ Background.prototype.draw = function draw(boardSize, hexagonSize, boardOffset) {
 
         for (var j = -1; j < boardWidth + 1; j++) {
             var x = j * hexagonSize + xOffset;
-            var y = i * (hexagonHeight - triangleHeight);
+            var y = i * rowHeight;
 
-            x += boardOffset.x;
-            y += boardOffset.y;
+            x += cappedBoardOffset.x;
+            y += cappedBoardOffset.y;
             Hexagon.drawHexagon(ctx, x, y, hexagonSize, borderColor);
         }
     }
