@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "webpack",
-    "dev": "webpack-dev-server --port 5000 --content-base build",
+    "dev": "webpack-dev-server --public 192.168.1.12:5000 --port 5000 --content-base build --host 0.0.0.0",
     "prestart": "npm run build",
     "start": "node server/server.js"
   },
