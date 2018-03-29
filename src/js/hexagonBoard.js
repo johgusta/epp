@@ -149,8 +149,10 @@ function mouseHandler(that) {
     }
 
     function mouseLeaveHandler() {
-        that._clearFocus();
         endPanning();
+        requestAnimationFrame(function () {
+            that._clearFocus();
+        });
     }
 
     function endPanning() {
@@ -163,7 +165,9 @@ function mouseHandler(that) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
 
         if (that.overlay.colorPickerOpen || hasPerformedPanning) {
-            that._clearFocus();
+            requestAnimationFrame(function() {
+                that._clearFocus();
+            });
             return;
         }
 
