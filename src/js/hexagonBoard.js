@@ -147,6 +147,7 @@ function mouseHandler(that) {
                 y: currentPosition.y
             };
             requestAnimationFrame(function () {
+                that._clearFocus();
                 that.draw();
             });
         }
