@@ -90,6 +90,19 @@ function mouseHandler(that) {
     that.boardContainer.addEventListener('mouseup', mouseUpHandler);
     that.boardContainer.addEventListener('mouseleave', mouseLeaveHandler);
 
+    that.boardContainer.addEventListener('touchstart', function (event) {
+        var touch = event.changedTouches[0];
+        if (touch) {
+            mouseDownHandler(touch);
+        }
+    });
+    that.boardContainer.addEventListener('touchmove', function (event) {
+        var touch = event.changedTouches[0];
+        if (touch) {
+            mouseMoveHandler(touch);
+        }
+    });
+
     var panThreshold = 10;
 
     var isMouseDown = false;
@@ -181,9 +194,6 @@ function mouseHandler(that) {
             that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
         });
     }
-
-    that.boardContainer.addEventListener('mousemove', _.throttle(focusHandler, 20));
-
 
     function onClickHandler(that, event) {
         var hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
