@@ -2,6 +2,7 @@
 
 var Color = require('color');
 var Hamster = require('hamsterjs');
+var Hammer = require('hammerjs');
 
 var Background = require('./background.js');
 var HexagonMatrix = require('./hexagonMatrix.js');
@@ -84,6 +85,69 @@ function HexagonBoard(mainContainer) {
 }
 
 function mouseHandler(that) {
+
+    var isPinching = false;
+
+    var hammertime = new Hammer(that.boardContainer);
+
+    hammertime.get('pinch').set({ enable: true });
+    hammertime.on('pinch', function (ev) {
+
+        var delta = ev.scale;
+        var newZoom = that._boardOffset.zoom - delta;
+
+        var startWidth = that.canvas.width;
+        var startHeight = that.canvas.height;
+
+        var ratio = startWidth / startHeight;
+        var width = startWidth + newZoom;
+        var height = Math.round(startWidth / ratio);
+
+        var sizeDifference = startWidth / width;
+
+        var size = Math.round(DEFAULT_SIZE * sizeDifference);
+
+        if (size < 10) {
+            size = 10;
+        } else if (size > 100) {
+            size = 100;
+        } else {
+            that._boardOffset.zoom = newZoom;
+        }
+
+        if (that.size !== size) {
+            that.size = size;
+            that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
+            requestAnimationFrame(function () {
+                that._clearFocus();
+                that.draw();
+            })
+        }
+    });
+
+//    hammertime.on('panstart', function(ev) {
+//        var fakeTouch = {
+//            clientX: ev.center.x,
+//            clientY: ev.center.y
+//        };
+//        mouseDownHandler(fakeTouch);
+//    });
+//    hammertime.on('panmove', function(ev) {
+//        var fakeTouch = {
+//            clientX: ev.center.x,
+//            clientY: ev.center.y
+//        };
+//        mouseMoveHandler(fakeTouch);
+//    });
+//    hammertime.on('panend', function(ev) {
+//        var fakeTouch = {
+//            clientX: ev.center.x,
+//            clientY: ev.center.y
+//        };
+//        mouseMoveHandler(fakeTouch);
+//    });
+
+
 
     that.boardContainer.addEventListener('mousedown', mouseDownHandler);
     that.boardContainer.addEventListener('mousemove', mouseMoveHandler);
