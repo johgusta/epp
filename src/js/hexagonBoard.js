@@ -102,8 +102,8 @@ function mouseHandler(that) {
     });
     hammertime.on('pinchend', function (ev) {
         that.overlay.appendDebugText('last pinch');
-        isPinching = false;
-        pinchStartSize = undefined;
+//        isPinching = false;
+//        pinchStartSize = undefined;
     });
     hammertime.on('pinch', function (ev) {
         that.overlay.appendDebugText('pinch scale: ' + ev.scale);
@@ -137,7 +137,22 @@ function mouseHandler(that) {
     that.boardContainer.addEventListener('touchmove', function (event) {
         var touch = event.changedTouches[0];
         if (touch) {
+            that.overlay.appendDebugText('touch move: ' + isPinching);
             mouseMoveHandler(touch);
+        }
+    });
+
+    that.boardContainer.addEventListener('touchend', function (event) {
+        if (isPinching && event.touches.length === 0) {
+            isPinching = false;
+            that.overlay.appendDebugText('pinching finished');
+        }
+    });
+
+    that.boardContainer.addEventListener('touchcancel', function (event) {
+        if (isPinching && event.touches.length === 0) {
+            isPinching = false;
+            that.overlay.appendDebugText('pinching canceled');
         }
     });
 
@@ -149,6 +164,10 @@ function mouseHandler(that) {
     var hasPerformedPanning = false;
 
     function mouseDownHandler(event) {
+        if (isPinching) {
+            that.overlay.appendDebugText('ignore mouse down');
+            return;
+        }
         isMouseDown = true;
         mouseStartPosition = {
             x: event.clientX,
@@ -157,7 +176,9 @@ function mouseHandler(that) {
     }
 
     function mouseMoveHandler(event) {
-        if (!mouseStartPosition || !isMouseDown) {
+        if (isPinching) {
+            return;
+        } else if (!mouseStartPosition || !isMouseDown) {
             focusHandler(event);
         } else {
             handlePanningMovement(event);
@@ -184,6 +205,7 @@ function mouseHandler(that) {
                 x: currentPosition.x,
                 y: currentPosition.y
             };
+            that.overlay.appendDebugText('perform panning');
             requestAnimationFrame(function () {
                 that._clearFocus();
                 that.draw();
