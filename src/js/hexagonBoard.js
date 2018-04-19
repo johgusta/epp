@@ -45,11 +45,6 @@ function HexagonBoard(mainContainer) {
 
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
-    var throttledRedraw = _.throttle(function () {
-        that._drawBoard();
-        that._clearFocus();
-    }, 40);
-
     function scrollHandler(event, delta) {
         event.preventDefault();
         event.stopPropagation();
@@ -78,7 +73,8 @@ function HexagonBoard(mainContainer) {
         that.overlay.appendDebugText('scroll delta: ' + delta);
         if (that.size !== size) {
             that.size = size;
-            throttledRedraw();
+            that._clearFocus();
+            that.drawBoard();
         }
     }
     Hamster(window.document).wheel(scrollHandler);
@@ -122,10 +118,8 @@ function mouseHandler(that) {
             that._boardOffset.x = xZoomOffset;
             that._boardOffset.y = yZoomOffset;
 
-            requestAnimationFrame(function () {
-                that._clearFocus();
-                that.draw();
-            });
+            that._clearFocus();
+            that.drawBoard();
         }
     });
 
@@ -210,10 +204,9 @@ function mouseHandler(that) {
                 y: currentPosition.y
             };
             that.overlay.appendDebugText('perform panning');
-            requestAnimationFrame(function () {
-                that._clearFocus();
-                that.draw();
-            });
+
+            that._clearFocus();
+            that.drawBoard();
         }
     }
 
@@ -353,7 +346,7 @@ HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
 };
 
 HexagonBoard.prototype.draw = function draw() {
-    this._drawBoard();
+    this.drawBoard();
     this._drawOverlay();
     this._drawLoadInfo();
 };
@@ -362,9 +355,15 @@ HexagonBoard.prototype._drawBackground = function _drawBackground() {
     this.background.draw(this.size, this._boardOffset);
 };
 
-HexagonBoard.prototype._drawBoard = function _drawBoard() {
-    this._drawBackground();
-    this._drawHexagons();
+HexagonBoard.prototype.drawBoard = function drawBoard() {
+    if (this._drawCallInQueue !== true) {
+        this._drawCallInQueue = true;
+        requestAnimationFrame(function () {
+            this._drawCallInQueue = false;
+            this._drawBackground();
+            this._drawHexagons();
+        }.bind(this));
+    }
 };
 
 HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
@@ -460,7 +459,7 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(clientX, cli
 HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     var changeColorCallback = function changeColorCallback (newCurrentColor) {
         this._currentColor = newCurrentColor;
-        this._drawBoard();
+        this.drawBoard();
         this._drawOverlay();
     }.bind(this);
 
