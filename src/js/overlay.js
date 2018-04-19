@@ -25,6 +25,13 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
         hexagonBoard.reset();
     });
 
+    if (hexagonBoard.debug === true) {
+        var debugContainer = document.createElement('div');
+        debugContainer.className = 'debug-container';
+        this._debugContainer = debugContainer;
+        topLeftContainer.appendChild(debugContainer);
+    }
+
     overlayContainer.appendChild(topLeftContainer);
 
     var bottomLeftContainer = document.createElement('div');
@@ -218,5 +225,16 @@ function createSingleHexagonCanvas(size, color) {
 
     return canvas;
 }
+
+Overlay.prototype.appendDebugText = function appendDebugText(text) {
+    if (this._debugContainer === undefined) {
+        return;
+    }
+    if (this._debugVisible !== true) {
+        this._debugVisible = true;
+        this._debugContainer.style.display = 'block';
+    }
+    this._debugContainer.innerText = text + '\n' + this._debugContainer.innerText;
+};
 
 module.exports = Overlay;

@@ -166,3 +166,11 @@ div.colorInput {
     height: 26px;
     max-width: 116px;
 }
+
+.debug-container {
+    display: none;
+    background: #ffffff;
+    border: 1px solid #c2c2c2;
+    max-height: 400px;
+    overflow: hidden;
+}

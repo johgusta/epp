@@ -16,6 +16,8 @@ var DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer) {
 
+    this.debug = true;
+
     this._init(mainContainer);
 
     this.size = DEFAULT_SIZE;
@@ -73,6 +75,7 @@ function HexagonBoard(mainContainer) {
             that._boardOffset.zoom = newZoom;
         }
 
+        that.overlay.appendDebugText('scroll delta: ' + delta);
         if (that.size !== size) {
             that.size = size;
             that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
