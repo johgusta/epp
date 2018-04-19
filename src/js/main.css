@@ -172,5 +172,6 @@ div.colorInput {
     background: #ffffff;
     border: 1px solid #c2c2c2;
     max-height: 400px;
+    max-width: 150px;
     overflow: hidden;
 }

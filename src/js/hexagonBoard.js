@@ -16,7 +16,7 @@ var DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer) {
 
-    this.debug = true;
+    this.debug = false;
 
     this._init(mainContainer);
 
@@ -91,6 +91,7 @@ function mouseHandler(that) {
 
     var isPinching = false;
     var pinchStartSize = undefined;
+    var pinchStartOffset = undefined;
 
     var hammertime = new Hammer(that.boardContainer);
 
@@ -99,14 +100,13 @@ function mouseHandler(that) {
         that.overlay.appendDebugText('first pinch');
         isPinching = true;
         pinchStartSize = that.size;
-    });
-    hammertime.on('pinchend', function (ev) {
-        that.overlay.appendDebugText('last pinch');
-//        isPinching = false;
-//        pinchStartSize = undefined;
+        pinchStartOffset = {
+            x: that._boardOffset.x,
+            y: that._boardOffset.y
+        };
+
     });
     hammertime.on('pinch', function (ev) {
-        that.overlay.appendDebugText('pinch scale: ' + ev.scale);
         var newSize = Math.round(pinchStartSize * ev.scale);
         if (newSize < 10) {
             newSize = 10;
@@ -116,6 +116,13 @@ function mouseHandler(that) {
 
         if (that.size !== newSize) {
             that.size = newSize;
+            var xZoomOffset = pinchStartOffset.x +
+                (ev.center.x / newSize - ev.center.x / pinchStartSize) * Math.max(newSize, pinchStartSize);
+            var yZoomOffset = pinchStartOffset.y +
+                (ev.center.y / newSize - ev.center.y / pinchStartSize) * Math.max(newSize, pinchStartSize);
+            that._boardOffset.x = xZoomOffset;
+            that._boardOffset.y = yZoomOffset;
+
             requestAnimationFrame(function () {
                 that._clearFocus();
                 that.draw();
@@ -137,7 +144,6 @@ function mouseHandler(that) {
     that.boardContainer.addEventListener('touchmove', function (event) {
         var touch = event.changedTouches[0];
         if (touch) {
-            that.overlay.appendDebugText('touch move: ' + isPinching);
             mouseMoveHandler(touch);
         }
     });
@@ -165,7 +171,6 @@ function mouseHandler(that) {
 
     function mouseDownHandler(event) {
         if (isPinching) {
-            that.overlay.appendDebugText('ignore mouse down');
             return;
         }
         isMouseDown = true;
