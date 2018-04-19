@@ -90,67 +90,38 @@ function HexagonBoard(mainContainer) {
 function mouseHandler(that) {
 
     var isPinching = false;
+    var pinchStartSize = undefined;
 
     var hammertime = new Hammer(that.boardContainer);
 
     hammertime.get('pinch').set({ enable: true });
+    hammertime.on('pinchstart', function (ev) {
+        that.overlay.appendDebugText('first pinch');
+        isPinching = true;
+        pinchStartSize = that.size;
+    });
+    hammertime.on('pinchend', function (ev) {
+        that.overlay.appendDebugText('last pinch');
+        isPinching = false;
+        pinchStartSize = undefined;
+    });
     hammertime.on('pinch', function (ev) {
-
-        var delta = ev.scale;
-        var newZoom = that._boardOffset.zoom - delta;
-
-        var startWidth = that.canvas.width;
-        var startHeight = that.canvas.height;
-
-        var ratio = startWidth / startHeight;
-        var width = startWidth + newZoom;
-        var height = Math.round(startWidth / ratio);
-
-        var sizeDifference = startWidth / width;
-
-        var size = Math.round(DEFAULT_SIZE * sizeDifference);
-
-        if (size < 10) {
-            size = 10;
-        } else if (size > 100) {
-            size = 100;
-        } else {
-            that._boardOffset.zoom = newZoom;
+        that.overlay.appendDebugText('pinch scale: ' + ev.scale);
+        var newSize = Math.round(pinchStartSize * ev.scale);
+        if (newSize < 10) {
+            newSize = 10;
+        } else if (newSize > 100) {
+            newSize = 100;
         }
 
-        if (that.size !== size) {
-            that.size = size;
-            that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
+        if (that.size !== newSize) {
+            that.size = newSize;
             requestAnimationFrame(function () {
                 that._clearFocus();
                 that.draw();
-            })
+            });
         }
     });
-
-//    hammertime.on('panstart', function(ev) {
-//        var fakeTouch = {
-//            clientX: ev.center.x,
-//            clientY: ev.center.y
-//        };
-//        mouseDownHandler(fakeTouch);
-//    });
-//    hammertime.on('panmove', function(ev) {
-//        var fakeTouch = {
-//            clientX: ev.center.x,
-//            clientY: ev.center.y
-//        };
-//        mouseMoveHandler(fakeTouch);
-//    });
-//    hammertime.on('panend', function(ev) {
-//        var fakeTouch = {
-//            clientX: ev.center.x,
-//            clientY: ev.center.y
-//        };
-//        mouseMoveHandler(fakeTouch);
-//    });
-
-
 
     that.boardContainer.addEventListener('mousedown', mouseDownHandler);
     that.boardContainer.addEventListener('mousemove', mouseMoveHandler);
