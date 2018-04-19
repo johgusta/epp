@@ -78,7 +78,6 @@ function HexagonBoard(mainContainer) {
         that.overlay.appendDebugText('scroll delta: ' + delta);
         if (that.size !== size) {
             that.size = size;
-            that._boardSize = calculateBoardSize(that.canvas.width, that.canvas.height, that.size);
             throttledRedraw();
         }
     }
@@ -354,15 +353,13 @@ HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
 };
 
 HexagonBoard.prototype.draw = function draw() {
-
-    this._boardSize = calculateBoardSize(this.canvas.width, this.canvas.height, this.size);
     this._drawBoard();
     this._drawOverlay();
     this._drawLoadInfo();
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
-    this.background.draw(this._boardSize, this.size, this._boardOffset);
+    this.background.draw(this.size, this._boardOffset);
 };
 
 HexagonBoard.prototype._drawBoard = function _drawBoard() {

@@ -12,11 +12,8 @@ Background.prototype.setSize = function setSize(width, height) {
     this.canvas.height = height;
 };
 
-Background.prototype.draw = function draw(boardSize, hexagonSize, boardOffset) {
+Background.prototype.draw = function draw(hexagonSize, boardOffset) {
     this.canvas.width = this.canvas.width;
-
-    var boardWidth = boardSize.width;
-    var boardHeight = boardSize.height;
 
     var ctx = this.canvas.getContext('2d');
     var borderColor = this._borderColor;
@@ -29,6 +26,9 @@ Background.prototype.draw = function draw(boardSize, hexagonSize, boardOffset) {
     var xOffset = 0;
 
     var rowHeight = (hexagonHeight - triangleHeight);
+
+    var boardWidth = Math.floor((this.canvas.width - hexagonSize / 2) / hexagonSize);
+    var boardHeight = Math.floor((this.canvas.height - triangleHeight) / rowHeight);
 
     var cappedBoardOffset = {
         x: boardOffset.x % hexagonSize,
