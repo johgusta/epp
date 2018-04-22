@@ -74,7 +74,7 @@ body {
 
 
 .currentColorSelector {
-    width: calc(100% - 4px);
+    width: 80px;
     min-height: 25px;
     margin-bottom: 6px;
     padding: 4px;
@@ -83,22 +83,9 @@ body {
     border: 1px solid #c2c2c2;
 }
 
-.colorsDiv {
-    width: 100%;
-    min-height: 100px;
-    padding: 2px;
-
+.colorsCanvas {
     background: #f6f6f6;
     border: 1px solid #c2c2c2;
-}
-
-.colorsDiv > div {
-    display: block;
-}
-
-.colorsDiv canvas {
-    position: relative;
-    top: 2px;
 }
 
 div.colorInput {

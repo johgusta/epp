@@ -1,5 +1,7 @@
 "use strict";
 
+var ColorList = require('./colorList.js');
+
 var $ = require('jquery');
 require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
@@ -53,11 +55,11 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     currentColorSelector.appendChild(colorInput);
 
-    var colorsDiv = document.createElement('div');
-    colorsDiv.className = 'colorsDiv';
-    bottomLeftContainer.appendChild(colorsDiv);
+    var colorsCanvas = document.createElement('canvas');
+    colorsCanvas.className = 'colorsCanvas';
+    bottomLeftContainer.appendChild(colorsCanvas);
 
-    this._colorsDiv = colorsDiv;
+    this._colorList = new ColorList(colorsCanvas);
 
     var saveDialogContainer = document.createElement('div');
     saveDialogContainer.className = 'saveDialogContainer';
@@ -169,12 +171,6 @@ Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, curren
 };
 
 Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentColor, changeColorCallback) {
-    var colorsDiv = this._colorsDiv;
-
-    while(colorsDiv.firstChild) {
-        colorsDiv.removeChild(colorsDiv.firstChild);
-    }
-
     var that = this;
     $('.colorPicker').spectrum({
         color: currentColor,
@@ -189,54 +185,8 @@ Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentC
         }
     });
 
-    colorList.forEach(function (color) {
-        var colorDiv = document.createElement('div');
-        colorDiv.className = 'button';
-
-        var hexagonCanvas = createSingleHexagonCanvas(12, color.name);
-
-        colorDiv.appendChild(hexagonCanvas);
-
-        var countSpan = document.createElement('span');
-        countSpan.innerText = ' x ' + color.count;
-
-
-        colorDiv.addEventListener('click', function () {
-            changeColorCallback(color.name);
-        });
-        colorDiv.appendChild(countSpan);
-        colorsDiv.appendChild(colorDiv);
-    });
+    this._colorList.draw(colorList, changeColorCallback);
 };
-
-function createSingleHexagonCanvas(size, color) {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-
-    var triangleHeight = Math.tan(Math.PI / 6) * size / 2;
-    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
-
-    canvas.width = triangleHeight * 2 + sideLength + 2;
-    canvas.height = size + 2;
-
-    context.beginPath();
-    context.translate(1, 1);
-    context.moveTo(triangleHeight, 0);
-    context.lineTo(triangleHeight + sideLength, 0);
-    context.lineTo(triangleHeight * 2 + sideLength, size / 2);
-    context.lineTo(triangleHeight + sideLength, size);
-    context.lineTo(triangleHeight, size);
-    context.lineTo(0, size / 2);
-    context.lineTo(triangleHeight, 0);
-
-    context.fillStyle = color;
-    context.fill();
-
-    context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-    context.stroke();
-
-    return canvas;
-}
 
 Overlay.prototype.appendDebugText = function appendDebugText(text) {
     if (this._debugContainer === undefined) {
