@@ -552,23 +552,6 @@ HexagonBoard.prototype.exportPattern = function exportPattern(name) {
     });
 };
 
-function calculateBoardSize(width, height, size) {
-
-    var sideLength = (size / 2) / Math.cos(Math.PI / 6);
-    var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
-
-    var hexagonHeight = (2 * triangleHeight + sideLength);
-
-
-    var boardWidth = Math.floor((width - size / 2) / size);
-    var boardHeight = Math.floor((height - triangleHeight) / (hexagonHeight - triangleHeight));
-
-    return {
-        width: boardWidth,
-        height: boardHeight
-    };
-}
-
 HexagonBoard.prototype.store = function store() {
     var serializedBoard = this._serialize(false);
     this.patternHandler.storeCurrent(serializedBoard);
