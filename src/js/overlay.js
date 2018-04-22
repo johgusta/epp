@@ -89,6 +89,14 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     });
     innerSaveContainer.appendChild(saveButton);
 
+    var exportButton = document.createElement('div');
+    exportButton.className = 'export button';
+    exportButton.innerText = 'Export';
+    exportButton.addEventListener('click', function (event) {
+        hexagonBoard.exportPattern(saveNameInput.value);
+    });
+    innerSaveContainer.appendChild(exportButton);
+
     var innerLoadContainer = document.createElement('div');
     innerLoadContainer.className = 'innerLoadContainer';
     saveDialogContainer.appendChild(innerLoadContainer);

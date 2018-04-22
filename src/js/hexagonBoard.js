@@ -3,6 +3,7 @@
 var Color = require('color');
 var Hamster = require('hamsterjs');
 var Hammer = require('hammerjs');
+var FileSaver = require('file-saver');
 
 var Background = require('./background.js');
 var HexagonMatrix = require('./hexagonMatrix.js');
@@ -541,6 +542,14 @@ HexagonBoard.prototype.deletePattern = function deletePattern(name) {
     this.patternHandler.deletePattern(name);
 
     this._drawLoadInfo();
+};
+
+HexagonBoard.prototype.exportPattern = function exportPattern(name) {
+    console.log('export pattern: ' + name);
+
+    this.canvas.toBlob(function (blob) {
+        FileSaver.saveAs(blob, name + ".png");
+    });
 };
 
 function calculateBoardSize(width, height, size) {
