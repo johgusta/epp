@@ -79,15 +79,19 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     innerSaveContainer.appendChild(saveNameInput);
 
-    var saveButton = document.createElement('input');
-    saveButton.type = 'submit';
+    var saveButton = document.createElement('div');
     saveButton.className = 'save button';
-    saveButton.value = 'Save';
-    innerSaveContainer.addEventListener('submit', function (event) {
+    saveButton.innerText = 'Save';
+
+    function savePattern(event) {
         event.preventDefault();
         hexagonBoard.savePattern(saveNameInput.value);
-    });
+    }
+
+    saveButton.addEventListener('click', savePattern);
+
     innerSaveContainer.appendChild(saveButton);
+    innerSaveContainer.addEventListener('submit', savePattern);
 
     var exportButton = document.createElement('div');
     exportButton.className = 'export button';
