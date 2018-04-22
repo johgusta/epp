@@ -11,17 +11,17 @@ var borderColor = 'rgba(0, 0, 0, 0.2)';
 var padding = 6;
 
 function ColorList(canvas) {
-    this._canvas = canvas;
+    this.canvas = canvas;
     this._colorList = [];
 
-    this._canvas.addEventListener('click', this._handleClick.bind(this));
+    this.canvas.addEventListener('click', this._handleClick.bind(this));
 }
 
 ColorList.prototype.draw = function draw(colorList, changeColorCallback) {
     this._colorList = colorList;
     this._changeColorCallback = changeColorCallback;
 
-    var colorsCanvas = this._canvas;
+    var colorsCanvas = this.canvas;
     colorsCanvas.width = itemWidth;
     colorsCanvas.height = colorItemHeight * colorList.length + padding;
     var context = colorsCanvas.getContext('2d');

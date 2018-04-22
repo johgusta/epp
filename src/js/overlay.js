@@ -59,7 +59,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     colorsCanvas.className = 'colorsCanvas';
     bottomLeftContainer.appendChild(colorsCanvas);
 
-    this._colorList = new ColorList(colorsCanvas);
+    this.colorList = new ColorList(colorsCanvas);
 
     var saveDialogContainer = document.createElement('div');
     saveDialogContainer.className = 'saveDialogContainer';
@@ -185,7 +185,7 @@ Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentC
         }
     });
 
-    this._colorList.draw(colorList, changeColorCallback);
+    this.colorList.draw(colorList, changeColorCallback);
 };
 
 Overlay.prototype.appendDebugText = function appendDebugText(text) {

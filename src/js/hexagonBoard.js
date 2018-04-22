@@ -547,8 +547,22 @@ HexagonBoard.prototype.deletePattern = function deletePattern(name) {
 HexagonBoard.prototype.exportPattern = function exportPattern(name) {
     console.log('export pattern: ' + name);
 
-    this.canvas.toBlob(function (blob) {
-        FileSaver.saveAs(blob, name + ".png");
+    var canvas = document.createElement('canvas');
+    canvas.width = this.canvas.width;
+    canvas.height = this.canvas.height;
+
+    var context = canvas.getContext('2d');
+
+    context.drawImage(this.canvas, 0, 0);
+
+    var colorsCanvas = this.overlay.colorList.canvas;
+    context.drawImage(colorsCanvas, 0, canvas.height - colorsCanvas.height);
+
+    if (name === undefined || name === '') {
+        name = 'Pattern';
+    }
+    canvas.toBlob(function (blob) {
+        FileSaver.saveAs(blob, name);
     });
 };
 
