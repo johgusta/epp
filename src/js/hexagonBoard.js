@@ -72,6 +72,16 @@ function HexagonBoard(mainContainer) {
 
         that.overlay.appendDebugText('scroll delta: ' + delta);
         if (that.size !== size) {
+            var previousNumberOfHexagons = event.originalEvent.clientX / that.size;
+            var currentNumberOfHexagons = event.originalEvent.clientX / size;
+            var xZoomOffset = that._boardOffset.x +
+                (currentNumberOfHexagons - previousNumberOfHexagons) * Math.max(size, that.size);
+            var yZoomOffset = that._boardOffset.y +
+                (event.originalEvent.clientY / size - event.originalEvent.clientY / that.size) * Math.max(size, that.size);
+
+            that._boardOffset.x = xZoomOffset;
+            that._boardOffset.y = yZoomOffset;
+
             that.size = size;
             that._clearFocus();
             that.drawBoard();
