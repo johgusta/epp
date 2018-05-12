@@ -1,17 +1,18 @@
 "use strict";
 
 var ColorList = require('./colorList.js');
+var ApiService = require('./apiService.js');
 
 var $ = require('jquery');
 require('spectrum-colorpicker/spectrum.js');
 require('spectrum-colorpicker/spectrum.css');
 
-function Overlay(overlayContainer, hexagonBoard) {
+function Overlay(overlayContainer, hexagonBoard, currentUser) {
     //this._hexagonBoard = hexagonBoard;
-    this._init(overlayContainer, hexagonBoard);
+    this._init(overlayContainer, hexagonBoard, currentUser);
 }
 
-Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
+Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, currentUser) {
     var topLeftContainer = document.createElement('div');
     topLeftContainer.className = 'topLeftContainer';
 
@@ -35,6 +36,26 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     }
 
     overlayContainer.appendChild(topLeftContainer);
+
+    var topRightContainer = document.createElement('div');
+    topRightContainer.className = 'topRightContainer';
+
+    var userButton = document.createElement('div');
+    userButton.className = 'user button';
+    topRightContainer.appendChild(userButton);
+
+    var userButtonText = document.createElement('span');
+    userButtonText.innerText = 'Log out ' + currentUser.firstname + ' ' +
+        currentUser.lastname;
+    userButton.appendChild(userButtonText);
+
+    userButton.addEventListener('click', function () {
+        console.log('User button clicked!');
+        ApiService.logout();
+    });
+
+    overlayContainer.appendChild(topRightContainer);
+
 
     var bottomLeftContainer = document.createElement('div');
     bottomLeftContainer.className = 'bottomLeftContainer';

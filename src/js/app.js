@@ -11,7 +11,7 @@ window.GlobalApiService = ApiService;
 
 ApiService.initializeUser().then(function (user) {
     if (user) {
-        var hexagonBoard = new HexagonBoard(mainContent);
+        var hexagonBoard = new HexagonBoard(mainContent, user);
         window.Board = hexagonBoard;
         hexagonBoard.draw();
     } else {

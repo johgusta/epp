@@ -31,6 +31,7 @@ ApiService.prototype.logout = function logout() {
     return api.get('/api-auth/logout/').then(function () {
         console.log('Logout successful');
         //TODO: Reroute to logout/login page
+        window.location = getCurrentUri();
     }).catch(function (error) {
         console.log('Logout error', error.response);
         throw error;
@@ -104,7 +105,7 @@ function redirectToGoogleLogin(clientId) {
     var url = 'https://accounts.google.com/o/oauth2/v2/auth';
     url += '?redirect_uri=' + encodeURIComponent(redirectUri);
     url += '&client_id=' + clientId;
-//        url += '&prompt=consent';
+    url += '&prompt=consent';
     url += '&response_type=code';
     url += '&scope=openid%20email%20profile';
     url += '&access_type=offline';

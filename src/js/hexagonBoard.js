@@ -15,9 +15,11 @@ var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
 var DEFAULT_BORDER_COLOR = '#cccccc';
 
-function HexagonBoard(mainContainer) {
+function HexagonBoard(mainContainer, user) {
 
     this.debug = false;
+
+    this.currentUser = user;
 
     this._init(mainContainer);
 
@@ -342,7 +344,7 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.background = new Background(backgroundCanvas);
 
     this.patternHandler = new PatternHandler();
-    this.overlay = new Overlay(overlayDiv, this);
+    this.overlay = new Overlay(overlayDiv, this, this.currentUser);
 };
 
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {

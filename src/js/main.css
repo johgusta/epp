@@ -55,6 +55,14 @@ body {
     pointer-events: auto;
 }
 
+.topRightContainer {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    pointer-events: auto;
+}
+
 .bottomLeftContainer {
     position: absolute;
     left: 10px;
