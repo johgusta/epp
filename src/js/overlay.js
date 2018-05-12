@@ -45,8 +45,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, current
     topRightContainer.appendChild(userButton);
 
     var userButtonText = document.createElement('span');
-    userButtonText.innerText = 'Log out ' + currentUser.firstname + ' ' +
-        currentUser.lastname;
+    userButtonText.innerText = 'Log out ' + currentUser.fullName;
     userButton.appendChild(userButtonText);
 
     userButton.addEventListener('click', function () {

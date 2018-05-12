@@ -45,7 +45,16 @@ ApiService.prototype.initializeUser = function initializeUser() {
     }
 
     return api.get('user/').then(function (response) {
-        var user = response.data;
+        var apiUser = response.data;
+
+        var user = {
+            id: apiUser.id,
+            username: apiUser.username,
+            firstName: apiUser.first_name,
+            lastName: apiUser.last_name,
+            email: apiUser.email
+        };
+        user.fullName = user.firstName + ' ' + user.lastName;
         return user;
     }).catch(function (error) {
         var errorResponse = error.response;
