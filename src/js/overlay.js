@@ -161,8 +161,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, current
     innerLoadContainer.appendChild(deleteButton);
 };
 
-Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, currentName) {
-    this._saveNameInput.value = currentName;
+Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, currentPatternId) {
 
     var loadDropDown = this._loadDropDown;
     while(loadDropDown.firstChild){
@@ -172,12 +171,13 @@ Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, curren
     savedPatterns.forEach(function (pattern) {
         var option = document.createElement('option');
         option.innerText = pattern.name;
-        option.value = pattern.name;
-        if (currentName === pattern.name) {
+        option.value = pattern.id;
+        if (currentPatternId === pattern.id) {
             option.selected = true;
+            this._saveNameInput.value = pattern.name;
         }
         loadDropDown.appendChild(option);
-    });
+    }.bind(this));
 
     if (savedPatterns.length === 0) {
         loadDropDown.setAttribute('disabled', true);

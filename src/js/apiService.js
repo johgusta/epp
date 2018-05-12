@@ -73,13 +73,51 @@ ApiService.prototype.getPatterns = function getPatterns() {
         var patterns = response.data;
         return patterns;
     }, function (error) {
-        console.error('Failed loading user patterns!', error);
+        console.error('Error loading user patterns', error);
         throw error;
     });
 };
 
-ApiService.prototype.savePattern = function savePattern(patternId) {
-    //TODO: Save or update pattern
+ApiService.prototype.addPattern = function addPattern(pattern) {
+    return api.post('/patterns/', pattern).then(function (response) {
+        var apiPattern = response.data;
+        console.log('Added pattern: ' + apiPattern.id);
+        return apiPattern;
+    }).catch(function (error) {
+        console.error('Error adding pattern', error);
+        throw error;
+    });
+};
+
+ApiService.prototype.getPattern = function getPattern(id) {
+    return api.get('/patterns/' + id + '/').then(function (response) {
+        var patterns = response.data;
+        return patterns;
+    }, function (error) {
+        console.error('Error fetching pattern: ' + id, error);
+        throw error;
+    });
+};
+
+ApiService.prototype.updatePattern = function updatePattern(id, pattern) {
+    return api.put('/patterns/' + id + '/', pattern).then(function (response) {
+        var apiPattern = response.data;
+        console.log('Update pattern: ' + apiPattern.id);
+        return apiPattern;
+    }, function (error) {
+        console.error('Error updating pattern: ' + id, error);
+        throw error;
+    });
+};
+
+ApiService.prototype.deletePattern = function deletePattern(id) {
+    return api.delete('/patterns/' + id + '/').then(function () {
+        console.log('Deleted pattern: ' + id);
+        return undefined;
+    }).catch(function (error) {
+        console.error('Error deleting pattern: ' + id, error);
+        throw error;
+    });
 };
 
 function getGoogleClientId() {

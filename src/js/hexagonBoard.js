@@ -29,7 +29,7 @@ function HexagonBoard(mainContainer, user) {
     this._hexagonMatrix = hexagonMatrix;
     this._currentColor = DEFAULT_COLOR;
     this._borderColor = DEFAULT_BORDER_COLOR;
-    this._currentPatternName = '';
+    this._currentPatternId = undefined;
 
     this._boardOffset = {
         x: 0,
@@ -510,44 +510,42 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
 };
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
-    var savedPatterns = this.patternHandler.getSavedPatterns();
-    this.overlay.updateLoadInfo(savedPatterns, this._currentPatternName);
+    this.patternHandler.getSavedPatterns().then(function (patterns) {
+        this.overlay.updateLoadInfo(patterns, this._currentPatternId);
+    }.bind(this));
 };
 
 HexagonBoard.prototype._clearFocus = function _clearFocus() {
     this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
-HexagonBoard.prototype.savePattern = function savePattern(name) {
-    console.log('save pattern as: ' + name);
-
+HexagonBoard.prototype.savePattern = function savePattern(patternName) {
     var serializedPattern = this._serialize(true);
 
-    this.patternHandler.savePattern(name, serializedPattern);
-
-    this._currentPatternName = name;
-
-    this._drawLoadInfo();
+    this.patternHandler.savePattern(patternName, serializedPattern).then(function () {
+        this._drawLoadInfo();
+    }.bind(this));
 };
 
-HexagonBoard.prototype.loadPattern = function loadPattern(name) {
-    console.log('load pattern: ' + name);
+HexagonBoard.prototype.loadPattern = function loadPattern(id) {
+    console.log('Load pattern: ' + id);
 
-    var serializedObject = this.patternHandler.loadPattern(name);
-    this._loadBoard(serializedObject);
+    this.patternHandler.loadPattern(id).then(function (pattern) {
+        var serializedObject = pattern.board;
+        this._loadBoard(serializedObject);
 
-    this._currentPatternName = name;
+        this._currentPatternId = id;
 
-    this.draw();
-    this.store();
+        this.draw();
+        this.store();
+    }.bind(this));
 };
 
 HexagonBoard.prototype.deletePattern = function deletePattern(name) {
-    console.log('delete pattern: ' + name);
+    this.patternHandler.deletePattern(name).then(function () {
+        this._drawLoadInfo();
+    }.bind(this));
 
-    this.patternHandler.deletePattern(name);
-
-    this._drawLoadInfo();
 };
 
 HexagonBoard.prototype.exportPattern = function exportPattern(name) {
@@ -586,7 +584,7 @@ HexagonBoard.prototype.reset = function reset() {
     this.patternHandler.clearCurrent();
 
     this._hexagonMatrix.reset();
-    this._currentPatternName = '';
+    this._currentPatternId = undefined;
     this.size = DEFAULT_SIZE;
     this.draw();
 };
@@ -605,7 +603,7 @@ HexagonBoard.prototype._serialize = function _serialize(isFullSerialization) {
     };
 
     if (isFullSerialization) {
-        serializedObject.board.name = this._currentPatternName;
+        serializedObject.board.id = this._currentPatternId;
         serializedObject.board.size = this.size;
     }
     return serializedObject;
@@ -621,8 +619,8 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
         return;
     }
 
-    if (serializedBoard.name) {
-        this._currentPatternName = serializedBoard.name;
+    if (serializedBoard.id) {
+        this._currentPatternId = serializedBoard.id;
     }
 
     if (serializedBoard.size) {

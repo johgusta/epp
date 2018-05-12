@@ -1,8 +1,8 @@
 "use strict";
 
+var ApiService = require('./apiService.js');
+
 var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
-var SAVED_PATTERNS_KEY = 'HexagonPatterns';
-var SAVED_PATTERN_PREFIX = 'HexagonPattern-';
 
 function PatternHandler() {
 
@@ -43,94 +43,47 @@ PatternHandler.prototype.clearCurrent = function clearCurrent() {
 };
 
 PatternHandler.prototype.savePattern = function savePattern(name, serializedObject) {
-    if (!window.localStorage) {
-        return;
-    }
-
     var serializedPattern = JSON.stringify(serializedObject);
-    var savedPatterns = this.getSavedPatterns();
 
-    var newPatterns = [];
-    //Remove duplicates
-    savedPatterns.forEach(function (pattern) {
-        if (pattern.name !== name) {
-            newPatterns.push(pattern);
-        }
-    });
-    newPatterns.push({
-        name: name
-    });
+    var apiPattern = {
+        title: name,
+        data: serializedPattern
+    };
 
-    this.storeSavedPatterns(newPatterns);
-
-    window.localStorage.setItem(SAVED_PATTERN_PREFIX + name, serializedPattern);
+    return ApiService.addPattern(apiPattern);
 };
 
-PatternHandler.prototype.loadPattern = function loadPattern(name) {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var serializedString = window.localStorage.getItem(SAVED_PATTERN_PREFIX + name);
-    var serializedObject;
-    try {
-        serializedObject= JSON.parse(serializedString);
-    } catch (e) {
-        console.error('Error loading stored pattern!', e);
-        window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
-        return;
-    }
-
-    return serializedObject;
+PatternHandler.prototype.loadPattern = function loadPattern(id) {
+    return ApiService.getPattern(id).then(function (apiPattern) {
+        var pattern = parseApiPattern(apiPattern);
+        return pattern;
+    });
 };
 
-PatternHandler.prototype.deletePattern = function deletePattern(name) {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var oldPatterns = this.getSavedPatterns();
-    var newPatterns = [];
-    oldPatterns.forEach(function (pattern) {
-        if (pattern.name !== name) {
-            newPatterns.push(pattern);
-        }
-    });
-
-    this.storeSavedPatterns(newPatterns);
-
-    window.localStorage.removeItem(SAVED_PATTERN_PREFIX + name);
+PatternHandler.prototype.deletePattern = function deletePattern(id) {
+    return ApiService.deletePattern(id);
 };
 
 PatternHandler.prototype.getSavedPatterns = function getSavedPatterns() {
-    if (!window.localStorage) {
-        return [];
-    }
+    return ApiService.getPatterns().then(function (apiPatterns) {
+        var patterns = apiPatterns.map(parseApiPattern);
+        return patterns;
+    });
+};
 
-    var savedPatternsString = window.localStorage.getItem(SAVED_PATTERNS_KEY);
-    var savedPatterns = [];
-
+function parseApiPattern(apiPattern) {
+    var pattern = {
+        name: apiPattern.title,
+        id: apiPattern.id
+    };
     try {
-        savedPatterns = JSON.parse(savedPatternsString);
+        var patternData = JSON.parse(apiPattern.data);
+        pattern.board = patternData;
     } catch (e) {
-        console.error('Error parsing saved patterns', e);
-        return [];
+        console.error('Error parsing saved pattern: ' + pattern.id, e);
     }
 
-    if (!Array.isArray(savedPatterns)) {
-        savedPatterns = [];
-    }
-
-    return savedPatterns;
-};
-
-PatternHandler.prototype.storeSavedPatterns = function storeSavedPatterns(savedPatterns) {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var savedPatternsString = JSON.stringify(savedPatterns);
-    window.localStorage.setItem(SAVED_PATTERNS_KEY, savedPatternsString);
-};
+    return pattern;
+}
 
 module.exports = PatternHandler;
