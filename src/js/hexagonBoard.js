@@ -300,6 +300,10 @@ function mouseHandler(that) {
 }
 
 HexagonBoard.prototype._init = function _init(mainContainer) {
+    while (mainContainer.hasChildNodes()) {
+        mainContainer.removeChild(mainContainer.lastChild);
+    }
+
     var boardContainer = document.createElement('div');
     boardContainer.id = 'board-container';
     this.boardContainer = boardContainer;
