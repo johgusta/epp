@@ -1,5 +1,10 @@
 "use strict";
 
+import style from './login.css';
+import loginTemplate from './login.html';
+
+import Mustache from 'mustache';
+
 import {ApiService} from '../js/apiService.js';
 
 function LoginPage(container) {
@@ -13,19 +18,11 @@ LoginPage.prototype.draw = function draw() {
         container.removeChild(container.lastChild);
     }
 
-    var loginDiv = document.createElement('div');
-    loginDiv.style.width = '200px';
-    container.appendChild(loginDiv);
+    var rendered = Mustache.render(loginTemplate);
 
-    var loginText = document.createElement('span');
-    loginText.innerText = 'Login';
-    loginDiv.appendChild(loginText);
+    container.innerHTML = rendered;
 
-    var button = document.createElement('div');
-    button.innerText = 'Login with google';
-    button.style.border = '1px solid grey';
-    button.style.cursor = 'pointer';
-    loginDiv.appendChild(button);
+    var button = document.getElementById('google-login-button');
 
     button.addEventListener('click', function () {
         ApiService.login();

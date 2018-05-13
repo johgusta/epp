@@ -1,0 +1,9 @@
+.login-page {
+    width: 400px;
+    margin: 0 auto;
+}
+
+.login {
+    border: 1px solid grey;
+    cursor: pointer;
+}
