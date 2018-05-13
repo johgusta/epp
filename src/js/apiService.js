@@ -1,7 +1,7 @@
 "use strict";
 
+var page = require('page');
 var axios = require('axios');
-var queryString = require('query-string');
 
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -12,6 +12,8 @@ var api = axios.create({
 //        baseURL: 'http://127.0.0.1:8000'
 //        baseURL: 'http://johgusta.pythonanywhere.com'
 });
+
+var callbackSuffix = '/login/callback';
 
 function ApiService() {
 
@@ -30,20 +32,30 @@ ApiService.prototype.login = function login() {
 ApiService.prototype.logout = function logout() {
     return api.get('/api-auth/logout/').then(function () {
         console.log('Logout successful');
-        //TODO: Reroute to logout/login page
-        window.location = getCurrentUri();
+        page('/login');
     }).catch(function (error) {
         console.log('Logout error', error.response);
         throw error;
     });
 };
 
-ApiService.prototype.initializeUser = function initializeUser() {
-    var parsedParams = queryString.parse(window.location.search);
-    if (parsedParams.code !== undefined) {
-        return loginUsingGoogleCode(parsedParams.code);
-    }
+ApiService.prototype.loginWithGoogleCode = function loginWithGoogleCode(code) {
+    console.log('Log in with google code');
+    var redirectUri = getCurrentUri() + callbackSuffix;
+    return api.post('api/login/social/session/', {
+        redirect_uri: redirectUri,
+        provider: 'google-oauth2',
+        code: code
+    }).then(function (response) {
+        console.log('Success api login', response);
+        return response;
+    }).catch(function (error) {
+        console.error('Failed api login', error);
+        throw error;
+    });
+};
 
+ApiService.prototype.getUser = function getUser() {
     return api.get('user/').then(function (response) {
         var apiUser = response.data;
 
@@ -130,24 +142,8 @@ function getGoogleClientId() {
     })
 }
 
-function loginUsingGoogleCode(code) {
-    console.log('Log in with google code');
-    var currentUri = getCurrentUri();
-    return api.post('api/login/social/session/', {
-        redirect_uri: currentUri,
-        provider: 'google-oauth2',
-        code: code
-    }).then(function (response) {
-        console.log('Success api login', response);
-        window.location = currentUri;
-    }).catch(function (error) {
-        console.error('Failed api login', error);
-        throw error;
-    });
-}
-
 function redirectToGoogleLogin(clientId) {
-    var redirectUri = getCurrentUri();
+    var redirectUri = getCurrentUri() + callbackSuffix;
 
     var url = 'https://accounts.google.com/o/oauth2/v2/auth';
     url += '?redirect_uri=' + encodeURIComponent(redirectUri);
