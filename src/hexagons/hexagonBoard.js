@@ -343,7 +343,6 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.canvas = canvas;
     this.background = new Background(backgroundCanvas);
 
-    this.patternHandler = new PatternHandler();
     this.overlay = new Overlay(overlayDiv, this, this.currentUser);
 };
 
@@ -510,7 +509,7 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
 };
 
 HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
-    this.patternHandler.getSavedPatterns().then(function (patterns) {
+    PatternHandler.getSavedPatterns().then(function (patterns) {
         this.overlay.updateLoadInfo(patterns, this._currentPatternId);
     }.bind(this));
 };
@@ -522,7 +521,7 @@ HexagonBoard.prototype._clearFocus = function _clearFocus() {
 HexagonBoard.prototype.savePattern = function savePattern(patternName) {
     var serializedPattern = this._serialize(true);
 
-    this.patternHandler.savePattern(patternName, serializedPattern).then(function () {
+    PatternHandler.savePattern(patternName, serializedPattern).then(function () {
         this._drawLoadInfo();
     }.bind(this));
 };
@@ -530,7 +529,7 @@ HexagonBoard.prototype.savePattern = function savePattern(patternName) {
 HexagonBoard.prototype.loadPattern = function loadPattern(id) {
     console.log('Load pattern: ' + id);
 
-    this.patternHandler.loadPattern(id).then(function (pattern) {
+    PatternHandler.loadPattern(id).then(function (pattern) {
         var serializedObject = pattern.board;
         this._loadBoard(serializedObject);
 
@@ -542,7 +541,7 @@ HexagonBoard.prototype.loadPattern = function loadPattern(id) {
 };
 
 HexagonBoard.prototype.deletePattern = function deletePattern(name) {
-    this.patternHandler.deletePattern(name).then(function () {
+    PatternHandler.deletePattern(name).then(function () {
         this._drawLoadInfo();
     }.bind(this));
 
@@ -572,16 +571,16 @@ HexagonBoard.prototype.exportPattern = function exportPattern(name) {
 
 HexagonBoard.prototype.store = function store() {
     var serializedBoard = this._serialize(false);
-    this.patternHandler.storeCurrent(serializedBoard);
+    PatternHandler.storeCurrent(serializedBoard);
 };
 
 HexagonBoard.prototype.load = function load() {
-    var serializedPattern = this.patternHandler.loadCurrent();
+    var serializedPattern = PatternHandler.loadCurrent();
     this._loadBoard(serializedPattern);
 };
 
 HexagonBoard.prototype.reset = function reset() {
-    this.patternHandler.clearCurrent();
+    PatternHandler.clearCurrent();
 
     this._hexagonMatrix.reset();
     this._currentPatternId = undefined;

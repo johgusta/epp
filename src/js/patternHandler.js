@@ -86,4 +86,5 @@ function parseApiPattern(apiPattern) {
     return pattern;
 }
 
-export {PatternHandler};
+var patternHandler = new PatternHandler();
+export {patternHandler as PatternHandler};

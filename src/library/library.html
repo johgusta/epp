@@ -2,5 +2,10 @@
     <div class="library">
         <div>Library</div>
         <span>User {{fullName}}</span>
+        <div class="patterns-list">
+            {{#patterns}}
+            <div id="{{id}}" class="pattern">{{name}}</div>
+            {{/patterns}}
+        </div>
     </div>
 <div>
