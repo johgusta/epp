@@ -1,12 +1,17 @@
 "use strict";
 
-function showLibraryPage(container) {
-    var libraryPage = new LibraryPage(container);
+require('../css/library.css');
+var testTemplate = require('../templates/library.html');
+var Mustache = require('mustache');
+
+function showLibraryPage(container, user) {
+    var libraryPage = new LibraryPage(container, user);
     libraryPage.draw();
 }
 
-function LibraryPage(container) {
+function LibraryPage(container, user) {
     this.container = container;
+    this.user = user;
 }
 
 LibraryPage.prototype.draw = function draw() {
@@ -16,9 +21,15 @@ LibraryPage.prototype.draw = function draw() {
         container.removeChild(container.lastChild);
     }
 
+
+    var rendered = Mustache.render(testTemplate, {fullName: this.user.fullName});
+
     var libraryDiv = document.createElement('div');
-    libraryDiv.innerText = 'Library';
+    libraryDiv.innerHTML = rendered;
     container.appendChild(libraryDiv);
+
+
+    console.log('loaded test template', testTemplate);
 };
 
 module.exports = showLibraryPage;

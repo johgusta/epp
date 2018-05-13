@@ -2,8 +2,8 @@
   "name": "epp",
   "version": "0.0.1",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server --public 192.168.7.85:5000 --port 5000 --content-base build --host 0.0.0.0",
+    "build": "webpack --mode=production",
+    "dev": "webpack-dev-server --mode=development --public 192.168.7.85:5000 --port 5000 --content-base build --host 0.0.0.0",
     "prestart": "npm run build",
     "start": "node server/server.js"
   },
@@ -19,6 +19,7 @@
     "html-loader": "^0.5.5",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
+    "mustache": "^2.3.0",
     "page": "^1.8.6",
     "query-string": "^6.1.0",
     "spectrum-colorpicker": "^1.8.0",

@@ -58,7 +58,13 @@ function edit() {
 }
 
 function library() {
-    showLibraryPage(mainContent);
+    ApiService.getUser().then(function (user) {
+        if (user) {
+            showLibraryPage(mainContent, user);
+        } else {
+            page('/login');
+        }
+    });
 }
 
 window.GlobalApiService = ApiService;
