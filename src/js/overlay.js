@@ -1,11 +1,11 @@
 "use strict";
 
-var ColorList = require('./colorList.js');
-var ApiService = require('./apiService.js');
+import {ColorList} from './colorList.js';
+import {ApiService} from './apiService.js';
 
-var $ = require('jquery');
-require('spectrum-colorpicker/spectrum.js');
-require('spectrum-colorpicker/spectrum.css');
+import $ from 'jquery';
+import spectrum from 'spectrum-colorpicker/spectrum.js';
+import style from 'spectrum-colorpicker/spectrum.css';
 
 function Overlay(overlayContainer, hexagonBoard, currentUser) {
     //this._hexagonBoard = hexagonBoard;
@@ -219,4 +219,4 @@ Overlay.prototype.appendDebugText = function appendDebugText(text) {
     this._debugContainer.innerText = text + '\n' + this._debugContainer.innerText;
 };
 
-module.exports = Overlay;
+export {Overlay};

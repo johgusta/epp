@@ -1,13 +1,13 @@
-require('./main.css');
-var page = require('page');
-var queryString = require('query-string');
+import style from './main.css';
+import page from 'page';
+import queryString from 'query-string';
 
-var HexagonBoard = require('./hexagonBoard.js');
-var LoginPage = require('./loginPage.js');
-var showLibraryPage = require('./libraryPage.js').showLibraryPage;
-var ApiService = require('./apiService.js');
+import {HexagonBoard} from './hexagonBoard.js';
+import {LoginPage} from './loginPage.js';
+import {showLibraryPage} from './libraryPage.js';
+import {ApiService} from './apiService.js';
 
-var _ = require('lodash');
+import _ from 'lodash';
 
 var mainContent = document.getElementById('main-content');
 

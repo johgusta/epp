@@ -1,6 +1,6 @@
 "use strict";
 
-var ApiService = require('./apiService.js');
+import {ApiService} from './apiService.js';
 
 function LoginPage(container) {
     this._container = container;
@@ -32,4 +32,4 @@ LoginPage.prototype.draw = function draw() {
     });
 };
 
-module.exports = LoginPage;
+export {LoginPage};

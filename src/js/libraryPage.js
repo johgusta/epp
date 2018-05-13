@@ -34,4 +34,3 @@ LibraryPage.prototype.draw = function draw() {
 };
 
 export {showLibraryPage};
-//module.exports = showLibraryPage;

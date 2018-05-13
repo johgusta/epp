@@ -1,6 +1,6 @@
 "use strict";
 
-var Hexagon = require('./hexagon.js');
+import {Hexagon} from './hexagon.js';
 
 var colorItemHeight = 30;
 var hexagonSize = 12;
@@ -83,4 +83,4 @@ function findColorIndex(x, y) {
     return colorIndex;
 }
 
-module.exports = ColorList;
+export {ColorList};

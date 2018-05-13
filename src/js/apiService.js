@@ -1,7 +1,7 @@
 "use strict";
 
-var page = require('page');
-var axios = require('axios');
+import page from 'page';
+import axios from 'axios';
 
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
@@ -166,4 +166,5 @@ function getCurrentUri() {
 }
 
 var apiService = new ApiService();
-module.exports = apiService;
+
+export {apiService as ApiService};

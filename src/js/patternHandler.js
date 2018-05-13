@@ -1,6 +1,6 @@
 "use strict";
 
-var ApiService = require('./apiService.js');
+import {ApiService} from './apiService.js';
 
 var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
 
@@ -86,4 +86,4 @@ function parseApiPattern(apiPattern) {
     return pattern;
 }
 
-module.exports = PatternHandler;
+export {PatternHandler};

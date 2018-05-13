@@ -1,6 +1,6 @@
 "use strict";
 
-var Hexagon = require('./hexagon.js');
+import {Hexagon} from './hexagon.js';
 
 function Background(canvas) {
     this.canvas = canvas;
@@ -54,4 +54,4 @@ Background.prototype.draw = function draw(hexagonSize, boardOffset) {
     }
 };
 
-module.exports = Background;
+export {Background};

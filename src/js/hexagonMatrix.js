@@ -136,4 +136,4 @@ HexagonMatrix.prototype.forEach = function forEach(callback) {
     });
 };
 
-module.exports = HexagonMatrix;
+export {HexagonMatrix};

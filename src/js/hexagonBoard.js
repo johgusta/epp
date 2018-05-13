@@ -1,15 +1,15 @@
 "use strict";
 
-var Color = require('color');
-var Hamster = require('hamsterjs');
-var Hammer = require('hammerjs');
-var FileSaver = require('file-saver');
+import Color from 'color';
+import Hamster from 'hamsterjs';
+import Hammer from 'hammerjs';
+import FileSave from 'file-saver';
 
-var Background = require('./background.js');
-var HexagonMatrix = require('./hexagonMatrix.js');
-var Hexagon = require('./hexagon.js');
-var Overlay = require('./overlay.js');
-var PatternHandler = require('./patternHandler.js');
+import {Background} from './background.js';
+import {HexagonMatrix} from './hexagonMatrix.js';
+import {Hexagon} from './hexagon.js';
+import {Overlay} from './overlay.js';
+import {PatternHandler} from './patternHandler.js';
 
 var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
@@ -642,4 +642,4 @@ HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
     }
 };
 
-module.exports = HexagonBoard;
+export {HexagonBoard};
