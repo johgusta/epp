@@ -1,7 +1,7 @@
 "use strict";
 
 import {ColorList} from './colorList.js';
-import {ApiService} from './apiService.js';
+import {ApiService} from '../js/apiService.js';
 
 import $ from 'jquery';
 import spectrum from 'spectrum-colorpicker/spectrum.js';

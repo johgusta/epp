@@ -1,6 +1,6 @@
 "use strict";
 
-import {ApiService} from './apiService.js';
+import {ApiService} from '../js/apiService.js';
 
 function LoginPage(container) {
     this._container = container;

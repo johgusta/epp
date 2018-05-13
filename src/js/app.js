@@ -2,9 +2,9 @@ import style from './main.css';
 import page from 'page';
 import queryString from 'query-string';
 
-import {HexagonBoard} from './hexagonBoard.js';
-import {LoginPage} from './loginPage.js';
-import {showLibraryPage} from './libraryPage.js';
+import {HexagonBoard} from '../hexagons/hexagonBoard.js';
+import {LoginPage} from '../login/loginPage.js';
+import {showLibraryPage} from '../library/library.js';
 import {ApiService} from './apiService.js';
 
 import _ from 'lodash';

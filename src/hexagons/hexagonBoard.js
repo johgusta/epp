@@ -9,7 +9,7 @@ import {Background} from './background.js';
 import {HexagonMatrix} from './hexagonMatrix.js';
 import {Hexagon} from './hexagon.js';
 import {Overlay} from './overlay.js';
-import {PatternHandler} from './patternHandler.js';
+import {PatternHandler} from '../js/patternHandler.js';
 
 var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';

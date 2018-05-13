@@ -1,8 +1,8 @@
 "use strict";
 
-import style from '../css/library.css';
+import style from './library.css';
 
-import testTemplate from '../templates/library.html';
+import testTemplate from './library.html';
 
 import Mustache from 'mustache';
 
