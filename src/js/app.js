@@ -4,7 +4,7 @@ var queryString = require('query-string');
 
 var HexagonBoard = require('./hexagonBoard.js');
 var LoginPage = require('./loginPage.js');
-var showLibraryPage = require('./libraryPage.js');
+var showLibraryPage = require('./libraryPage.js').showLibraryPage;
 var ApiService = require('./apiService.js');
 
 var _ = require('lodash');

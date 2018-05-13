@@ -1,8 +1,10 @@
 "use strict";
 
-require('../css/library.css');
-var testTemplate = require('../templates/library.html');
-var Mustache = require('mustache');
+import style from '../css/library.css';
+
+import testTemplate from '../templates/library.html';
+
+import Mustache from 'mustache';
 
 function showLibraryPage(container, user) {
     var libraryPage = new LibraryPage(container, user);
@@ -21,7 +23,6 @@ LibraryPage.prototype.draw = function draw() {
         container.removeChild(container.lastChild);
     }
 
-
     var rendered = Mustache.render(testTemplate, {fullName: this.user.fullName});
 
     var libraryDiv = document.createElement('div');
@@ -32,4 +33,5 @@ LibraryPage.prototype.draw = function draw() {
     console.log('loaded test template', testTemplate);
 };
 
-module.exports = showLibraryPage;
+export {showLibraryPage};
+//module.exports = showLibraryPage;
