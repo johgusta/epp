@@ -10,8 +10,8 @@ module.exports = {
         filename: 'bundle.js'
     },
     module: {
-        loaders: [
-            { test: /\.css$/, loader: 'style!css' }
+        rules: [
+            { test: /\.css$/, loader: 'style-loader!css-loader' }
         ]
     },
     devtool: 'source-map',
