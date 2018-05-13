@@ -4,6 +4,7 @@ var queryString = require('query-string');
 
 var HexagonBoard = require('./hexagonBoard.js');
 var LoginPage = require('./loginPage.js');
+var showLibraryPage = require('./libraryPage.js');
 var ApiService = require('./apiService.js');
 
 var _ = require('lodash');
@@ -12,6 +13,7 @@ var mainContent = document.getElementById('main-content');
 
 page('/', index);
 page('/edit', edit);
+page('/library', library);
 page('/login', login);
 page('/login/callback', loginCallback);
 page();
@@ -19,7 +21,7 @@ page();
 function index() {
     ApiService.getUser().then(function (user) {
         if (user) {
-            page('/edit');
+            page('/library');
         } else {
             page('/login');
         }
@@ -39,7 +41,7 @@ function loginCallback() {
     }
 
     ApiService.loginWithGoogleCode(parsedParams.code).then(function () {
-        page.redirect('/edit');
+        page.redirect('/library');
     });
 }
 
@@ -53,6 +55,10 @@ function edit() {
             page('/login');
         }
     });
+}
+
+function library() {
+    showLibraryPage(mainContent);
 }
 
 window.GlobalApiService = ApiService;
