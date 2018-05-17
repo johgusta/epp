@@ -42,6 +42,20 @@ PatternHandler.prototype.clearCurrent = function clearCurrent() {
     window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
 };
 
+PatternHandler.prototype.addPattern = function addPattern(name) {
+    var emptyPattern = {
+        board: {}
+    };
+    var serializedPattern = JSON.stringify(emptyPattern);
+
+    var apiPattern = {
+        title: name,
+        data: serializedPattern
+    };
+
+    return ApiService.addPattern(apiPattern);
+};
+
 PatternHandler.prototype.savePattern = function savePattern(name, serializedObject) {
     var serializedPattern = JSON.stringify(serializedObject);
 

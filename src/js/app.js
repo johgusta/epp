@@ -5,15 +5,18 @@ import queryString from 'query-string';
 import {HexagonBoard} from '../hexagons/hexagonBoard.js';
 import {LoginPage} from '../login/loginPage.js';
 import {showLibraryPage} from '../library/library.js';
+import {showAddPatternPage} from '../library/add/addLibrary.js';
 import {ApiService} from './apiService.js';
+import {PatternHandler} from './patternHandler.js';
 
 import _ from 'lodash';
 
 var mainContent = document.getElementById('main-content');
 
 page('/', index);
-page('/edit', edit);
+page('/pattern/:id', pattern);
 page('/library', library);
+page('/library/add', addPattern);
 page('/login', login);
 page('/login/callback', loginCallback);
 page();
@@ -45,12 +48,14 @@ function loginCallback() {
     });
 }
 
-function edit() {
+function pattern(ctx) {
     ApiService.getUser().then(function (user) {
         if (user) {
+            var id = ctx.params.id;
             var hexagonBoard = new HexagonBoard(mainContent, user);
             window.Board = hexagonBoard;
-            hexagonBoard.draw();
+//            hexagonBoard.draw();
+            hexagonBoard.loadPattern(id);
         } else {
             page('/login');
         }
@@ -65,6 +70,17 @@ function library() {
             page('/login');
         }
     });
+}
+
+function addPattern() {
+    ApiService.getUser().then(function (user) {
+        if (user) {
+            showAddPatternPage(mainContent, user);
+        } else {
+            page('/login');
+        }
+    });
+
 }
 
 window.GlobalApiService = ApiService;

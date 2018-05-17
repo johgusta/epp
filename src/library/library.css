@@ -23,10 +23,18 @@
 }
 
 .pattern {
+}
+
+.library-button {
     padding: 5px;
     margin: 4px;
     border: 1px solid gray;
     border-radius: 4px;
     cursor: pointer;
     background: white;
+}
+
+.add-pattern {
+    width: 80px;
+    margin-top: 10px;
 }
