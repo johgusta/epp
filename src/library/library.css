@@ -12,14 +12,12 @@
     transform: translateX(-50%);
 
     width: 400px;
-    height: 400px;
 
-    background: #eeeeee;
 }
 
 .patterns-list {
     padding: 5px;
-    /*border: 1px solid gray;*/
+    border: 1px solid rgba(0,0,0,.1);
 }
 
 .pattern {
@@ -35,6 +33,6 @@
 }
 
 .add-pattern {
-    width: 80px;
-    margin-top: 10px;
+    float: right;
+    margin: 10px;
 }

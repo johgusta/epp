@@ -4,6 +4,8 @@
 //$mdc-theme-on-secondary: #442b2d;
 
 @import "@material/button/mdc-button";
+@import "@material/list/mdc-list";
+@import "@material/fab/mdc-fab";
 
 body {
     background: #FFFFFF;
@@ -19,6 +21,8 @@ body {
     user-select: none;
 
     overscroll-behavior: none;
+
+    font-family: Roboto, sans-serif;
 }
 
 .game-container {
