@@ -19,6 +19,18 @@ module.exports = {
                 ]
             },
             {
+                test: /\.scss$/,
+                use: [
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader' },
+                    { loader: 'sass-loader',
+                        options: {
+                            includePaths: ['./node_modules']
+                        }
+                    },
+                ]
+            },
+            {
                 test: /\.html$/,
                 use: [ {
                     loader: 'html-loader',

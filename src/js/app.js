@@ -1,4 +1,4 @@
-import style from './main.css';
+import style from './main.scss';
 import page from 'page';
 import queryString from 'query-string';
 
