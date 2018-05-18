@@ -1,0 +1,69 @@
+<div class="overlayDiv">
+    <button id="menu-drawer-button" class="mdc-fab material-icons menu-drawer-button"
+            aria-label="Menu">
+          <span class="mdc-fab__icon">
+            menu
+          </span>
+    </button>
+    <div class="colorSelectionContainer">
+        <div class="currentColorSelector">
+            <span>Current color:</span>
+            <input type="text" class="colorPicker" style="display: none;">
+        </div>
+        <canvas id="colorsCanvas" width="80" height="36"></canvas>
+    </div>
+</div>
+
+<aside id="drawer-menu" class="mdc-drawer mdc-drawer--temporary mdc-typography">
+    <nav class="mdc-drawer__drawer">
+        <!--<header class="mdc-drawer__header">-->
+            <!--<div class="mdc-drawer__header-content">-->
+                <!--<div class="user-drawer-content">-->
+                    <!--<div class="current-pattern">-->
+                        <!--{{pattern.name}}-->
+                    <!--</div>-->
+                    <!--<div class="current-user">-->
+                        <!--{{username}}-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</header>-->
+
+        <div class="mdc-drawer__toolbar-spacer">
+            <div class="user-drawer-content">
+                <div class="current-pattern">
+                    {{pattern.name}}
+                </div>
+                <div class="current-user">
+                    {{username}}
+                </div>
+            </div>
+        </div>
+
+        <div class="mdc-list-group mdc-drawer__content">
+            <h3 class="mdc-list-group__subheader">Pattern</h3>
+            <ul class="mdc-list">
+                <li class="mdc-list-item">
+                    <i class="material-icons mdc-list-item__graphic" aria-hidden="true">save</i>Save
+                </li>
+                <li class="mdc-list-item">
+                    <i class="material-icons mdc-list-item__graphic" aria-hidden="true">save_alt</i>Save As
+                </li>
+                <li class="mdc-list-item">
+                    <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>Export
+                </li>
+                <li class="mdc-list-item">
+                    <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_circle</i>Remove
+                </li>
+            </ul>
+
+            <hr class="mdc-list-divider">
+            <h3 class="mdc-list-group__subheader">Settings</h3>
+            <ul class="mdc-list">
+                <li class="mdc-list-item">
+                    <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_circle</i>Sign out
+                </li>
+            </ul>
+        </div>
+    </nav>
+</aside>

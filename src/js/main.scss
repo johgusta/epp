@@ -8,6 +8,7 @@
 @import "@material/fab/mdc-fab";
 @import "@material/dialog/mdc-dialog";
 @import "@material/textfield/mdc-text-field";
+@import "@material/drawer/mdc-drawer";
 
 body {
     background: #FFFFFF;
@@ -47,75 +48,6 @@ body {
     position: absolute;
 }
 
-.overlayDiv {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-
-    font-family: Segoe UI,Helvetica Neue,Helvetica,Arial,sans-serif;
-    font-size: 12px;
-}
-
-.topLeftContainer {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-
-    pointer-events: auto;
-}
-
-.topRightContainer {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-
-    pointer-events: auto;
-}
-
-.bottomLeftContainer {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    pointer-events: auto;
-}
-
-.saveDialogContainer {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-
-    pointer-events: auto;
-    background: #f6f6f6;
-    border: 1px solid #c2c2c2;
-}
-
-
-.currentColorSelector {
-    width: 80px;
-    min-height: 25px;
-    margin-bottom: 6px;
-    padding: 4px;
-
-    background: #f6f6f6;
-    border: 1px solid #c2c2c2;
-}
-
-.colorsCanvas {
-    background: #f6f6f6;
-    border: 1px solid #c2c2c2;
-}
-
-div.colorInput {
-    display: table;
-    background: #ffffff;
-    border-color: #c2c2c2;
-    border-radius: 4px;
-}
-
 .button {
     padding: 4px;
     margin: 4px;
@@ -148,38 +80,4 @@ div.colorInput {
 .button.disabled {
     opacity: 0.5;
     cursor: default;
-}
-
-.saveName {
-    width: 80px;
-    height: 26px;
-    margin: 4px;
-}
-
-.innerSaveContainer {
-    display: inline-block;
-    border-right: 1px solid #c2c2c2;
-    margin: 0;
-    padding-right: 4px;
-}
-
-.innerLoadContainer {
-    display: inline-block;
-    padding-left: 10px;
-}
-
-.loadPatternDropDown {
-    position: relative;
-    top: -1px;
-    height: 26px;
-    max-width: 116px;
-}
-
-.debug-container {
-    display: none;
-    background: #ffffff;
-    border: 1px solid #c2c2c2;
-    max-height: 400px;
-    max-width: 150px;
-    overflow: hidden;
 }
