@@ -6,6 +6,8 @@ import testTemplate from './library.html';
 
 import Mustache from 'mustache';
 import page from 'page';
+import {MDCDialog} from '@material/dialog';
+import {MDCTextField} from '@material/textfield';
 
 import {PatternHandler} from '../js/patternHandler.js';
 
@@ -43,16 +45,32 @@ LibraryPage.prototype.draw = function draw() {
 
     patternElements.forEach(function (pattern) {
         pattern.addEventListener('click', function () {
-            console.log('clicked pattern', pattern.id);
             page('/pattern/' + pattern.id);
         });
     });
 
     var addPatternButton = container.querySelector('#add-pattern-button');
 
-    addPatternButton.addEventListener('click', function () {
-        page('/library/add');
+    var aside = document.querySelector('#my-mdc-dialog');
+
+    var dialog = new MDCDialog(aside);
+
+
+    var textField = new MDCTextField(document.querySelector('.mdc-text-field'));
+
+    addPatternButton.addEventListener('click', function (evt) {
+        dialog.lastFocusedTarget = evt.target;
+        dialog.show();
     });
+
+    dialog.listen('MDCDialog:accept', function() {
+        if (textField.value) {
+            PatternHandler.addPattern(textField.value).then(function (pattern) {
+                page('/pattern/' + pattern.id);
+            });
+        }
+    })
+
 };
 
 LibraryPage.prototype.updatePatterns = function updatePatterns(patterns) {

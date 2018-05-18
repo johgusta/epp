@@ -5,7 +5,6 @@ import queryString from 'query-string';
 import {HexagonBoard} from '../hexagons/hexagonBoard.js';
 import {LoginPage} from '../login/loginPage.js';
 import {showLibraryPage} from '../library/library.js';
-import {showAddPatternPage} from '../library/add/addLibrary.js';
 import {ApiService} from './apiService.js';
 import {PatternHandler} from './patternHandler.js';
 
@@ -16,7 +15,6 @@ var mainContent = document.getElementById('main-content');
 page('/', index);
 page('/pattern/:id', pattern);
 page('/library', library);
-page('/library/add', addPattern);
 page('/login', login);
 page('/login/callback', loginCallback);
 page();
@@ -70,17 +68,6 @@ function library() {
             page('/login');
         }
     });
-}
-
-function addPattern() {
-    ApiService.getUser().then(function (user) {
-        if (user) {
-            showAddPatternPage(mainContent, user);
-        } else {
-            page('/login');
-        }
-    });
-
 }
 
 window.GlobalApiService = ApiService;
