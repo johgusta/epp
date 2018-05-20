@@ -1,6 +1,7 @@
 var express = require('express');
 var path = require('path');
-var sslRedirect = require('heroku-ssl-redirect');
+
+var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 
 var app = express();
 
@@ -10,7 +11,9 @@ var publicPath = path.resolve(__dirname, '../build');
 
 var useSslRedirect = process.env.FORCE_SSL === 'true';
 if (useSslRedirect) {
-    app.use(sslRedirect);
+    var configIgnoreHosts = process.env.SSL_IGNORE_HOSTS;
+    ignoreHosts = configIgnoreHosts ? JSON.parse(configIgnoreHosts) : undefined;
+    app.use(redirectToHTTPS(ignoreHosts));
 }
 
 // We point to our static assets
