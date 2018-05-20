@@ -4,6 +4,7 @@ import {ColorList} from './colorList.js';
 import {ApiService} from '../js/apiService.js';
 
 import Mustache from 'mustache';
+import page from 'page';
 
 import $ from 'jquery';
 import spectrum from 'spectrum-colorpicker/spectrum.js';
@@ -57,6 +58,11 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     var drawerItemRemove = drawerContainer.querySelector('#drawer-item-remove');
     drawerItemRemove.addEventListener('click', function () {
         hexagonBoard.deletePattern();
+    });
+
+    var drawerItemLibrary = drawerContainer.querySelector('#drawer-item-library');
+    drawerItemLibrary.addEventListener('click', function () {
+        page('/library');
     });
 
     var drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
