@@ -1,6 +1,6 @@
 "use strict";
 
-import style from './library.css';
+import style from './library.scss';
 
 import testTemplate from './library.html';
 

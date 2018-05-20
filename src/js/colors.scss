@@ -1,0 +1,19 @@
+$mdc-theme-primary: #4a148c;
+$mdc-theme-primary-light: #7c43bd;
+$mdc-theme-primary-dark: #7c43bd;
+$mdc-theme-secondary: #d81b60;
+$mdc-theme-secondary-light: #ff5c8d;
+$mdc-theme-secondary-dark: #a00037;
+$mdc-theme-on-primary: #ffffff;
+$mdc-theme-on-secondary: #ffffff;
+$mdc-theme-background: #ffffff;
+
+@import "@material/button/mdc-button";
+@import "@material/list/mdc-list";
+@import "@material/fab/mdc-fab";
+@import "@material/dialog/mdc-dialog";
+@import "@material/textfield/mdc-text-field";
+@import "@material/drawer/mdc-drawer";
+@import "@material/elevation/mdc-elevation";
+@import "@material/theme/mdc-theme";
+

@@ -11,7 +11,7 @@ import spectrum from 'spectrum-colorpicker/spectrum.js';
 import spectrumStyle from 'spectrum-colorpicker/spectrum.css';
 
 import overlayTemplate from './overlay.html';
-import style from './overlay.css';
+import style from './overlay.scss';
 
 import {MDCTemporaryDrawer} from '@material/drawer';
 import {MDCDialog} from '@material/dialog';

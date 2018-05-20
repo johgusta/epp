@@ -1,3 +1,5 @@
+@import "../js/colors";
+
 .outer-wrapper {
     display: flex;
     flex-direction: column;
@@ -14,7 +16,8 @@
 
 .library-header {
     font-size: 22px;
-    margin: 50px 0px 20px 20px;
+    margin-top: 40px;
+    padding: 20px;
 }
 
 .patterns-list {

@@ -1,3 +1,5 @@
+@import "../js/main.scss";
+
 .overlayDiv {
     position: absolute;
     left: 0px;
@@ -45,10 +47,6 @@ div.colorInput {
     border-radius: 4px;
 }
 
-.drawer-header {
-    background: lightblue;
-}
-
 .header-drawer-content {
     width: 100%;
 }
@@ -71,6 +69,10 @@ div.colorInput {
 .header-text-content > div:not(:first-child) {
     font-size: 16px;
     opacity: 0.3;
+}
+
+.drawer-navigation-list i.mdc-list-item__graphic {
+    color: $mdc-theme-primary-light;
 }
 
 #save-as-pattern-dialog {

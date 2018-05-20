@@ -1,6 +1,6 @@
 "use strict";
 
-import style from './login.css';
+import style from './login.scss';
 import loginTemplate from './login.html';
 
 import Mustache from 'mustache';
