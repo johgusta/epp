@@ -49,11 +49,12 @@ function loginCallback() {
 function pattern(ctx) {
     ApiService.getUser().then(function (user) {
         if (user) {
-            var id = ctx.params.id;
-            var hexagonBoard = new HexagonBoard(mainContent, user);
-            window.Board = hexagonBoard;
-//            hexagonBoard.draw();
-            hexagonBoard.loadPattern(id);
+            var patternId = ctx.params.id;
+            PatternHandler.loadPattern(patternId).then(function (pattern) {
+                var hexagonBoard = new HexagonBoard(mainContent, user, pattern);
+                window.Board = hexagonBoard;
+                hexagonBoard.draw();
+            });
         } else {
             page('/login');
         }

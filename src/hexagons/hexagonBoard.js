@@ -15,7 +15,7 @@ var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
 var DEFAULT_BORDER_COLOR = '#cccccc';
 
-function HexagonBoard(mainContainer, user, patternId) {
+function HexagonBoard(mainContainer, user, pattern) {
 
     this.debug = false;
 
@@ -29,7 +29,6 @@ function HexagonBoard(mainContainer, user, patternId) {
     this._hexagonMatrix = hexagonMatrix;
     this._currentColor = DEFAULT_COLOR;
     this._borderColor = DEFAULT_BORDER_COLOR;
-    this._currentPatternId = undefined;
 
     this._boardOffset = {
         x: 0,
@@ -37,7 +36,7 @@ function HexagonBoard(mainContainer, user, patternId) {
         zoom: 0
     };
 
-    this.load();
+    this._load(pattern);
 
     var that = this;
 
@@ -294,9 +293,6 @@ function mouseHandler(that) {
         requestAnimationFrame(function () {
             that._clearFocus();
             that.draw();
-            requestAnimationFrame(function () {
-                that.store();
-            });
         });
     }
 }
@@ -343,7 +339,7 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.canvas = canvas;
     this.background = new Background(backgroundCanvas);
 
-    this.overlay = new Overlay(overlayDiv, this, this.currentUser);
+    this.overlay = new Overlay(overlayDiv, this, this.currentUser, this._patternTitle);
 };
 
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
@@ -364,7 +360,6 @@ HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
 HexagonBoard.prototype.draw = function draw() {
     this.drawBoard();
     this._drawOverlay();
-    this._drawLoadInfo();
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
@@ -508,43 +503,18 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
 };
 
-HexagonBoard.prototype._drawLoadInfo = function _drawLoadInfo() {
-    PatternHandler.getSavedPatterns().then(function (patterns) {
-        this.overlay.updateLoadInfo(patterns, this._currentPatternId);
-    }.bind(this));
-};
-
 HexagonBoard.prototype._clearFocus = function _clearFocus() {
     this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
-HexagonBoard.prototype.savePattern = function savePattern(patternName) {
-    var serializedPattern = this._serialize(true);
+HexagonBoard.prototype.savePattern = function savePattern() {
+    var serializedPattern = this.serialize();
 
-    PatternHandler.savePattern(patternName, serializedPattern).then(function () {
-        this._drawLoadInfo();
-    }.bind(this));
-};
-
-HexagonBoard.prototype.loadPattern = function loadPattern(id) {
-    console.log('Load pattern: ' + id);
-
-    PatternHandler.loadPattern(id).then(function (pattern) {
-        var serializedObject = pattern.board;
-        this._loadBoard(serializedObject);
-
-        this._currentPatternId = id;
-
-        this.draw();
-        this.store();
-    }.bind(this));
+    return PatternHandler.savePattern(this._patternName, serializedPattern);
 };
 
 HexagonBoard.prototype.deletePattern = function deletePattern(name) {
-    PatternHandler.deletePattern(name).then(function () {
-        this._drawLoadInfo();
-    }.bind(this));
-
+    return PatternHandler.deletePattern(name);
 };
 
 HexagonBoard.prototype.exportPattern = function exportPattern(name) {
@@ -569,76 +539,65 @@ HexagonBoard.prototype.exportPattern = function exportPattern(name) {
     });
 };
 
-HexagonBoard.prototype.store = function store() {
-    var serializedBoard = this._serialize(false);
-    PatternHandler.storeCurrent(serializedBoard);
-};
-
-HexagonBoard.prototype.load = function load() {
-    var serializedPattern = PatternHandler.loadCurrent();
-    this._loadBoard(serializedPattern);
-};
-
-HexagonBoard.prototype.reset = function reset() {
-    PatternHandler.clearCurrent();
-
-    this._hexagonMatrix.reset();
-    this._currentPatternId = undefined;
-    this.size = DEFAULT_SIZE;
-    this.draw();
-};
-
-HexagonBoard.prototype._serialize = function _serialize(isFullSerialization) {
-    var hexagons = [];
-    this._hexagonMatrix.forEach(function (hexagon) {
-        hexagons.push(hexagon);
-    });
-
-    var serializedObject = {
-        board: {
-            currentColor: this._currentColor,
-            hexagons: hexagons
-        }
-    };
-
-    if (isFullSerialization) {
-        serializedObject.board.id = this._currentPatternId;
-        serializedObject.board.size = this.size;
+HexagonBoard.prototype._load = function _load(pattern) {
+    if (!pattern) {
+        throw new Error('Can not load board without pattern!');
     }
-    return serializedObject;
-};
 
-HexagonBoard.prototype._loadBoard = function _loadBoard(serializedObject) {
-    if (!serializedObject) {
-        return;
-    }
-    var serializedBoard = serializedObject.board;
+    this._patternId = pattern.id;
+    this.patternTitle = pattern.title;
 
-    if (!serializedBoard) {
+    var patternData = pattern.data;
+    if (!patternData) {
         return;
     }
 
-    if (serializedBoard.id) {
-        this._currentPatternId = serializedBoard.id;
+    var savedHexagonBoard = patternData.board;
+
+    if (!savedHexagonBoard) {
+        return;
     }
 
-    if (serializedBoard.size) {
-        this.size = serializedBoard.size;
+    if (savedHexagonBoard.size) {
+        this.size = savedHexagonBoard.size;
     }
 
-    if (serializedBoard.currentColor) {
-        this._currentColor = serializedBoard.currentColor;
+    if (savedHexagonBoard.currentColor) {
+        this._currentColor = savedHexagonBoard.currentColor;
     }
 
     var hexagonMatrix = this._hexagonMatrix;
-    hexagonMatrix.reset();
-    if (Array.isArray(serializedBoard.hexagons)) {
-        serializedBoard.hexagons.forEach(function (hexagon) {
+    if (Array.isArray(savedHexagonBoard.hexagons)) {
+        savedHexagonBoard.hexagons.forEach(function (hexagon) {
             if (hexagon.color !== undefined) {
                 hexagonMatrix.add(hexagon);
             }
         });
     }
+};
+
+HexagonBoard.prototype.serialize = function serialize() {
+    var board = this._serializeBoard();
+
+    var patternData = {
+        board: board
+    };
+    return patternData;
+};
+
+HexagonBoard.prototype._serializeBoard = function _serializeBoard() {
+    var hexagons = [];
+    this._hexagonMatrix.forEach(function (hexagon) {
+        hexagons.push(hexagon);
+    });
+
+    var serializedBoard = {
+        currentColor: this._currentColor,
+        hexagons: hexagons,
+        size: this.size
+    };
+
+    return serializedBoard;
 };
 
 export {HexagonBoard};

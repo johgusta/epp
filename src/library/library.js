@@ -15,7 +15,7 @@ function showLibraryPage(container, user) {
     var libraryPage = new LibraryPage(container, user);
     libraryPage.draw();
 
-    PatternHandler.getSavedPatterns().then(function (patterns) {
+    PatternHandler.getPatterns().then(function (patterns) {
         libraryPage.updatePatterns(patterns);
     });
 }

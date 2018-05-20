@@ -2,50 +2,12 @@
 
 import {ApiService} from './apiService.js';
 
-var HEXAGON_BOARD_STORAGE_KEY = 'HexagonBoard';
-
 function PatternHandler() {
 
 }
 
-PatternHandler.prototype.storeCurrent = function storeCurrent(serializedBoard) {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var serializedString = JSON.stringify(serializedBoard);
-    window.localStorage.setItem(HEXAGON_BOARD_STORAGE_KEY, serializedString);
-};
-
-PatternHandler.prototype.loadCurrent = function loadCurrent() {
-    if (!window.localStorage) {
-        return;
-    }
-
-    var serializedString = window.localStorage.getItem(HEXAGON_BOARD_STORAGE_KEY);
-    var serializedObject;
-    try {
-        serializedObject= JSON.parse(serializedString);
-    } catch (e) {
-        console.error('Error loading stored board!', e);
-        window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
-        return;
-    }
-    return serializedObject;
-};
-
-PatternHandler.prototype.clearCurrent = function clearCurrent() {
-    if (!window.localStorage) {
-        return;
-    }
-
-    window.localStorage.removeItem(HEXAGON_BOARD_STORAGE_KEY);
-};
-
 PatternHandler.prototype.addPattern = function addPattern(name) {
-    var emptyPattern = {
-        board: {}
-    };
+    var emptyPattern = {};
     var serializedPattern = JSON.stringify(emptyPattern);
 
     var apiPattern = {
@@ -56,15 +18,15 @@ PatternHandler.prototype.addPattern = function addPattern(name) {
     return ApiService.addPattern(apiPattern);
 };
 
-PatternHandler.prototype.savePattern = function savePattern(name, serializedObject) {
+PatternHandler.prototype.savePattern = function savePattern(patternId, patternName, serializedObject) {
     var serializedPattern = JSON.stringify(serializedObject);
 
     var apiPattern = {
-        title: name,
+        title: patternName,
         data: serializedPattern
     };
 
-    return ApiService.addPattern(apiPattern);
+    return ApiService.updatePattern(patternId, apiPattern);
 };
 
 PatternHandler.prototype.loadPattern = function loadPattern(id) {
@@ -78,7 +40,7 @@ PatternHandler.prototype.deletePattern = function deletePattern(id) {
     return ApiService.deletePattern(id);
 };
 
-PatternHandler.prototype.getSavedPatterns = function getSavedPatterns() {
+PatternHandler.prototype.getPatterns = function getPatterns() {
     return ApiService.getPatterns().then(function (apiPatterns) {
         var patterns = apiPatterns.map(parseApiPattern);
         return patterns;
@@ -91,8 +53,7 @@ function parseApiPattern(apiPattern) {
         id: apiPattern.id
     };
     try {
-        var patternData = JSON.parse(apiPattern.data);
-        pattern.board = patternData;
+        pattern.board = JSON.parse(apiPattern.data);
     } catch (e) {
         console.error('Error parsing saved pattern: ' + pattern.id, e);
     }

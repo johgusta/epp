@@ -126,10 +126,6 @@ HexagonMatrix.prototype.find = function find(hexagonIndex) {
     return hexagon;
 };
 
-HexagonMatrix.prototype.reset = function reset() {
-    this._board = [];
-};
-
 HexagonMatrix.prototype.forEach = function forEach(callback) {
     this._board.forEach(function (row) {
         row.items.forEach(callback);

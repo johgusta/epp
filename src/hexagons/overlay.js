@@ -14,17 +14,16 @@ import style from './overlay.css';
 
 import {MDCTemporaryDrawer} from '@material/drawer';
 
-function Overlay(overlayContainer, hexagonBoard, currentUser) {
-    //this._hexagonBoard = hexagonBoard;
-    this._init(overlayContainer, hexagonBoard, currentUser);
+function Overlay(overlayContainer, hexagonBoard) {
+    this._init(overlayContainer, hexagonBoard);
 }
 
-Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, currentUser) {
+Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     var renderedTemplate = Mustache.render(overlayTemplate, {
-        username: currentUser.fullName,
+        username: hexagonBoard.currentUser.fullName,
         pattern: {
-            name: 'Testing test'
+            name: hexagonBoard.patternTitle
         }
     });
 
@@ -38,10 +37,6 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, current
     drawerMenuButton.addEventListener('click', function () {
         drawer.open = true;
     });
-};
-
-Overlay.prototype.updateLoadInfo = function updateLoadInfo(savedPatterns, currentPatternId) {
-
 };
 
 Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentColor, changeColorCallback) {
