@@ -8,7 +8,8 @@ var isProduction = process.env.NODE_ENV === 'production';
 var port = isProduction ? process.env.PORT : 3000;
 var publicPath = path.resolve(__dirname, '../build');
 
-if (isProduction) {
+var useSslRedirect = process.env.FORCE_SSL === 'true';
+if (useSslRedirect) {
     app.use(sslRedirect);
 }
 
