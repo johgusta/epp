@@ -15,7 +15,7 @@ var DEFAULT_SIZE = 24;
 var DEFAULT_COLOR = '#ff0000';
 var DEFAULT_BORDER_COLOR = '#cccccc';
 
-function HexagonBoard(mainContainer, user) {
+function HexagonBoard(mainContainer, user, patternId) {
 
     this.debug = false;
 

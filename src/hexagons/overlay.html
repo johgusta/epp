@@ -16,29 +16,35 @@
 
 <aside id="drawer-menu" class="mdc-drawer mdc-drawer--temporary mdc-typography">
     <nav class="mdc-drawer__drawer">
-        <!--<header class="mdc-drawer__header">-->
-            <!--<div class="mdc-drawer__header-content">-->
-                <!--<div class="user-drawer-content">-->
-                    <!--<div class="current-pattern">-->
-                        <!--{{pattern.name}}-->
-                    <!--</div>-->
-                    <!--<div class="current-user">-->
-                        <!--{{username}}-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</header>-->
-
-        <div class="mdc-drawer__toolbar-spacer">
-            <div class="user-drawer-content">
-                <div class="current-pattern">
-                    {{pattern.name}}
-                </div>
-                <div class="current-user">
-                    {{username}}
+        <header class="mdc-drawer__header drawer-header">
+            <div class="mdc-drawer__header-content">
+                <div class="header-drawer-content">
+                    <div class="logo-container">
+                        <img class="drawer-logo" src="../static/hexagon_logo.png">
+                    </div>
+                    <div class="header-text-content">
+                        <div class="current-pattern">
+                            {{pattern.name}}
+                        </div>
+                        <div class="current-user">
+                            {{username}}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </header>
+
+        <!--<div class="mdc-drawer__toolbar-spacer">-->
+        <!--<div class="mdc-drawer__toolbar-spacer">-->
+            <!--<div class="user-drawer-content">-->
+                <!--<div class="current-pattern">-->
+                    <!--{{pattern.name}}-->
+                <!--</div>-->
+                <!--<div class="current-user">-->
+                    <!--{{username}}-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
 
         <div class="mdc-list-group mdc-drawer__content">
             <h3 class="mdc-list-group__subheader">Pattern</h3>
