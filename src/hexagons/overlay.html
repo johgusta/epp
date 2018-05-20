@@ -64,3 +64,29 @@
         </div>
     </nav>
 </aside>
+<aside id="save-as-pattern-dialog"
+       class="mdc-dialog"
+       role="alertdialog"
+       aria-labelledby="save-as-pattern-dialog-label"
+       aria-describedby="save-as-pattern-dialog-description">
+    <div class="mdc-dialog__surface">
+        <header class="mdc-dialog__header">
+            <h2 id="save-as-pattern-dialog-label" class="mdc-dialog__header__title">
+                Rename pattern
+            </h2>
+        </header>
+        <section id="create-pattern-dialog-description" class="mdc-dialog__body">
+            <div class="mdc-text-field mdc-text-field--fullwidth">
+                <input class="mdc-text-field__input"
+                       type="text"
+                       placeholder="Pattern name"
+                       aria-label="Pattern name">
+            </div>
+        </section>
+        <footer class="mdc-dialog__footer">
+            <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
+            <button type="button" class="mdc-button mdc-button--unelevated mdc-dialog__footer__button mdc-dialog__footer__button--accept">Save</button>
+        </footer>
+    </div>
+    <div class="mdc-dialog__backdrop"></div>
+</aside>

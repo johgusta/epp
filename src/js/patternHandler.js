@@ -6,24 +6,26 @@ function PatternHandler() {
 
 }
 
-PatternHandler.prototype.addPattern = function addPattern(name) {
-    var emptyPattern = {};
-    var serializedPattern = JSON.stringify(emptyPattern);
+PatternHandler.prototype.addPattern = function addPattern(name, serializedPattern) {
+    if (!serializedPattern) {
+        serializedPattern = {};
+    }
+    var patternString = JSON.stringify(serializedPattern);
 
     var apiPattern = {
         title: name,
-        data: serializedPattern
+        data: patternString
     };
 
     return ApiService.addPattern(apiPattern);
 };
 
-PatternHandler.prototype.savePattern = function savePattern(patternId, patternName, serializedObject) {
-    var serializedPattern = JSON.stringify(serializedObject);
+PatternHandler.prototype.savePattern = function savePattern(patternId, patternName, serializedPattern) {
+    var patternString = JSON.stringify(serializedPattern);
 
     var apiPattern = {
         title: patternName,
-        data: serializedPattern
+        data: patternString
     };
 
     return ApiService.updatePattern(patternId, apiPattern);

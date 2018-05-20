@@ -508,10 +508,16 @@ HexagonBoard.prototype._clearFocus = function _clearFocus() {
     this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
-HexagonBoard.prototype.savePattern = function savePattern(patternTitle) {
+HexagonBoard.prototype.savePattern = function savePattern() {
     var serializedPattern = this.serialize();
 
-    return PatternHandler.savePattern(this._patternId, patternTitle, serializedPattern);
+    return PatternHandler.savePattern(this._patternId, this.patternTitle, serializedPattern);
+};
+
+HexagonBoard.prototype.savePatternAs = function savePatternAs(patternTitle) {
+    var serializedPattern = this.serialize();
+
+    return PatternHandler.addPattern(patternTitle, serializedPattern);
 };
 
 HexagonBoard.prototype.deletePattern = function deletePattern() {

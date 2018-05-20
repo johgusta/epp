@@ -51,12 +51,10 @@ LibraryPage.prototype.draw = function draw() {
 
     var addPatternButton = container.querySelector('#add-pattern-button');
 
-    var aside = document.querySelector('#my-mdc-dialog');
+    var createPatternElm = document.querySelector('#create-pattern-dialog');
+    var dialog = new MDCDialog(createPatternElm);
 
-    var dialog = new MDCDialog(aside);
-
-
-    var textField = new MDCTextField(document.querySelector('.mdc-text-field'));
+    var patternNameField = new MDCTextField(createPatternElm.querySelector('.mdc-text-field'));
 
     addPatternButton.addEventListener('click', function (evt) {
         dialog.lastFocusedTarget = evt.target;
@@ -64,7 +62,7 @@ LibraryPage.prototype.draw = function draw() {
     });
 
     dialog.listen('MDCDialog:accept', function() {
-        if (textField.value) {
+        if (patternNameField.value) {
             PatternHandler.addPattern(textField.value).then(function (pattern) {
                 page('/pattern/' + pattern.id);
             });

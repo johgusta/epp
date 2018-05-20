@@ -14,6 +14,8 @@ import overlayTemplate from './overlay.html';
 import style from './overlay.css';
 
 import {MDCTemporaryDrawer} from '@material/drawer';
+import {MDCDialog} from '@material/dialog';
+import {MDCTextField} from '@material/textfield';
 
 function Overlay(overlayContainer, hexagonBoard) {
     this._init(overlayContainer, hexagonBoard);
@@ -40,14 +42,29 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
         drawer.open = true;
     });
 
+    var saveAsPatternElm = document.querySelector('#save-as-pattern-dialog');
+    var saveAsPatternDialog = new MDCDialog(saveAsPatternElm);
+
+    var patternNameField = new MDCTextField(saveAsPatternElm.querySelector('.mdc-text-field'));
+
+    saveAsPatternDialog.listen('MDCDialog:accept', function() {
+        if (patternNameField.value) {
+            hexagonBoard.savePatternAs(patternNameField.value).then(function (newPattern) {
+                page('/pattern/' + newPattern.id);
+            });
+        }
+    });
+
     var drawerItemSave = drawerContainer.querySelector('#drawer-item-save');
     drawerItemSave.addEventListener('click', function () {
-        hexagonBoard.savePattern(hexagonBoard.patternTitle);
+        hexagonBoard.savePattern();
     });
 
     var drawerItemSaveAs = drawerContainer.querySelector('#drawer-item-save-as');
-    drawerItemSaveAs.addEventListener('click', function () {
-        hexagonBoard.savePattern(hexagonBoard.patternTitle);
+    drawerItemSaveAs.addEventListener('click', function (evt) {
+//        drawer.open = false;
+        saveAsPatternDialog.lastFocusedTarget = evt.target;
+        saveAsPatternDialog.show();
     });
 
     var drawerItemExport = drawerContainer.querySelector('#drawer-item-export');
