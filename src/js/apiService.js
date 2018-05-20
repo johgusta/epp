@@ -13,8 +13,13 @@ axios.defaults.withCredentials = true;
 console.log('Using API_URL as ' + API_URL);
 var api = axios.create({
     baseURL: API_URL //Configured in environment variables
-//        baseURL: 'http://127.0.0.1:8000'
-//        baseURL: 'http://johgusta.pythonanywhere.com'
+});
+
+// Add a response interceptor
+api.interceptors.response.use(function (response) {
+    var accessToken = response.headers["access-token"];
+    Cookie.set(csrfTokenName, accessToken);
+    return response;
 });
 
 var callbackSuffix = '/login/callback';
@@ -139,8 +144,6 @@ ApiService.prototype.deletePattern = function deletePattern(id) {
 function getGoogleClientId() {
     return api.get('google-client-id/').then(function (response) {
         var data = response.data;
-        var accessToken = response.headers["access-token"];
-        Cookie.set(csrfTokenName, accessToken);
         return data.client_id;
     }).catch(function (error) {
         console.error('Failed to fetch client id', error);
