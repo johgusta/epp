@@ -530,7 +530,7 @@ HexagonBoard.prototype.exportPattern = function exportPattern() {
     context.drawImage(this.canvas, 0, 0);
 
     var colorsCanvas = this.overlay.colorList.canvas;
-    context.drawImage(colorsCanvas, 0, canvas.height - colorsCanvas.height);
+    context.drawImage(colorsCanvas, canvas.width - colorsCanvas.width, canvas.height - colorsCanvas.height);
 
     var fileName = this.patternTitle;
     if (!fileName) {
