@@ -1,4 +1,6 @@
 import style from './main.scss';
+import loadingStyle from './loading.scss';
+
 import page from 'page';
 import queryString from 'query-string';
 
