@@ -2,9 +2,12 @@
 
 import page from 'page';
 import axios from 'axios';
+import Cookie from 'js-cookie';
+
+var csrfTokenName = 'customcsrftoken';
 
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfCookieName = csrfTokenName;
 axios.defaults.withCredentials = true;
 
 console.log('Using API_URL as ' + API_URL);
@@ -136,6 +139,8 @@ ApiService.prototype.deletePattern = function deletePattern(id) {
 function getGoogleClientId() {
     return api.get('google-client-id/').then(function (response) {
         var data = response.data;
+        var accessToken = response.headers["access-token"];
+        Cookie.set(csrfTokenName, accessToken);
         return data.client_id;
     }).catch(function (error) {
         console.error('Failed to fetch client id', error);
