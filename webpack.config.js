@@ -1,3 +1,4 @@
+var webpack = require('webpack');
 var path = require('path');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -57,7 +58,10 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             { from: './src/static' }
-        ])
+        ]),
+        new webpack.DefinePlugin({
+            API_URL: JSON.stringify(process.env.API_URL)
+        })
     ],
     devServer: {
         historyApiFallback: true

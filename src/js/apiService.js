@@ -7,8 +7,9 @@ axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 axios.defaults.withCredentials = true;
 
+console.log('Using API_URL as ' + API_URL);
 var api = axios.create({
-    baseURL: 'http://localhost:8000'
+    baseURL: API_URL //Configured in environment variables
 //        baseURL: 'http://127.0.0.1:8000'
 //        baseURL: 'http://johgusta.pythonanywhere.com'
 });
