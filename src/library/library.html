@@ -2,11 +2,18 @@
     <div class="library">
         <div class="library-header">Pattern library</div>
         <!--<span>User {{fullName}}</span>-->
+        {{#patterns.length}}
         <ul id="library-patterns-list" class="mdc-list patterns-list">
             {{#patterns}}
             <li id="{{id}}" class="mdc-list-item pattern">{{title}}</li>
             {{/patterns}}
         </ul>
+        {{/patterns.length}}
+        {{^patterns}}
+        <div class="no-patterns">
+            Create your first pattern!
+        </div>
+        {{/patterns}}
         <button id="add-pattern-button" class="mdc-fab material-icons add-pattern"
                 aria-label="Add">
           <span class="mdc-fab__icon">

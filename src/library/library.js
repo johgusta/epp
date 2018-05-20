@@ -63,7 +63,7 @@ LibraryPage.prototype.draw = function draw() {
 
     dialog.listen('MDCDialog:accept', function() {
         if (patternNameField.value) {
-            PatternHandler.addPattern(textField.value).then(function (pattern) {
+            PatternHandler.addPattern(patternNameField.value).then(function (pattern) {
                 page('/pattern/' + pattern.id);
             });
         }
