@@ -72,7 +72,15 @@ div.colorInput {
 }
 
 .drawer-navigation-list i.mdc-list-item__graphic {
-    color: $mdc-theme-primary-light;
+    color: $mdc-theme-secondary-light;
+}
+
+h3.drawer-sub-headers {
+  color: $mdc-theme-on-primary;
+  background-color: $mdc-theme-primary-light;
+
+  margin: 0;
+  padding: 0.75rem 16px;
 }
 
 #save-as-pattern-dialog {
