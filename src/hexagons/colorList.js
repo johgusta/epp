@@ -4,7 +4,7 @@ import {Hexagon} from './hexagon.js';
 
 var colorItemHeight = 30;
 var hexagonSize = 12;
-var itemWidth = 80;
+var itemWidth = 90;
 var fontSize = 14;
 var borderColor = 'rgba(0, 0, 0, 0.2)';
 
