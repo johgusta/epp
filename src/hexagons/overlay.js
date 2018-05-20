@@ -32,10 +32,36 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     var colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
     this.colorList = new ColorList(colorsCanvas);
 
-    var drawer = new MDCTemporaryDrawer(overlayContainer.querySelector('#drawer-menu'));
+    var drawerContainer = overlayContainer.querySelector('#drawer-menu');
+    var drawer = new MDCTemporaryDrawer(drawerContainer);
     var drawerMenuButton = overlayContainer.querySelector('#menu-drawer-button');
     drawerMenuButton.addEventListener('click', function () {
         drawer.open = true;
+    });
+
+    var drawerItemSave = drawerContainer.querySelector('#drawer-item-save');
+    drawerItemSave.addEventListener('click', function () {
+        hexagonBoard.savePattern(hexagonBoard.patternTitle);
+    });
+
+    var drawerItemSaveAs = drawerContainer.querySelector('#drawer-item-save-as');
+    drawerItemSaveAs.addEventListener('click', function () {
+        hexagonBoard.savePattern(hexagonBoard.patternTitle);
+    });
+
+    var drawerItemExport = drawerContainer.querySelector('#drawer-item-export');
+    drawerItemExport.addEventListener('click', function () {
+        hexagonBoard.exportPattern();
+    });
+
+    var drawerItemRemove = drawerContainer.querySelector('#drawer-item-remove');
+    drawerItemRemove.addEventListener('click', function () {
+        hexagonBoard.deletePattern();
+    });
+
+    var drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
+    drawerItemSignOut.addEventListener('click', function () {
+        ApiService.logout();
     });
 };
 

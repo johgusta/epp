@@ -49,11 +49,11 @@ PatternHandler.prototype.getPatterns = function getPatterns() {
 
 function parseApiPattern(apiPattern) {
     var pattern = {
-        name: apiPattern.title,
+        title: apiPattern.title,
         id: apiPattern.id
     };
     try {
-        pattern.board = JSON.parse(apiPattern.data);
+        pattern.data = JSON.parse(apiPattern.data);
     } catch (e) {
         console.error('Error parsing saved pattern: ' + pattern.id, e);
     }

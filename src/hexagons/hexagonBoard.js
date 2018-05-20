@@ -3,7 +3,8 @@
 import Color from 'color';
 import Hamster from 'hamsterjs';
 import Hammer from 'hammerjs';
-import FileSave from 'file-saver';
+import FileSaver from 'file-saver';
+import page from 'page';
 
 import {Background} from './background.js';
 import {HexagonMatrix} from './hexagonMatrix.js';
@@ -21,8 +22,6 @@ function HexagonBoard(mainContainer, user, pattern) {
 
     this.currentUser = user;
 
-    this._init(mainContainer);
-
     this.size = DEFAULT_SIZE;
 
     var hexagonMatrix = new HexagonMatrix();
@@ -37,6 +36,8 @@ function HexagonBoard(mainContainer, user, pattern) {
     };
 
     this._load(pattern);
+
+    this._init(mainContainer);
 
     var that = this;
 
@@ -339,7 +340,7 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.canvas = canvas;
     this.background = new Background(backgroundCanvas);
 
-    this.overlay = new Overlay(overlayDiv, this, this.currentUser, this._patternTitle);
+    this.overlay = new Overlay(overlayDiv, this);
 };
 
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
@@ -507,19 +508,19 @@ HexagonBoard.prototype._clearFocus = function _clearFocus() {
     this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
-HexagonBoard.prototype.savePattern = function savePattern() {
+HexagonBoard.prototype.savePattern = function savePattern(patternTitle) {
     var serializedPattern = this.serialize();
 
-    return PatternHandler.savePattern(this._patternName, serializedPattern);
+    return PatternHandler.savePattern(this._patternId, patternTitle, serializedPattern);
 };
 
-HexagonBoard.prototype.deletePattern = function deletePattern(name) {
-    return PatternHandler.deletePattern(name);
+HexagonBoard.prototype.deletePattern = function deletePattern() {
+    return PatternHandler.deletePattern(this._patternId).then(function () {
+        page('/library');
+    });
 };
 
-HexagonBoard.prototype.exportPattern = function exportPattern(name) {
-    console.log('export pattern: ' + name);
-
+HexagonBoard.prototype.exportPattern = function exportPattern() {
     var canvas = document.createElement('canvas');
     canvas.width = this.canvas.width;
     canvas.height = this.canvas.height;
@@ -531,11 +532,12 @@ HexagonBoard.prototype.exportPattern = function exportPattern(name) {
     var colorsCanvas = this.overlay.colorList.canvas;
     context.drawImage(colorsCanvas, 0, canvas.height - colorsCanvas.height);
 
-    if (name === undefined || name === '') {
-        name = 'Pattern';
+    var fileName = this.patternTitle;
+    if (!fileName) {
+        fileName = 'Pattern';
     }
     canvas.toBlob(function (blob) {
-        FileSaver.saveAs(blob, name);
+        FileSaver.saveAs(blob, fileName);
     });
 };
 
