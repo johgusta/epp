@@ -103,7 +103,13 @@ function mouseHandler(that) {
         isPinching = true;
     });
     hammertime.on('pinch', function (ev) {
-        var zoom = 1 - (1- ev.scale) / 10;
+        var zoom = ev.scale;
+        if (zoom < 1) {
+            zoom = 1 - (1- zoom) / 10;
+        }
+        if (zoom > 1) {
+            zoom = 1 - (1- zoom) / 50;
+        }
 
         handleZoom(that, ev.center.x, ev.center.y, zoom);
     });
