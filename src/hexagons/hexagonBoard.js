@@ -1,7 +1,6 @@
 "use strict";
 
 import Color from 'color';
-import Hamster from 'hamsterjs';
 import Hammer from 'hammerjs';
 import FileSaver from 'file-saver';
 import page from 'page';
@@ -12,7 +11,7 @@ import {Hexagon} from './hexagon.js';
 import {Overlay} from './overlay.js';
 import {PatternHandler} from '../js/patternHandler.js';
 
-var DEFAULT_SIZE = 24;
+var DEFAULT_SIZE = 32;
 var DEFAULT_COLOR = '#ff0000';
 var DEFAULT_BORDER_COLOR = '#cccccc';
 
@@ -22,17 +21,19 @@ function HexagonBoard(mainContainer, user, pattern) {
 
     this.currentUser = user;
 
-    this.size = DEFAULT_SIZE;
-
     var hexagonMatrix = new HexagonMatrix();
     this._hexagonMatrix = hexagonMatrix;
     this._currentColor = DEFAULT_COLOR;
     this._borderColor = DEFAULT_BORDER_COLOR;
 
-    this._boardOffset = {
+    this.viewport = {
         x: 0,
         y: 0,
-        zoom: 0
+        scale: 1
+    };
+
+    this.getSize = function () {
+        return DEFAULT_SIZE * this.viewport.scale;
     };
 
     this._load(pattern);
@@ -48,58 +49,51 @@ function HexagonBoard(mainContainer, user, pattern) {
 
     window.addEventListener("resize", _.throttle(actualResizeHandler, 66), false);
 
-    function scrollHandler(event, delta) {
+    scrollHandlers(this);
+    mouseHandler(this);
+}
+
+function scrollHandlers(that) {
+    function wheelHandler(event) {
         event.preventDefault();
         event.stopPropagation();
 
-        var newZoom = that._boardOffset.zoom - delta;
+        var zoomIntensity = 0.1;
+        var wheel = event.wheelDelta / 120;
+        var zoom = Math.exp(wheel * zoomIntensity);
 
-        var startWidth = that.canvas.width;
-        var startHeight = that.canvas.height;
+        handleZoom(that, event.clientX, event.clientY, zoom);
 
-        var ratio = startWidth / startHeight;
-        var width = startWidth + newZoom;
-        var height = Math.round(startWidth / ratio);
-
-        var sizeDifference = startWidth / width;
-
-        var size = Math.round(DEFAULT_SIZE * sizeDifference);
-
-        if (size < 10) {
-            size = 10;
-        } else if (size > 100) {
-            size = 100;
-        } else {
-            that._boardOffset.zoom = newZoom;
-        }
-
-        that.overlay.appendDebugText('scroll delta: ' + delta);
-        if (that.size !== size) {
-            var previousNumberOfHexagons = event.originalEvent.clientX / that.size;
-            var currentNumberOfHexagons = event.originalEvent.clientX / size;
-            var xZoomOffset = that._boardOffset.x +
-                (currentNumberOfHexagons - previousNumberOfHexagons) * Math.max(size, that.size);
-            var yZoomOffset = that._boardOffset.y +
-                (event.originalEvent.clientY / size - event.originalEvent.clientY / that.size) * Math.max(size, that.size);
-
-            that._boardOffset.x = xZoomOffset;
-            that._boardOffset.y = yZoomOffset;
-
-            that.size = size;
-            that._clearFocus();
-            that.drawBoard();
-        }
+        that._clearFocus();
+        that.drawBoard();
     }
-    Hamster(window.document).wheel(scrollHandler);
 
-    mouseHandler(this);
+    window.document.addEventListener('wheel', wheelHandler);
+}
+
+function handleZoom(that, xPosition, yPosition, zoom) {
+    var newScale = that.viewport.scale * zoom;
+    var oldScale = that.viewport.scale;
+    var scaleChange = oldScale - newScale;
+
+    if (newScale < 0.2 || newScale > 10) {
+        return;
+    }
+
+    var mouseX = (xPosition + that.viewport.x) / oldScale;
+    var mouseY = (yPosition + that.viewport.y) / oldScale;
+
+    that.viewport.x -= (mouseX * scaleChange);
+    that.viewport.y -= (mouseY * scaleChange);
+    that.viewport.scale = newScale;
+
+    that._clearFocus();
+    that.drawBoard();
 }
 
 function mouseHandler(that) {
 
     var isPinching = false;
-    var pinchStartSize = undefined;
-    var pinchStartOffset = undefined;
 
     var hammertime = new Hammer(that.boardContainer);
 
@@ -107,33 +101,11 @@ function mouseHandler(that) {
     hammertime.on('pinchstart', function (ev) {
         that.overlay.appendDebugText('first pinch');
         isPinching = true;
-        pinchStartSize = that.size;
-        pinchStartOffset = {
-            x: that._boardOffset.x,
-            y: that._boardOffset.y
-        };
-
     });
     hammertime.on('pinch', function (ev) {
-        var newSize = Math.round(pinchStartSize * ev.scale);
-        if (newSize < 10) {
-            newSize = 10;
-        } else if (newSize > 100) {
-            newSize = 100;
-        }
+        var zoom = 1 - (1- ev.scale) / 10;
 
-        if (that.size !== newSize) {
-            that.size = newSize;
-            var xZoomOffset = pinchStartOffset.x +
-                (ev.center.x / newSize - ev.center.x / pinchStartSize) * Math.max(newSize, pinchStartSize);
-            var yZoomOffset = pinchStartOffset.y +
-                (ev.center.y / newSize - ev.center.y / pinchStartSize) * Math.max(newSize, pinchStartSize);
-            that._boardOffset.x = xZoomOffset;
-            that._boardOffset.y = yZoomOffset;
-
-            that._clearFocus();
-            that.drawBoard();
-        }
+        handleZoom(that, ev.center.x, ev.center.y, zoom);
     });
 
     that.boardContainer.addEventListener('mousedown', mouseDownHandler);
@@ -209,8 +181,8 @@ function mouseHandler(that) {
             var xDiff = currentPosition.x - mouseStartPosition.x;
             var yDiff = currentPosition.y - mouseStartPosition.y;
 
-            that._boardOffset.x += xDiff;
-            that._boardOffset.y += yDiff;
+            that.viewport.x -= xDiff;
+            that.viewport.y -= yDiff;
 
             mouseStartPosition = {
                 x: currentPosition.x,
@@ -364,7 +336,7 @@ HexagonBoard.prototype.draw = function draw() {
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
-    this.background.draw(this.size, this._boardOffset);
+    this.background.draw(this.getSize(), this.viewport);
 };
 
 HexagonBoard.prototype.drawBoard = function drawBoard() {
@@ -391,7 +363,7 @@ HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
 };
 
 HexagonBoard.prototype._drawHexagon = function _drawHexagon(context, hexagonPosition, color, borderColor) {
-    var size = this.size;
+    var size = this.getSize();
 
     var x = hexagonPosition.x;
     var y = hexagonPosition.y;
@@ -403,16 +375,16 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
     var xIndex = hexagonIndex.x;
     var yIndex = hexagonIndex.y;
 
-    var size = this.size;
+    var size = this.getSize();
 
     var sideLength = (size / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
-    var xOffset = yIndex % 2 !== 0 ? size /2 : 0;
+    var xOffset = yIndex % 2 !== 0 ? Math.floor(size /2) : 0;
 
-    var x = xIndex * size + xOffset + this._boardOffset.x;
-    var y = yIndex * (hexagonHeight - triangleHeight) + this._boardOffset.y;
+    var x = xIndex * size + xOffset - this.viewport.x;
+    var y = yIndex * (hexagonHeight - triangleHeight) - this.viewport.y;
 
     return {
         x: x,
@@ -421,12 +393,12 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
 };
 
 HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(clientX, clientY) {
-    var hexagonSize = this.size;
+    var hexagonSize = this.getSize();
     var sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
     var triangleHeight = Math.sin(Math.PI / 6) * sideLength;
 
-    var x = clientX - this._boardOffset.x;
-    var y = clientY - this._boardOffset.y;
+    var x = clientX + this.viewport.x;
+    var y = clientY + this.viewport.y;
 
     var hexagonHeight = (2 * triangleHeight + sideLength);
 
@@ -567,7 +539,7 @@ HexagonBoard.prototype._load = function _load(pattern) {
     }
 
     if (savedHexagonBoard.size) {
-        this.size = savedHexagonBoard.size;
+//        this._defaultSize = savedHexagonBoard.size;
     }
 
     if (savedHexagonBoard.currentColor) {
@@ -602,7 +574,7 @@ HexagonBoard.prototype._serializeBoard = function _serializeBoard() {
     var serializedBoard = {
         currentColor: this._currentColor,
         hexagons: hexagons,
-        size: this.size
+        size: this.getSize()
     };
 
     return serializedBoard;
