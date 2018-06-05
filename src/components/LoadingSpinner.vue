@@ -1,32 +1,15 @@
 <template>
   <div class="loading-container">
-      <svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-          <circle class="path" fill="none" stroke-width="6" stroke-linecap="round"
-            cx="33" cy="33" r="30"></circle>
-      </svg>
+    <svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+        <circle class="path" fill="none" stroke-width="6" stroke-linecap="round"
+                cx="33" cy="33" r="30"></circle>
+    </svg>
   </div>
 </template>
 
 <script>
-import ApiService from '@/js/apiService';
-
 export default {
-  name: 'home',
-  mounted() {
-    if (this.$store.state.user) {
-      console.log('User saved');
-      // this.$router.push('library');
-    }
-    ApiService.getUser().then((user) => {
-      if (user) {
-        this.$store.commit('loginUser', user.fullName);
-        this.$router.push('library');
-      } else {
-        this.$store.state.user = undefined;
-        this.$router.push('login');
-      }
-    });
-  },
+  name: 'LoadingSpinner',
 };
 </script>
 

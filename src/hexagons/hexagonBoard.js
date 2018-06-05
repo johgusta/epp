@@ -3,23 +3,20 @@
 import Color from 'color';
 import Hammer from 'hammerjs';
 import FileSaver from 'file-saver';
-import page from 'page';
+import _ from 'lodash';
 
-import {Background} from './background.js';
-import {HexagonMatrix} from './hexagonMatrix.js';
-import {Hexagon} from './hexagon.js';
-import {Overlay} from './overlay.js';
-import {PatternHandler} from '../js/patternHandler.js';
+import Background from './background.js';
+import HexagonMatrix from './hexagonMatrix.js';
+import Hexagon from './hexagon.js';
+import PatternHandler from '../js/patternHandler.js';
 
 var DEFAULT_SIZE = 32;
 var DEFAULT_COLOR = '#ff0000';
 var DEFAULT_BORDER_COLOR = '#cccccc';
 
-function HexagonBoard(mainContainer, user, pattern) {
+function HexagonBoard(mainContainer, pattern) {
 
     this.debug = false;
-
-    this.currentUser = user;
 
     var hexagonMatrix = new HexagonMatrix();
     this._hexagonMatrix = hexagonMatrix;
@@ -311,14 +308,12 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
     this.foregroundCanvas = foregroundCanvas;
     boardContainer.appendChild(foregroundCanvas);
 
-    var overlayDiv = document.createElement('div');
-    overlayDiv.className = 'overlayDiv';
-    mainContainer.appendChild(overlayDiv);
+    // var overlayDiv = document.createElement('div');
+    // overlayDiv.className = 'overlayDiv';
+    // mainContainer.appendChild(overlayDiv);
 
     this.canvas = canvas;
     this.background = new Background(backgroundCanvas);
-
-    this.overlay = new Overlay(overlayDiv, this);
 };
 
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
@@ -499,9 +494,7 @@ HexagonBoard.prototype.savePatternAs = function savePatternAs(patternTitle) {
 };
 
 HexagonBoard.prototype.deletePattern = function deletePattern() {
-    return PatternHandler.deletePattern(this._patternId).then(function () {
-        page('/library');
-    });
+    return PatternHandler.deletePattern(this._patternId);
 };
 
 HexagonBoard.prototype.exportPattern = function exportPattern() {
@@ -586,4 +579,4 @@ HexagonBoard.prototype._serializeBoard = function _serializeBoard() {
     return serializedBoard;
 };
 
-export {HexagonBoard};
+export default HexagonBoard;

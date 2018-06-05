@@ -8,12 +8,12 @@ $mdc-theme-on-primary: #ffffff;
 $mdc-theme-on-secondary: #ffffff;
 $mdc-theme-background: #ffffff;
 
-@import "@material/button/mdc-button";
-@import "@material/list/mdc-list";
-@import "@material/fab/mdc-fab";
 @import "@material/dialog/mdc-dialog";
 @import "@material/textfield/mdc-text-field";
 @import "@material/drawer/mdc-drawer";
 @import "@material/elevation/mdc-elevation";
 @import "@material/theme/mdc-theme";
 
+@import "vue-mdc-adapter/dist/button/styles";
+@import "vue-mdc-adapter/dist/fab/styles";
+@import "vue-mdc-adapter/dist/list/styles";

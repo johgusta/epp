@@ -1,36 +1,26 @@
 "use strict";
 
-import {ColorList} from './colorList.js';
-import {ApiService} from '../js/apiService.js';
+import ColorList from './colorList.js';
+import ApiService from '../js/apiService.js';
 
 import Mustache from 'mustache';
-import page from 'page';
 
 import $ from 'jquery';
 import spectrum from 'spectrum-colorpicker/spectrum.js';
 import spectrumStyle from 'spectrum-colorpicker/spectrum.css';
 
-import overlayTemplate from './overlay.html';
 import style from './overlay.scss';
 
 import {MDCTemporaryDrawer} from '@material/drawer';
 import {MDCDialog} from '@material/dialog';
 import {MDCTextField} from '@material/textfield';
 
-function Overlay(overlayContainer, hexagonBoard) {
-    this._init(overlayContainer, hexagonBoard);
+function Overlay(overlayContainer, hexagonBoard, router) {
+  hexagonBoard.overlay = this;
+  this._init(overlayContainer, hexagonBoard, router);
 }
 
-Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
-
-    var renderedTemplate = Mustache.render(overlayTemplate, {
-        username: hexagonBoard.currentUser.fullName,
-        pattern: {
-            name: hexagonBoard.patternTitle
-        }
-    });
-
-    overlayContainer.innerHTML = renderedTemplate;
+Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, router) {
 
     var colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
     this.colorList = new ColorList(colorsCanvas);
@@ -50,7 +40,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
     saveAsPatternDialog.listen('MDCDialog:accept', function() {
         if (patternNameField.value) {
             hexagonBoard.savePatternAs(patternNameField.value).then(function (newPattern) {
-                page('/pattern/' + newPattern.id);
+              router.push({ name: 'pattern', params: { id: newPattern.id } });
             });
         }
     });
@@ -62,7 +52,6 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     var drawerItemSaveAs = drawerContainer.querySelector('#drawer-item-save-as');
     drawerItemSaveAs.addEventListener('click', function (evt) {
-//        drawer.open = false;
         saveAsPatternDialog.lastFocusedTarget = evt.target;
         saveAsPatternDialog.show();
     });
@@ -74,12 +63,14 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     var drawerItemRemove = drawerContainer.querySelector('#drawer-item-remove');
     drawerItemRemove.addEventListener('click', function () {
-        hexagonBoard.deletePattern();
+        hexagonBoard.deletePattern().then(() => {
+          router.push({name: 'library' });
+        });
     });
 
     var drawerItemLibrary = drawerContainer.querySelector('#drawer-item-library');
     drawerItemLibrary.addEventListener('click', function () {
-        page('/library');
+        router.push({ name: 'library' });
     });
 
     var drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
@@ -117,4 +108,4 @@ Overlay.prototype.appendDebugText = function appendDebugText(text) {
     this._debugContainer.innerText = text + '\n' + this._debugContainer.innerText;
 };
 
-export {Overlay};
+export default Overlay;

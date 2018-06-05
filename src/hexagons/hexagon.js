@@ -30,7 +30,7 @@ function drawHexagon(context, x, y, size, borderColor, color) {
     context.restore();
 }
 
-var Hexagon = {
+const Hexagon = {
     drawHexagon: drawHexagon
 };
-export {Hexagon};
+export default Hexagon;

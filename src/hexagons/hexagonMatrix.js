@@ -132,4 +132,4 @@ HexagonMatrix.prototype.forEach = function forEach(callback) {
     });
 };
 
-export {HexagonMatrix};
+export default HexagonMatrix;
