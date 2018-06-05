@@ -21,6 +21,7 @@ $duration: 1.4s;
 
 .loading-container {
   height: 100%;
+  margin: 10px;
 
   display: flex;
   align-items: center;
