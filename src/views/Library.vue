@@ -113,7 +113,6 @@ export default {
 .library {
   .library-header {
     font-size: 22px;
-    margin-top: 40px;
     padding: 20px;
     font-family: Tillana;
   }

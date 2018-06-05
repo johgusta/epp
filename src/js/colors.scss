@@ -13,6 +13,8 @@ $mdc-theme-background: #ffffff;
 @import "@material/drawer/mdc-drawer";
 @import "@material/elevation/mdc-elevation";
 @import "@material/theme/mdc-theme";
+@import "@material/typography/mdc-typography";
+
 
 @import "vue-mdc-adapter/dist/button/styles";
 @import "vue-mdc-adapter/dist/fab/styles";

@@ -1,7 +1,15 @@
 <template>
   <div class="main-page">
     <div class="main-container mdc-elevation--z2">
-      <img class="logo" src="@/assets/logo.png">
+      <div class="main-header">
+        <img class="logo" src="@/assets/logo.png">
+        <div class="main-header-text mdc-typography--headline4">
+          English Paper Piecing
+        </div>
+        <div class="main-header-sub-text mdc-typography--headline5">
+          Hexagons for everyone!
+        </div>
+      </div>
       <slot class="main-content"></slot>
     </div>
   </div>
@@ -35,19 +43,23 @@ export default {
   background-repeat: repeat;
 
   .main-container {
-
     width: 90%;
     max-width: 450px;
     margin: 0 20px;
-    padding: 20px;
+    padding: 10px;
+
+    text-align: center;
 
     background-color: #ffffff;
     overflow-y: auto;
     max-height: 95%;
 
-    .logo {
+    .main-header {
+      font-family: Tillana;
+      margin: 5px;
+      .logo {
         height: 150px;
-        margin: 10px;
+      }
     }
   }
 }

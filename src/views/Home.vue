@@ -1,11 +1,7 @@
 <template>
   <MainContainer>
-    <div class="home-header">
-      <h1>English Paper Piecing</h1>
-      <h2>Hexagons for everyone!</h2>
-    </div>
     <LoadingSpinner v-if="loading"/>
-    <div v-if="!loading" class="main-content">
+    <div v-if="!loading" class="home-content">
       <mdc-button v-if="!currentUser" raised @click="signInWithGoogle">
         <i class="material-icons mdc-button__icon" aria-hidden="true">person</i>
         Sign in with Google
@@ -74,12 +70,12 @@ export default {
 </script>
 
 <style lang="scss">
-.home-header {
-  font-family: Tillana;
-}
-.logged-in {
-  .mdc-button {
-    margin: 5px;
+.home-content {
+  margin: 20px;
+  .logged-in {
+    .mdc-button {
+      margin: 5px;
+    }
   }
 }
 </style>
