@@ -34,7 +34,7 @@
               </header>
 
               <div class="mdc-list-group mdc-drawer__content drawer-navigation-list">
-                  <h3 class="mdc-list-group__subheader drawer-sub-headers">Tools</h3>
+                  <h3 class="mdc-list-group__subheader drawer-sub-headers">File</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-save" class="mdc-list-item">
                           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
@@ -63,7 +63,7 @@
                   </ul>
 
                   <hr class="mdc-list-divider">
-                  <h3 class="mdc-list-group__subheader drawer-sub-headers">Settings</h3>
+                  <h3 class="mdc-list-group__subheader drawer-sub-headers">Other</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-library" class="mdc-list-item">
                           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
