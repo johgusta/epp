@@ -2,7 +2,6 @@ var path = require('path')
 
 module.exports = {
   lintOnSave: false,
-  baseUrl: '/',
   css: {
     loaderOptions: {
       sass: {
@@ -12,4 +11,7 @@ module.exports = {
       }
     }
   },
+  devServer: {
+    port: 3000,
+  }
 };

@@ -1,8 +1,7 @@
-
-
-// import page from 'page';
 import axios from 'axios';
 import Cookie from 'js-cookie';
+
+import store from '@/store';
 
 const csrfTokenName = 'customcsrftoken';
 
@@ -74,7 +73,7 @@ ApiService.prototype.login = function login() {
 ApiService.prototype.logout = function logout() {
   return api.get('/api-auth/logout/').then(() => {
     console.log('Logout successful');
-    // page('/login');
+    store.commit('logoutUser');
   }).catch((error) => {
     console.log('Logout error', error.response);
     throw error;

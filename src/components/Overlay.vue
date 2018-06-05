@@ -19,14 +19,14 @@
                   <div class="mdc-drawer__header-content">
                       <div class="header-drawer-content">
                           <div class="logo-container">
-                              <img class="drawer-logo" src="../static/hexagon_logo.png">
+                              <img class="drawer-logo" src="@/assets/logo.png">
                           </div>
                           <div class="header-text-content">
+                              <div class="active-pattern-text">
+                                  Active pattern:
+                              </div>
                               <div class="current-pattern">
                                   {{patternTitle}}
-                              </div>
-                              <div class="current-user">
-                                  {{username}}
                               </div>
                           </div>
                       </div>
@@ -34,7 +34,7 @@
               </header>
 
               <div class="mdc-list-group mdc-drawer__content drawer-navigation-list">
-                  <h3 class="mdc-list-group__subheader drawer-sub-headers">Pattern</h3>
+                  <h3 class="mdc-list-group__subheader drawer-sub-headers">Tools</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-save" class="mdc-list-item">
                           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">save</i>Save
@@ -45,8 +45,8 @@
                       <li id="drawer-item-export" class="mdc-list-item">
                           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>Export
                       </li>
-                      <li id="drawer-item-remove" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_circle</i>Remove
+                      <li id="drawer-item-delete" class="mdc-list-item">
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">delete</i>Delete
                       </li>
                   </ul>
 
@@ -54,10 +54,10 @@
                   <h3 class="mdc-list-group__subheader drawer-sub-headers">Settings</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-library" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">list</i>Library
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">list</i>Pattern Library
                       </li>
                       <li id="drawer-item-sign-out" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_circle</i>Sign out
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_circle</i>Log Out
                       </li>
                   </ul>
               </div>
@@ -108,7 +108,7 @@ export default {
     }
   },
   mounted() {
-    const overlay = new Overlay(this.$el, this.board, this.$router);
+    const overlay = new Overlay(this.$el, this.board);
     this.$emit('overlay-ready');
   }
 }
@@ -175,7 +175,7 @@ div.colorInput {
 }
 
 .drawer-logo {
-  height: 80px;
+  height: 100px;
   margin: 10px;
 }
 
@@ -198,6 +198,7 @@ h3.drawer-sub-headers {
 
   margin: 0;
   padding: 0.75rem 16px;
+  font-family: Tillana;
 }
 
 #save-as-pattern-dialog {

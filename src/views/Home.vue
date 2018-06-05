@@ -1,84 +1,85 @@
 <template>
-  <div class="loading-container">
-      <svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-          <circle class="path" fill="none" stroke-width="6" stroke-linecap="round"
-            cx="33" cy="33" r="30"></circle>
-      </svg>
-  </div>
+  <MainContainer>
+    <div class="home-header">
+      <h1>English Paper Piecing</h1>
+      <h2>Hexagons for everyone!</h2>
+    </div>
+    <LoadingSpinner v-if="loading"/>
+    <div v-if="!loading" class="main-content">
+      <mdc-button v-if="!currentUser" raised @click="signInWithGoogle">
+        <i class="material-icons mdc-button__icon" aria-hidden="true">person</i>
+        Sign in with Google
+      </mdc-button>
+      <div v-if="currentUser" class="logged-in">
+        <div>
+          <mdc-button raised @click="openPatternLibrary">
+            Open Pattern Library
+          </mdc-button>
+        </div>
+        <div>
+          <mdc-button outlined @click="signOutUser">
+            Log out {{currentUser}}
+          </mdc-button>
+        </div>
+      </div>
+    </div>
+  </MainContainer>
 </template>
 
 <script>
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import MainContainer from '@/components/MainContainer.vue';
 import ApiService from '@/js/apiService';
 
 export default {
   name: 'home',
-  mounted() {
-    if (this.$store.state.user) {
-      console.log('User saved');
-      // this.$router.push('library');
+  components: {
+    LoadingSpinner,
+    MainContainer,
+  },
+  data() {
+    return {
+      loading: true,
+      currentUser: undefined,
+    };
+  },
+  methods: {
+    signInWithGoogle() {
+      console.log('sign in with google');
+      ApiService.login();
+    },
+    openPatternLibrary() {
+      this.$router.push({ name: 'library'});
+    },
+    signOutUser() {
+      this.loading = true;
+      ApiService.logout().then(() => {
+        this.loading = false;
+        this.currentUser = this.$store.state.userFullName;
+      });
     }
+  },
+  mounted() {
     ApiService.getUser().then((user) => {
       if (user) {
         this.$store.commit('loginUser', user.fullName);
-        this.$router.push('library');
       } else {
-        this.$store.state.user = undefined;
-        this.$router.push('login');
+        this.$store.commit('logoutUser');
       }
+      this.loading = false;
+      this.currentUser = this.$store.state.userFullName
     });
   },
 };
 </script>
 
 <style lang="scss">
-// Here is where the magic happens
-
-$offset: 187;
-$duration: 1.4s;
-
-.loading-container {
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .spinner {
-    animation: rotator $duration linear infinite;
-  }
-
-  @keyframes rotator {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(270deg); }
-  }
-
-  .path {
-    stroke-dasharray: $offset;
-    stroke-dashoffset: 0;
-    transform-origin: center;
-    animation:
-    dash $duration ease-in-out infinite,
-    colors ($duration*4) ease-in-out infinite;
-  }
-
-  @keyframes colors {
-    0% { stroke: #4285F4; }
-    25% { stroke: #DE3E35; }
-    50% { stroke: #F7C223; }
-    75% { stroke: #1B9A59; }
-    100% { stroke: #4285F4; }
-  }
-
-  @keyframes dash {
-    0% { stroke-dashoffset: $offset; }
-    50% {
-      stroke-dashoffset: $offset/4;
-      transform:rotate(135deg);
-    }
-    100% {
-      stroke-dashoffset: $offset;
-      transform:rotate(450deg);
-    }
+.home-header {
+  font-family: Tillana;
+}
+.logged-in {
+  .mdc-button {
+    margin: 5px;
   }
 }
 </style>

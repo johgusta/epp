@@ -2,6 +2,7 @@
 
 import ColorList from './colorList.js';
 import ApiService from '../js/apiService.js';
+import router from '@/router';
 
 import Mustache from 'mustache';
 
@@ -15,12 +16,12 @@ import {MDCTemporaryDrawer} from '@material/drawer';
 import {MDCDialog} from '@material/dialog';
 import {MDCTextField} from '@material/textfield';
 
-function Overlay(overlayContainer, hexagonBoard, router) {
+function Overlay(overlayContainer, hexagonBoard) {
   hexagonBoard.overlay = this;
   this._init(overlayContainer, hexagonBoard, router);
 }
 
-Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, router) {
+Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
     var colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
     this.colorList = new ColorList(colorsCanvas);
@@ -61,7 +62,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, router)
         hexagonBoard.exportPattern();
     });
 
-    var drawerItemRemove = drawerContainer.querySelector('#drawer-item-remove');
+    var drawerItemRemove = drawerContainer.querySelector('#drawer-item-delete');
     drawerItemRemove.addEventListener('click', function () {
         hexagonBoard.deletePattern().then(() => {
           router.push({name: 'library' });
@@ -75,7 +76,9 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard, router)
 
     var drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
     drawerItemSignOut.addEventListener('click', function () {
-        ApiService.logout();
+        ApiService.logout().then(() => {
+          router.push({ name: 'home' });
+        });
     });
 };
 

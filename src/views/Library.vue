@@ -1,10 +1,9 @@
 <template>
-  <div class="outer-wrapper">
+  <MainContainer>
     <div class="library">
       <div class="library-header mdc-theme--primary-bg mdc-theme--on-primary">
         Pattern library
       </div>
-      <!--<span>User {{fullName}}</span>-->
 
       <mdc-list interactive bordered two-line class="patterns-list">
         <mdc-list-item v-for="pattern in patterns" :key="pattern.id" :id="pattern.id"
@@ -16,6 +15,7 @@
       <div v-if="patterns.length ===0" class="no-patterns">
         Create your first pattern!
       </div>
+      <mdc-fab class="back-button" icon="arrow_back" @click="goBack"></mdc-fab>
       <mdc-fab class="add-pattern" icon="add" @click="addPattern"></mdc-fab>
     </div>
     <aside id="create-pattern-dialog"
@@ -45,15 +45,20 @@
       </div>
       <div class="mdc-dialog__backdrop"></div>
     </aside>
-  </div>
+  </MainContainer>
 </template>
 
 <script>
+import MainContainer from '@/components/MainContainer.vue';
 import moment from 'moment';
 import { MDCDialog } from '@material/dialog';
 import PatternHandler from '@/js/patternHandler';
 
 export default {
+  name: 'Library',
+  components: {
+    MainContainer,
+  },
   data() {
     return {
       patterns: [],
@@ -73,6 +78,9 @@ export default {
       }
       this.dialog.show();
     },
+    goBack() {
+      this.$router.push({ name: 'home' });
+    }
   },
   mounted() {
     PatternHandler.getPatterns().then((patterns) => {
@@ -101,35 +109,29 @@ export default {
 </script>
 
 <style lang="scss">
-.outer-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 
-  width: 100%;
-  height: 100%;
-
-  .library {
-    width: 90%;
-    max-width: 600px;
-
-    .library-header {
-      font-size: 22px;
-      margin-top: 40px;
-      padding: 20px;
-    }
-    .patterns-list {
-      padding-top: 0;
-      text-align: start;
-    }
-    .no-patterns {
-      opacity: 0.3;
-      padding: 15px;
-    }
-    .add-pattern {
-      float: right;
-      margin: 10px;
-    }
+.library {
+  .library-header {
+    font-size: 22px;
+    margin-top: 40px;
+    padding: 20px;
+    font-family: Tillana;
+  }
+  .patterns-list {
+    padding-top: 0;
+    text-align: start;
+  }
+  .no-patterns {
+    opacity: 0.3;
+    padding: 15px;
+  }
+  .back-button {
+    float: left;
+    margin: 10px;
+  }
+  .add-pattern {
+    float: right;
+    margin: 10px;
   }
 }
 </style>
