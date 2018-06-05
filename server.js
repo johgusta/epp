@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var history = require('connect-history-api-fallback');
 
 var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 
@@ -7,7 +8,6 @@ var app = express();
 
 var isProduction = process.env.NODE_ENV === 'production';
 var port = isProduction ? process.env.PORT : 3000;
-var publicPath = path.resolve(__dirname, '../build');
 
 var useSslRedirect = process.env.FORCE_SSL === 'true';
 if (useSslRedirect) {
@@ -17,11 +17,15 @@ if (useSslRedirect) {
 }
 
 // We point to our static assets
-app.use(express.static(publicPath));
+var publicPath = path.resolve(__dirname, './dist');
+var staticMiddleware = express.static(publicPath)
+app.use(staticMiddleware);
+app.use(history());
+app.use(staticMiddleware);
 
-app.get('*', function(request, response){
-    response.sendFile(path.resolve(__dirname, '../build/index.html'));
-});
+// app.get('*', function(request, response){
+//     response.sendFile(path.resolve(__dirname, '../build/index.html'));
+// });
 
 // And run the server
 app.listen(port, function () {

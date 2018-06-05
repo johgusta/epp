@@ -6,9 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "postinstall": "vue-cli-service build",
+    "start": "node server.js"
   },
   "dependencies": {
+    "@material/button": "^0.36.0",
     "@material/dialog": "^0.36.0",
     "@material/drawer": "^0.36.0",
     "@material/textfield": "^0.36.0",
@@ -36,6 +39,9 @@
     "@vue/eslint-config-airbnb": "^3.0.0-beta.15",
     "@vue/test-utils": "^1.0.0-beta.16",
     "chai": "^4.1.2",
+    "connect-history-api-fallback": "^1.5.0",
+    "express": "^4.16.3",
+    "express-http-to-https": "^1.1.4",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "vue-template-compiler": "^2.5.16"
