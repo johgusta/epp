@@ -55,10 +55,12 @@ export default {
     max-height: 95%;
 
     .main-header {
-      font-family: Tillana;
       margin: 5px;
       .logo {
         height: 150px;
+      }
+      .main-header-text, .main-header-sub-text {
+        font-family: Tillana;
       }
     }
   }
