@@ -2,7 +2,7 @@
   <MainContainer>
     <div class="library">
       <div class="library-header mdc-theme--primary-bg mdc-theme--on-primary">
-        Pattern library
+        Pattern Library
       </div>
 
       <mdc-list interactive bordered two-line class="patterns-list">
@@ -80,7 +80,7 @@ export default {
     },
     goBack() {
       this.$router.push({ name: 'home' });
-    }
+    },
   },
   mounted() {
     PatternHandler.getPatterns().then((patterns) => {

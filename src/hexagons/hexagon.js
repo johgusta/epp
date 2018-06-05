@@ -1,36 +1,36 @@
-"use strict";
 
-function drawHexagon(context, x, y, size, borderColor, color) {
-    var topHeight = Math.tan(Math.PI / 6) * size / 2;
-    var hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
 
-    //Correct fuzzy lines when stroking by offseting half a pixel for odd line widths;
-    x += 0.5;
-    y += 0.5;
+function drawHexagon(context, xParam, yParam, size, borderColor, color) {
+  const topHeight = Math.tan(Math.PI / 6) * size / 2;
+  const hypotenuse = (size / 2) / Math.cos(Math.PI / 6);
 
-    context.save();
+  // Correct fuzzy lines when stroking by offseting half a pixel for odd line widths;
+  const x = xParam + 0.5;
+  const y = yParam + 0.5;
 
-    context.beginPath();
-    context.moveTo(x + size / 2, y);
-    context.lineTo(x + size, y + topHeight);
-    context.lineTo(x + size, y + topHeight + hypotenuse);
-    context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
-    context.lineTo(x, y + topHeight + hypotenuse);
-    context.lineTo(x, y + topHeight);
-    context.lineTo(x + size / 2, y);
+  context.save();
 
-    if (color !== undefined) {
-        context.fillStyle = color;
-        context.fill();
-    }
+  context.beginPath();
+  context.moveTo(x + size / 2, y);
+  context.lineTo(x + size, y + topHeight);
+  context.lineTo(x + size, y + topHeight + hypotenuse);
+  context.lineTo(x + size / 2, y + topHeight * 2 + hypotenuse);
+  context.lineTo(x, y + topHeight + hypotenuse);
+  context.lineTo(x, y + topHeight);
+  context.lineTo(x + size / 2, y);
 
-    context.strokeStyle = borderColor;
-    context.stroke();
+  if (color !== undefined) {
+    context.fillStyle = color;
+    context.fill();
+  }
 
-    context.restore();
+  context.strokeStyle = borderColor;
+  context.stroke();
+
+  context.restore();
 }
 
 const Hexagon = {
-    drawHexagon: drawHexagon
+  drawHexagon,
 };
 export default Hexagon;

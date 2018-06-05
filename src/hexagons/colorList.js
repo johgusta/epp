@@ -1,86 +1,85 @@
-"use strict";
 
-import Hexagon from './hexagon.js';
 
-var colorItemHeight = 30;
-var hexagonSize = 12;
-var itemWidth = 90;
-var fontSize = 14;
-var borderColor = 'rgba(0, 0, 0, 0.2)';
+import Hexagon from './hexagon';
 
-var padding = 6;
+const colorItemHeight = 30;
+const hexagonSize = 12;
+const itemWidth = 90;
+const fontSize = 14;
+const borderColor = 'rgba(0, 0, 0, 0.2)';
+
+const padding = 6;
 
 function ColorList(canvas) {
-    this.canvas = canvas;
-    this._colorList = [];
+  this.canvas = canvas;
+  this._colorList = [];
 
-    this.canvas.addEventListener('click', this._handleClick.bind(this));
+  this.canvas.addEventListener('click', this._handleClick.bind(this));
 }
 
 ColorList.prototype.draw = function draw(colorList, changeColorCallback) {
-    this._colorList = colorList;
-    this._changeColorCallback = changeColorCallback;
+  this._colorList = colorList;
+  this._changeColorCallback = changeColorCallback;
 
-    var colorsCanvas = this.canvas;
-    colorsCanvas.width = itemWidth;
-    colorsCanvas.height = colorItemHeight * colorList.length + padding;
-    var context = colorsCanvas.getContext('2d');
+  const colorsCanvas = this.canvas;
+  colorsCanvas.width = itemWidth;
+  colorsCanvas.height = colorItemHeight * colorList.length + padding;
+  const context = colorsCanvas.getContext('2d');
 
-    context.font = fontSize + 'px sans-serif';
+  context.font = `${fontSize}px sans-serif`;
 
-    colorList.forEach(function (color, index) {
-        var x = 0;
-        var y = colorItemHeight * index;
+  colorList.forEach((color, index) => {
+    const x = 0;
+    const y = colorItemHeight * index;
 
-        context.save();
-        context.translate(x, y);
+    context.save();
+    context.translate(x, y);
 
-        context.save();
-        context.translate(0.5, 0.5);
-        context.beginPath();
-        context.rect(padding, padding, itemWidth - padding * 2, colorItemHeight - padding);
+    context.save();
+    context.translate(0.5, 0.5);
+    context.beginPath();
+    context.rect(padding, padding, itemWidth - padding * 2, colorItemHeight - padding);
 
-        context.fillStyle = '#fdfdfd';
-        context.fill();
+    context.fillStyle = '#fdfdfd';
+    context.fill();
 
-        context.strokeStyle = '#c2c2c2';
-        context.stroke();
-        context.restore();
+    context.strokeStyle = '#c2c2c2';
+    context.stroke();
+    context.restore();
 
-        Hexagon.drawHexagon(context, padding + 6, padding + 4, hexagonSize, borderColor, color.name);
+    Hexagon.drawHexagon(context, padding + 6, padding + 4, hexagonSize, borderColor, color.name);
 
-        context.fillText(' x ' + color.count, hexagonSize + padding + 8, fontSize + padding + 2);
+    context.fillText(` x ${color.count}`, hexagonSize + padding + 8, fontSize + padding + 2);
 
-        context.restore();
-    });
+    context.restore();
+  });
 };
 
 ColorList.prototype._handleClick = function _handleClick(event) {
+  const x = event.offsetX;
+  const y = event.offsetY;
 
-    var x = event.offsetX;
-    var y = event.offsetY;
 
+  const colorIndex = findColorIndex(x, y);
+  if (colorIndex === undefined) {
+    return;
+  }
 
-    var colorIndex = findColorIndex(x, y);
-    if (colorIndex === undefined) {
-        return;
-    }
-
-    var color = this._colorList[colorIndex];
-    this._changeColorCallback(color.name);
+  const color = this._colorList[colorIndex];
+  this._changeColorCallback(color.name);
 };
 
 function findColorIndex(x, y) {
-    if (x <= padding || x >= itemWidth - padding) {
-        return;
-    }
+  if (x <= padding || x >= itemWidth - padding) {
+    return undefined;
+  }
 
-    var modY = y % colorItemHeight;
-    if (modY <= padding) {
-        return;
-    }
-    var colorIndex = Math.floor(y / colorItemHeight);
-    return colorIndex;
+  const modY = y % colorItemHeight;
+  if (modY <= padding) {
+    return undefined;
+  }
+  const colorIndex = Math.floor(y / colorItemHeight);
+  return colorIndex;
 }
 
 export default ColorList;

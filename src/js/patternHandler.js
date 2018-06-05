@@ -1,5 +1,3 @@
-
-
 import ApiService from '@/js/apiService';
 
 function parseApiPattern(apiPattern) {

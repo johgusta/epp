@@ -12,7 +12,7 @@
 
 <script>
 import queryString from 'query-string';
-import ApiService from '@/js/apiService.js';
+import ApiService from '@/js/apiService';
 import MainContainer from '@/components/MainContainer.vue';
 
 export default {
@@ -28,15 +28,15 @@ export default {
   methods: {
     goHome() {
       this.$router.push({ name: 'home' });
-    }
+    },
   },
   mounted() {
     console.log('Hello world');
     const parsedParams = queryString.parse(window.location.search);
     const code = parsedParams.code;
     if (code === undefined) {
-        this.error = 'Code missing for login callback!';
-        return;
+      this.error = 'Code missing for login callback!';
+      return;
     }
 
     ApiService.loginWithGoogleCode(code).then(() => {
@@ -45,7 +45,7 @@ export default {
       this.error = 'Error logging in!';
     });
   },
-}
+};
 </script>
 
 <style lang="scss">

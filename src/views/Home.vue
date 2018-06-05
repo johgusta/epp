@@ -49,7 +49,7 @@ export default {
       ApiService.login();
     },
     openPatternLibrary() {
-      this.$router.push({ name: 'library'});
+      this.$router.push({ name: 'library' });
     },
     signOutUser() {
       this.loading = true;
@@ -57,7 +57,7 @@ export default {
         this.loading = false;
         this.currentUser = this.$store.state.userFullName;
       });
-    }
+    },
   },
   mounted() {
     ApiService.getUser().then((user) => {
@@ -67,7 +67,7 @@ export default {
         this.$store.commit('logoutUser');
       }
       this.loading = false;
-      this.currentUser = this.$store.state.userFullName
+      this.currentUser = this.$store.state.userFullName;
     });
   },
 };

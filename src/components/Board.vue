@@ -8,7 +8,7 @@
 
 <script>
 import Overlay from '@/components/Overlay.vue';
-import HexagonBoard from '@/hexagons/hexagonBoard.js';
+import HexagonBoard from '@/hexagons/hexagonBoard';
 
 export default {
   name: 'Board',
@@ -21,7 +21,7 @@ export default {
   data() {
     return {
       hexagonBoard: undefined,
-    }
+    };
   },
   methods: {
     overlayReady() {
@@ -37,8 +37,13 @@ export default {
 </script>
 
 <style lang="scss">
-#outer-board-container, #main-board {
+#outer-board-container, #main-board, #board-container {
   width: 100%;
   height: 100%;
+}
+#board-container {
+  canvas {
+    position: absolute;
+  }
 }
 </style>

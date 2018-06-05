@@ -1,20 +1,15 @@
-"use strict";
+import $ from 'jquery';
+import 'spectrum-colorpicker/spectrum';
+import 'spectrum-colorpicker/spectrum.css';
 
-import ColorList from './colorList.js';
-import ApiService from '../js/apiService.js';
+import { MDCTemporaryDrawer } from '@material/drawer';
+import { MDCDialog } from '@material/dialog';
+import { MDCTextField } from '@material/textfield';
+
 import router from '@/router';
 
-import Mustache from 'mustache';
-
-import $ from 'jquery';
-import spectrum from 'spectrum-colorpicker/spectrum.js';
-import spectrumStyle from 'spectrum-colorpicker/spectrum.css';
-
-import style from './overlay.scss';
-
-import {MDCTemporaryDrawer} from '@material/drawer';
-import {MDCDialog} from '@material/dialog';
-import {MDCTextField} from '@material/textfield';
+import ApiService from '@/js/apiService';
+import ColorList from './colorList';
 
 function Overlay(overlayContainer, hexagonBoard) {
   hexagonBoard.overlay = this;
@@ -22,93 +17,93 @@ function Overlay(overlayContainer, hexagonBoard) {
 }
 
 Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
+  const colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
+  this.colorList = new ColorList(colorsCanvas);
 
-    var colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
-    this.colorList = new ColorList(colorsCanvas);
+  const drawerContainer = overlayContainer.querySelector('#drawer-menu');
+  const drawer = new MDCTemporaryDrawer(drawerContainer);
+  const drawerMenuButton = overlayContainer.querySelector('#menu-drawer-button');
+  drawerMenuButton.addEventListener('click', () => {
+    drawer.open = true;
+  });
 
-    var drawerContainer = overlayContainer.querySelector('#drawer-menu');
-    var drawer = new MDCTemporaryDrawer(drawerContainer);
-    var drawerMenuButton = overlayContainer.querySelector('#menu-drawer-button');
-    drawerMenuButton.addEventListener('click', function () {
-        drawer.open = true;
+  const saveAsPatternElm = document.querySelector('#save-as-pattern-dialog');
+  const saveAsPatternDialog = new MDCDialog(saveAsPatternElm);
+
+  const patternNameField = new MDCTextField(saveAsPatternElm.querySelector('.mdc-text-field'));
+
+  saveAsPatternDialog.listen('MDCDialog:accept', () => {
+    if (patternNameField.value) {
+      hexagonBoard.savePatternAs(patternNameField.value).then((newPattern) => {
+        router.push({ name: 'pattern', params: { id: newPattern.id } });
+      });
+    }
+  });
+
+  const drawerItemSave = drawerContainer.querySelector('#drawer-item-save');
+  drawerItemSave.addEventListener('click', () => {
+    hexagonBoard.savePattern();
+  });
+
+  const drawerItemSaveAs = drawerContainer.querySelector('#drawer-item-save-as');
+  drawerItemSaveAs.addEventListener('click', (evt) => {
+    saveAsPatternDialog.lastFocusedTarget = evt.target;
+    saveAsPatternDialog.show();
+  });
+
+  const drawerItemExport = drawerContainer.querySelector('#drawer-item-export');
+  drawerItemExport.addEventListener('click', () => {
+    hexagonBoard.exportPattern();
+  });
+
+  const drawerItemRemove = drawerContainer.querySelector('#drawer-item-delete');
+  drawerItemRemove.addEventListener('click', () => {
+    hexagonBoard.deletePattern().then(() => {
+      router.push({ name: 'library' });
     });
+  });
 
-    var saveAsPatternElm = document.querySelector('#save-as-pattern-dialog');
-    var saveAsPatternDialog = new MDCDialog(saveAsPatternElm);
+  const drawerItemLibrary = drawerContainer.querySelector('#drawer-item-library');
+  drawerItemLibrary.addEventListener('click', () => {
+    router.push({ name: 'library' });
+  });
 
-    var patternNameField = new MDCTextField(saveAsPatternElm.querySelector('.mdc-text-field'));
-
-    saveAsPatternDialog.listen('MDCDialog:accept', function() {
-        if (patternNameField.value) {
-            hexagonBoard.savePatternAs(patternNameField.value).then(function (newPattern) {
-              router.push({ name: 'pattern', params: { id: newPattern.id } });
-            });
-        }
+  const drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
+  drawerItemSignOut.addEventListener('click', () => {
+    ApiService.logout().then(() => {
+      router.push({ name: 'home' });
     });
-
-    var drawerItemSave = drawerContainer.querySelector('#drawer-item-save');
-    drawerItemSave.addEventListener('click', function () {
-        hexagonBoard.savePattern();
-    });
-
-    var drawerItemSaveAs = drawerContainer.querySelector('#drawer-item-save-as');
-    drawerItemSaveAs.addEventListener('click', function (evt) {
-        saveAsPatternDialog.lastFocusedTarget = evt.target;
-        saveAsPatternDialog.show();
-    });
-
-    var drawerItemExport = drawerContainer.querySelector('#drawer-item-export');
-    drawerItemExport.addEventListener('click', function () {
-        hexagonBoard.exportPattern();
-    });
-
-    var drawerItemRemove = drawerContainer.querySelector('#drawer-item-delete');
-    drawerItemRemove.addEventListener('click', function () {
-        hexagonBoard.deletePattern().then(() => {
-          router.push({name: 'library' });
-        });
-    });
-
-    var drawerItemLibrary = drawerContainer.querySelector('#drawer-item-library');
-    drawerItemLibrary.addEventListener('click', function () {
-        router.push({ name: 'library' });
-    });
-
-    var drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
-    drawerItemSignOut.addEventListener('click', function () {
-        ApiService.logout().then(() => {
-          router.push({ name: 'home' });
-        });
-    });
+  });
 };
 
-Overlay.prototype.redrawColorList = function redrawColorList(colorList, currentColor, changeColorCallback) {
-    var that = this;
-    $('.colorPicker').spectrum({
-        color: currentColor,
-        showInitial: true,
-        replacerClassName: 'colorInput',
-        show: function () {
-            that.colorPickerOpen = true;
-        },
-        change: function(color) {
-            changeColorCallback(color.toHexString());
-            that.colorPickerOpen = false;
-        }
-    });
+Overlay.prototype.redrawColorList =
+function redrawColorList(colorList, currentColor, changeColorCallback) {
+  const that = this;
+  $('.colorPicker').spectrum({
+    color: currentColor,
+    showInitial: true,
+    replacerClassName: 'colorInput',
+    show() {
+      that.colorPickerOpen = true;
+    },
+    change(color) {
+      changeColorCallback(color.toHexString());
+      that.colorPickerOpen = false;
+    },
+  });
 
-    this.colorList.draw(colorList, changeColorCallback);
+  this.colorList.draw(colorList, changeColorCallback);
 };
 
 Overlay.prototype.appendDebugText = function appendDebugText(text) {
-    if (this._debugContainer === undefined) {
-        return;
-    }
-    if (this._debugVisible !== true) {
-        this._debugVisible = true;
-        this._debugContainer.style.display = 'block';
-    }
-    this._debugContainer.innerText = text + '\n' + this._debugContainer.innerText;
+  if (this._debugContainer === undefined) {
+    return;
+  }
+  if (this._debugVisible !== true) {
+    this._debugVisible = true;
+    this._debugContainer.style.display = 'block';
+  }
+  this._debugContainer.innerText = `${text}\n${this._debugContainer.innerText}`;
 };
 
 export default Overlay;

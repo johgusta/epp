@@ -12,13 +12,13 @@ export default {
   name: 'MainContainer',
   data() {
     return {
-      currentUserFullName: undefined
+      currentUserFullName: undefined,
     };
   },
   mounted() {
     this.currentUserFullName = this.$store.state.userFullName;
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">

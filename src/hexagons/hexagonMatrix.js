@@ -1,135 +1,135 @@
-"use strict";
+
 
 function HexagonMatrix() {
-    this._board = [];
+  this._board = [];
 }
 
 HexagonMatrix.prototype.add = function add(hexagon) {
-    var row;
-    for (var i = 0; i < this._board.length; i++) {
-        var itRow = this._board[i];
-        if (itRow.index === hexagon.y) {
-            row = itRow;
-            break;
-        }
+  let row;
+  for (let i = 0; i < this._board.length; i++) {
+    const itRow = this._board[i];
+    if (itRow.index === hexagon.y) {
+      row = itRow;
+      break;
+    }
+  }
+
+  if (row === undefined) {
+    row = {
+      index: hexagon.y,
+      items: [],
+    };
+
+    let rowIndex = this._board.length;
+    for (let j = 0; j < this._board.length; j++) {
+      const iterRow = this._board[j];
+      if (row.index < iterRow.index) {
+        rowIndex = j;
+        break;
+      }
     }
 
-    if (row === undefined) {
-        row = {
-            index: hexagon.y,
-            items: []
-        };
+    this._board.splice(rowIndex, 0, row);
+  }
 
-        var rowIndex = this._board.length;
-        for (i = 0; i < this._board.length; i++) {
-            itRow = this._board[i];
-            if (row.index < itRow.index) {
-                rowIndex = i;
-                break;
-            }
-        }
-
-        this._board.splice(rowIndex, 0, row);
+  let hexIndex = row.items.length;
+  for (let k = 0; k < row.items.length; k++) {
+    const itHex = row.items[k];
+    if (hexagon.x < itHex.x) {
+      hexIndex = k;
+      break;
     }
+  }
 
-    var hexIndex = row.items.length;
-    for (i = 0; i < row.items.length; i++) {
-        var itHex = row.items[i];
-        if (hexagon.x < itHex.x) {
-            hexIndex = i;
-            break;
-        }
+  row.items.splice(hexIndex, 0, hexagon);
+
+  let index = -2000000;
+  for (let j = 0; j < row.items.length; j++) {
+    const hex = row.items[j];
+
+    if (hex) {
+      if (hex.x < index) {
+        console.warn('No good!');
+      }
+      index = hex.x;
+    } else {
+      console.warn('Really not good!');
     }
-
-    row.items.splice(hexIndex, 0, hexagon);
-
-    var index = -2000000;
-    for (var j = 0; j < row.items.length; j++) {
-        var hex = row.items[j];
-
-        if (hex === undefined) {
-            console.warn('Really not good!');
-            continue;
-        }
-        if (hex.x < index) {
-            console.warn('No good!');
-        }
-        index = hex.x;
-    }
+  }
 };
 
 HexagonMatrix.prototype.remove = function remove(hexagonIndex) {
-    var rowIndex;
-    for (var i = 0; i < this._board.length; i++) {
-        var itRow = this._board[i];
-        if (itRow.index === hexagonIndex.y) {
-            rowIndex = i;
-            break;
-        }
+  let rowIndex;
+  for (let i = 0; i < this._board.length; i++) {
+    const itRow = this._board[i];
+    if (itRow.index === hexagonIndex.y) {
+      rowIndex = i;
+      break;
     }
+  }
 
-    if (rowIndex === undefined) {
-        console.warn('Hexagon index does not match any row for y: ' + hexagonIndex.y);
-        return;
+  if (rowIndex === undefined) {
+    console.warn(`Hexagon index does not match any row for y: ${hexagonIndex.y}`);
+    return undefined;
+  }
+
+  const row = this._board[rowIndex];
+
+  let deleteIndex;
+  for (let j = 0; j < row.items.length; j++) {
+    const itHex = row.items[j];
+    if (itHex.x === hexagonIndex.x) {
+      deleteIndex = j;
+      break;
     }
+  }
 
-    var row = this._board[rowIndex];
+  if (deleteIndex === undefined) {
+    console.warn(`Hexagon index does not match any hexagon for x: ${hexagonIndex.x}`);
+    return undefined;
+  }
 
-    var deleteIndex;
-    for (i = 0; i < row.items.length; i++) {
-        var itHex = row.items[i];
-        if (itHex.x === hexagonIndex.x) {
-            deleteIndex = i;
-            break;
-        }
-    }
+  const removedHexagon = row.items[deleteIndex];
 
-    if (deleteIndex === undefined) {
-        console.warn('Hexagon index does not match any hexagon for x: ' + hexagonIndex.x);
-        return;
-    }
+  row.items.splice(deleteIndex, 1);
 
-    var removedHexagon = row.items[deleteIndex];
+  if (row.items.length === 0) {
+    this._board.splice(rowIndex, 1);
+  }
 
-    row.items.splice(deleteIndex, 1);
-
-    if (row.items.length === 0) {
-        this._board.splice(rowIndex, 1);
-    }
-
-    return removedHexagon;
+  return removedHexagon;
 };
 
 HexagonMatrix.prototype.find = function find(hexagonIndex) {
-    var row;
-    for (var i = 0; i < this._board.length; i++) {
-        var itRow = this._board[i];
-        if (itRow.index === hexagonIndex.y) {
-            row = itRow;
-            break;
-        }
+  let row;
+  for (let i = 0; i < this._board.length; i++) {
+    const itRow = this._board[i];
+    if (itRow.index === hexagonIndex.y) {
+      row = itRow;
+      break;
     }
+  }
 
-    if (row === undefined) {
-        return undefined;
+  if (row === undefined) {
+    return undefined;
+  }
+
+  let hexagon;
+  for (let j = 0; j < row.items.length; j++) {
+    const itHex = row.items[j];
+    if (itHex.x === hexagonIndex.x) {
+      hexagon = itHex;
+      break;
     }
+  }
 
-    var hexagon;
-    for (var j = 0; j < row.items.length; j++) {
-        var itHex = row.items[j];
-        if (itHex.x === hexagonIndex.x) {
-            hexagon = itHex;
-            break;
-        }
-    }
-
-    return hexagon;
+  return hexagon;
 };
 
 HexagonMatrix.prototype.forEach = function forEach(callback) {
-    this._board.forEach(function (row) {
-        row.items.forEach(callback);
-    });
+  this._board.forEach((row) => {
+    row.items.forEach(callback);
+  });
 };
 
 export default HexagonMatrix;

@@ -9,7 +9,6 @@
 import Board from '@/components/Board.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PatternHandler from '@/js/patternHandler';
-import HexagonBoard from '@/hexagons/hexagonBoard.js';
 
 export default {
   components: {

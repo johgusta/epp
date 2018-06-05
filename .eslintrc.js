@@ -11,7 +11,11 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'prefer-destructuring': 'off',
-    'no-underscore-dangle': ['error', { 'allow': ['__vue__'] }],
+    'no-underscore-dangle': 'off',
+    'no-param-reassign': ['error', { 'props': false }],
+    'no-plusplus': 'off',
+    'no-mixed-operators': 'off',
+    'no-use-before-define': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint'

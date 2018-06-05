@@ -37,16 +37,28 @@
                   <h3 class="mdc-list-group__subheader drawer-sub-headers">Tools</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-save" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">save</i>Save
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            save
+                          </i>
+                          Save
                       </li>
                       <li id="drawer-item-save-as" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">save_alt</i>Save As
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            save_alt
+                          </i>
+                          Save As
                       </li>
                       <li id="drawer-item-export" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">share</i>Export
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            share
+                          </i>
+                          Export
                       </li>
                       <li id="drawer-item-delete" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">delete</i>Delete
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            delete
+                          </i>
+                          Delete
                       </li>
                   </ul>
 
@@ -54,10 +66,16 @@
                   <h3 class="mdc-list-group__subheader drawer-sub-headers">Settings</h3>
                   <ul class="mdc-list">
                       <li id="drawer-item-library" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">list</i>Pattern Library
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            list
+                          </i>
+                          Pattern Library
                       </li>
                       <li id="drawer-item-sign-out" class="mdc-list-item">
-                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_circle</i>Log Out
+                          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">
+                            account_circle
+                          </i>
+                          Log Out
                       </li>
                   </ul>
               </div>
@@ -83,8 +101,10 @@
                   </div>
               </section>
               <footer class="mdc-dialog__footer">
-                  <button type="button" class="mdc-button mdc-dialog__footer__button mdc-dialog__footer__button--cancel">Cancel</button>
-                  <button type="button" class="mdc-button mdc-button--unelevated mdc-dialog__footer__button mdc-dialog__footer__button--accept">Save</button>
+                  <button type="button" class="mdc-button mdc-dialog__footer__button
+                    mdc-dialog__footer__button--cancel">Cancel</button>
+                  <button type="button" class="mdc-button mdc-button--unelevated
+                    mdc-dialog__footer__button mdc-dialog__footer__button--accept">Save</button>
               </footer>
           </div>
           <div class="mdc-dialog__backdrop"></div>
@@ -93,7 +113,7 @@
 </template>
 
 <script>
-import Overlay from '@/hexagons/overlay.js';
+import Overlay from '@/hexagons/overlay';
 
 export default {
   name: 'Overlay',
@@ -105,17 +125,17 @@ export default {
     return {
       patternTitle: this.pattern.title,
       username: this.$store.state.userFullName,
-    }
+    };
   },
   mounted() {
-    const overlay = new Overlay(this.$el, this.board);
+    this.overlay = new Overlay(this.$el, this.board);
     this.$emit('overlay-ready');
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
-@import "../js/main.scss";
+@import "../js/colors.scss";
 
 .overlayDiv {
   position: absolute;
