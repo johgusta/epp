@@ -1,7 +1,18 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write;
+    // Make sure the uid of the requesting user matches name of the user
+    // document. The wildcard expression {userId} makes the userId variable
+    // available in rules.
+    match /users/{userId} {
+      allow read, update, delete: if request.auth.uid == userId;
+      allow create: if request.auth.uid != null;
+    }
+    match /patterns/{patternId} {
+      // Anyone can read a published patter; only pattern authors can read unpublished patterns
+      allow read: if resource.data.published == true || request.auth.uid == resource.data.author;
+      // Only pattern authors can write
+      allow update, delete: if request.auth.uid == resource.data.author;
+      allow create: if request.auth.uid != null;
     }
   }
 }

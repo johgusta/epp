@@ -59,9 +59,8 @@ function redirectToGoogleLogin(clientId) {
   window.location = url;
 }
 
-ApiService.prototype.setFirestoreDb = function setFirestoreDb(firestore) {
-  this.firestore = firestore;
-  this.patternsDb = firestore.collection('patterns');
+ApiService.prototype.setFirestoreDb = function setFirestoreDb(db) {
+  this.patternsDb = db.collection('patterns');
 };
 
 ApiService.prototype.login = function login() {
@@ -119,22 +118,28 @@ ApiService.prototype.getUser = function getUser() {
 };
 
 ApiService.prototype.getPatterns = function getPatterns() {
-  return this.patternsDb.get().then((querySnapshot) => {
-    const patterns = [];
-    querySnapshot.forEach((doc) => {
-      const pattern = doc.data();
-      pattern.id = doc.id;
-      patterns.push(pattern);
+  const userId = firebase.auth().currentUser.uid;
+  return this.patternsDb
+    .where('author', '==', userId)
+    .orderBy('updated', 'desc').get()
+    .then((querySnapshot) => {
+      const patterns = [];
+      querySnapshot.forEach((doc) => {
+        const pattern = doc.data();
+        pattern.id = doc.id;
+        patterns.push(pattern);
+      });
+      return patterns;
+    })
+    .catch((error) => {
+      console.error('Error loading user patterns', error);
+      throw error;
     });
-    return patterns;
-  }).catch((error) => {
-    console.error('Error loading user patterns', error);
-    throw error;
-  });
 };
 
 ApiService.prototype.addPattern = function addPattern(pattern) {
   pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
+  pattern.author = firebase.auth().currentUser.uid;
   return this.patternsDb.add(pattern)
     .then((docRef) => {
       return {
@@ -150,9 +155,12 @@ ApiService.prototype.addPattern = function addPattern(pattern) {
 ApiService.prototype.getPattern = function getPattern(id) {
   return this.patternsDb.doc(id).get()
     .then((docRef) => {
-      const pattern = docRef.data();
-      pattern.id = docRef.id;
-      return pattern;
+      if (docRef.exists) {
+        const pattern = docRef.data();
+        pattern.id = docRef.id;
+        return pattern;
+      }
+      return undefined;
     })
     .catch((error) => {
       console.error(`Error fetching pattern: ${id}`, error);
@@ -162,6 +170,7 @@ ApiService.prototype.getPattern = function getPattern(id) {
 
 ApiService.prototype.updatePattern = function updatePattern(id, pattern) {
   pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
+  pattern.author = firebase.auth().currentUser.uid;
   return this.patternsDb.doc(id).set(pattern)
     .then(() => {
       console.log(`Update pattern: ${id}`);

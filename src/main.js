@@ -38,8 +38,6 @@ const firestore = firebaseApp.firestore();
 const settings = { timestampsInSnapshots: true };
 firestore.settings(settings);
 
-ApiService.setFirestoreDb(firestore);
-
 const CLIENT_ID =
   '36350522881-c9nukpad4d36fqvrsklm1e7kup7uqm6m.apps.googleusercontent.com';
 const uiConfig = {
@@ -55,7 +53,28 @@ const uiConfig = {
   callbacks: {
     // Called when the user has been successfully signed in.
     // Avoid redirect after sign in
-    signInSuccessWithAuthResult() {
+    signInSuccessWithAuthResult(authResult) {
+      if (authResult.user && authResult.additionalUserInfo) {
+        console.log('sign in success');
+        if (authResult.additionalUserInfo.isNewUser) {
+          console.log('sign in new user!');
+          const user = authResult.user;
+          const userProfile = authResult.additionalUserInfo.profile;
+          const userId = user.uid;
+          const newUser = {
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+          };
+          if (userProfile.given_name) {
+            newUser.given_name = userProfile.given_name;
+          }
+          if (userProfile.family_name) {
+            newUser.family_name = userProfile.family_name;
+          }
+          firestore.collection('users').doc(userId).set(newUser);
+        }
+      }
       return false;
     },
   },
@@ -76,6 +95,8 @@ Vue.use(VueMDCFAB);
 Vue.use(VueMDCList);
 Vue.use(VueMDCTextfield);
 
+ApiService.setFirestoreDb(firestore);
+
 let app;
 firebase.auth().onAuthStateChanged((user) => {
   if (!app) {
@@ -83,9 +104,7 @@ firebase.auth().onAuthStateChanged((user) => {
       router,
       store,
       firestore() {
-        return {
-          patterns: firestore.collection('patterns'),
-        };
+        return {};
       },
       render: h => h(App),
     }).$mount('#app');

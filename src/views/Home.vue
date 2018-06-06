@@ -2,10 +2,10 @@
   <MainContainer>
     <LoadingSpinner v-show="loading"/>
     <div v-show="!loading" class="home-content">
-      <!-- <mdc-button v-if="!currentUser" raised @click="signInWithGoogle">
+      <mdc-button v-show="currentUser" raised @click="deleteUser">
         <i class="material-icons mdc-button__icon" aria-hidden="true">person</i>
-        Sign in with Google
-      </mdc-button> -->
+        Delete user
+      </mdc-button>
       <div id="firebaseui-container"></div>
       <div v-show="currentUser" class="logged-in">
         <div>
@@ -44,6 +44,10 @@ export default {
     signInWithGoogle() {
       console.log('sign in with google');
       ApiService.login();
+    },
+    deleteUser() {
+      console.log('delete user');
+      this.$firebase.auth().currentUser.delete();
     },
     openPatternLibrary() {
       this.$router.push({ name: 'library' });
