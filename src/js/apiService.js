@@ -1,7 +1,6 @@
 import axios from 'axios';
 import Cookie from 'js-cookie';
-
-import store from '@/store';
+import firebase from 'firebase/app';
 
 const csrfTokenName = 'customcsrftoken';
 
@@ -60,6 +59,11 @@ function redirectToGoogleLogin(clientId) {
   window.location = url;
 }
 
+ApiService.prototype.setFirestoreDb = function setFirestoreDb(firestore) {
+  this.firestore = firestore;
+  this.patternsDb = firestore.collection('patterns');
+};
+
 ApiService.prototype.login = function login() {
   console.log('ApiService login called');
   getGoogleClientId().then((clientId) => {
@@ -71,13 +75,7 @@ ApiService.prototype.login = function login() {
 };
 
 ApiService.prototype.logout = function logout() {
-  return api.get('/api-auth/logout/').then(() => {
-    console.log('Logout successful');
-    store.commit('logoutUser');
-  }).catch((error) => {
-    console.log('Logout error', error.response);
-    throw error;
-  });
+  return firebase.auth().signOut();
 };
 
 ApiService.prototype.loginWithGoogleCode = function loginWithGoogleCode(code) {
@@ -121,55 +119,68 @@ ApiService.prototype.getUser = function getUser() {
 };
 
 ApiService.prototype.getPatterns = function getPatterns() {
-  return api.get('/patterns/').then((response) => {
-    const patterns = response.data;
+  return this.patternsDb.get().then((querySnapshot) => {
+    const patterns = [];
+    querySnapshot.forEach((doc) => {
+      const pattern = doc.data();
+      pattern.id = doc.id;
+      patterns.push(pattern);
+    });
     return patterns;
-  }, (error) => {
+  }).catch((error) => {
     console.error('Error loading user patterns', error);
     throw error;
   });
 };
 
 ApiService.prototype.addPattern = function addPattern(pattern) {
-  return api.post('/patterns/', pattern).then((response) => {
-    const apiPattern = response.data;
-    console.log(`Added pattern: ${apiPattern.id}`);
-    return apiPattern;
-  }).catch((error) => {
-    console.error('Error adding pattern', error);
-    throw error;
-  });
+  pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
+  return this.patternsDb.add(pattern)
+    .then((docRef) => {
+      return {
+        id: docRef.id,
+      };
+    })
+    .catch((error) => {
+      console.error('Error adding pattern', error);
+      throw error;
+    });
 };
 
 ApiService.prototype.getPattern = function getPattern(id) {
-  return api.get(`/patterns/${id}/`).then((response) => {
-    const patterns = response.data;
-    return patterns;
-  }, (error) => {
-    console.error(`Error fetching pattern: ${id}`, error);
-    throw error;
-  });
+  return this.patternsDb.doc(id).get()
+    .then((docRef) => {
+      const pattern = docRef.data();
+      pattern.id = docRef.id;
+      return pattern;
+    })
+    .catch((error) => {
+      console.error(`Error fetching pattern: ${id}`, error);
+      throw error;
+    });
 };
 
 ApiService.prototype.updatePattern = function updatePattern(id, pattern) {
-  return api.put(`/patterns/${id}/`, pattern).then((response) => {
-    const apiPattern = response.data;
-    console.log(`Update pattern: ${apiPattern.id}`);
-    return apiPattern;
-  }, (error) => {
-    console.error(`Error updating pattern: ${id}`, error);
-    throw error;
-  });
+  pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
+  return this.patternsDb.doc(id).set(pattern)
+    .then(() => {
+      console.log(`Update pattern: ${id}`);
+    })
+    .catch((error) => {
+      console.error(`Error updating pattern: ${id}`, error);
+      throw error;
+    });
 };
 
 ApiService.prototype.deletePattern = function deletePattern(id) {
-  return api.delete(`/patterns/${id}/`).then(() => {
-    console.log(`Deleted pattern: ${id}`);
-    return undefined;
-  }).catch((error) => {
-    console.error(`Error deleting pattern: ${id}`, error);
-    throw error;
-  });
+  return this.patternsDb.doc(id).delete()
+    .then(() => {
+      console.log(`Deleted pattern: ${id}`);
+    })
+    .catch((error) => {
+      console.error(`Error deleting pattern: ${id}`, error);
+      throw error;
+    });
 };
 
 const apiService = new ApiService();

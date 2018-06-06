@@ -4,7 +4,7 @@ function parseApiPattern(apiPattern) {
   const pattern = {
     title: apiPattern.title,
     id: apiPattern.id,
-    updated: apiPattern.updated,
+    updated: apiPattern.updated.toDate(),
   };
   try {
     pattern.data = JSON.parse(apiPattern.data);

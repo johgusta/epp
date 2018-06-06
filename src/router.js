@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import firebase from 'firebase/app';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import LoginCallback from './views/LoginCallback.vue';
@@ -7,7 +8,7 @@ import Pattern from './views/Pattern.vue';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -32,3 +33,13 @@ export default new Router({
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'home' && !firebase.auth().currentUser) {
+    next({ name: 'home' });
+  } else {
+    next();
+  }
+});
+
+export default router;

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 var express = require('express');
 var path = require('path');
 var history = require('connect-history-api-fallback');
@@ -12,7 +14,7 @@ var port = isProduction ? process.env.PORT : 3000;
 var useSslRedirect = process.env.FORCE_SSL === 'true';
 if (useSslRedirect) {
     var configIgnoreHosts = process.env.SSL_IGNORE_HOSTS;
-    ignoreHosts = configIgnoreHosts ? JSON.parse(configIgnoreHosts) : undefined;
+    var ignoreHosts = configIgnoreHosts ? JSON.parse(configIgnoreHosts) : undefined;
     app.use(redirectToHTTPS(ignoreHosts));
 }
 

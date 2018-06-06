@@ -1,12 +1,13 @@
 <template>
   <MainContainer>
-    <LoadingSpinner v-if="loading"/>
-    <div v-if="!loading" class="home-content">
-      <mdc-button v-if="!currentUser" raised @click="signInWithGoogle">
+    <LoadingSpinner v-show="loading"/>
+    <div v-show="!loading" class="home-content">
+      <!-- <mdc-button v-if="!currentUser" raised @click="signInWithGoogle">
         <i class="material-icons mdc-button__icon" aria-hidden="true">person</i>
         Sign in with Google
-      </mdc-button>
-      <div v-if="currentUser" class="logged-in">
+      </mdc-button> -->
+      <div id="firebaseui-container"></div>
+      <div v-show="currentUser" class="logged-in">
         <div>
           <mdc-button raised @click="openPatternLibrary">
             Open Pattern Library
@@ -35,7 +36,7 @@ export default {
   },
   data() {
     return {
-      loading: true,
+      loading: false,
       currentUser: undefined,
     };
   },
@@ -51,19 +52,18 @@ export default {
       this.loading = true;
       ApiService.logout().then(() => {
         this.loading = false;
-        this.currentUser = this.$store.state.userFullName;
+        this.currentUser = undefined;
       });
     },
   },
   mounted() {
-    ApiService.getUser().then((user) => {
-      if (user) {
-        this.$store.commit('loginUser', user.fullName);
-      } else {
-        this.$store.commit('logoutUser');
-      }
+    this.$firebase.auth().onAuthStateChanged(() => {
       this.loading = false;
       this.currentUser = this.$store.state.userFullName;
+
+      if (!this.$store.state.userFullName) {
+        this.$authUi.start('#firebaseui-container', this.$authUiConfig);
+      }
     });
   },
 };

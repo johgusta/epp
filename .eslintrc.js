@@ -16,6 +16,7 @@ module.exports = {
     'no-plusplus': 'off',
     'no-mixed-operators': 'off',
     'no-use-before-define': 'off',
+    'arrow-body-style': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint'
