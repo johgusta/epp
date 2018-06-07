@@ -19,6 +19,11 @@ export default new Vuex.Store({
       localStorage.removeItem(USERNAME_KEY);
     },
   },
+  getters: {
+    userDisplayName: (state) => {
+      return state.userFullName;
+    },
+  },
   actions: {
 
   },

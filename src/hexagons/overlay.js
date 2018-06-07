@@ -8,7 +8,7 @@ import { MDCTextField } from '@material/textfield';
 
 import router from '@/router';
 
-import ApiService from '@/js/apiService';
+import FirebaseHelper from '@/js/firebaseHelper';
 import ColorList from './colorList';
 
 function Overlay(overlayContainer, hexagonBoard) {
@@ -70,7 +70,7 @@ Overlay.prototype._init = function _init(overlayContainer, hexagonBoard) {
 
   const drawerItemSignOut = drawerContainer.querySelector('#drawer-item-sign-out');
   drawerItemSignOut.addEventListener('click', () => {
-    ApiService.logout().then(() => {
+    FirebaseHelper.signOut().then(() => {
       router.push({ name: 'home' });
     });
   });

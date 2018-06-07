@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookie from 'js-cookie';
-import firebase from 'firebase/app';
+
+import FirebaseHelper from '@/js/firebaseHelper';
 
 const csrfTokenName = 'customcsrftoken';
 
@@ -59,10 +60,6 @@ function redirectToGoogleLogin(clientId) {
   window.location = url;
 }
 
-ApiService.prototype.setFirestoreDb = function setFirestoreDb(db) {
-  this.patternsDb = db.collection('patterns');
-};
-
 ApiService.prototype.login = function login() {
   console.log('ApiService login called');
   getGoogleClientId().then((clientId) => {
@@ -71,10 +68,6 @@ ApiService.prototype.login = function login() {
     console.error('Failed to login user', error);
     throw error;
   });
-};
-
-ApiService.prototype.logout = function logout() {
-  return firebase.auth().signOut();
 };
 
 ApiService.prototype.loginWithGoogleCode = function loginWithGoogleCode(code) {
@@ -117,78 +110,99 @@ ApiService.prototype.getUser = function getUser() {
   });
 };
 
+ApiService.prototype.getFirestoreCollection = function getFirestoreCollection() {
+  return FirebaseHelper.getFirestore()
+    .then((firestore) => {
+      return firestore.collection('patterns');
+    });
+};
+
 ApiService.prototype.getPatterns = function getPatterns() {
-  const userId = firebase.auth().currentUser.uid;
-  return this.patternsDb
-    .where('author', '==', userId)
-    .orderBy('updated', 'desc').get()
-    .then((querySnapshot) => {
-      const patterns = [];
-      querySnapshot.forEach((doc) => {
-        const pattern = doc.data();
-        pattern.id = doc.id;
-        patterns.push(pattern);
-      });
-      return patterns;
-    })
-    .catch((error) => {
-      console.error('Error loading user patterns', error);
-      throw error;
+  return this.getFirestoreCollection()
+    .then((db) => {
+      const userId = FirebaseHelper.getCurrentUser().uid;
+      return db.where('author', '==', userId)
+        .orderBy('updated', 'desc').get()
+        .then((querySnapshot) => {
+          const patterns = [];
+          querySnapshot.forEach((doc) => {
+            const pattern = doc.data();
+            pattern.id = doc.id;
+            patterns.push(pattern);
+          });
+          return patterns;
+        })
+        .catch((error) => {
+          console.error('Error loading user patterns', error);
+          throw error;
+        });
     });
 };
 
 ApiService.prototype.addPattern = function addPattern(pattern) {
-  pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
-  pattern.author = firebase.auth().currentUser.uid;
-  return this.patternsDb.add(pattern)
-    .then((docRef) => {
-      return {
-        id: docRef.id,
-      };
-    })
-    .catch((error) => {
-      console.error('Error adding pattern', error);
-      throw error;
+  return this.getFirestoreCollection()
+    .then((db) => {
+      pattern.updated = FirebaseHelper.getServerTimestamp();
+      pattern.author = FirebaseHelper.getCurrentUser().uid;
+      return db.add(pattern)
+        .then((docRef) => {
+          return {
+            id: docRef.id,
+          };
+        })
+        .catch((error) => {
+          console.error('Error adding pattern', error);
+          throw error;
+        });
     });
 };
 
 ApiService.prototype.getPattern = function getPattern(id) {
-  return this.patternsDb.doc(id).get()
-    .then((docRef) => {
-      if (docRef.exists) {
-        const pattern = docRef.data();
-        pattern.id = docRef.id;
-        return pattern;
-      }
-      return undefined;
-    })
-    .catch((error) => {
-      console.error(`Error fetching pattern: ${id}`, error);
-      throw error;
+  return this.getFirestoreCollection()
+    .then((db) => {
+      return db.doc(id).get()
+        .then((docRef) => {
+          if (docRef.exists) {
+            const pattern = docRef.data();
+            pattern.id = docRef.id;
+            return pattern;
+          }
+          return undefined;
+        })
+        .catch((error) => {
+          console.error(`Error fetching pattern: ${id}`, error);
+          throw error;
+        });
     });
 };
 
 ApiService.prototype.updatePattern = function updatePattern(id, pattern) {
-  pattern.updated = firebase.firestore.FieldValue.serverTimestamp();
-  pattern.author = firebase.auth().currentUser.uid;
-  return this.patternsDb.doc(id).set(pattern)
-    .then(() => {
-      console.log(`Update pattern: ${id}`);
-    })
-    .catch((error) => {
-      console.error(`Error updating pattern: ${id}`, error);
-      throw error;
+  return this.getFirestoreCollection()
+    .then((db) => {
+      pattern.updated = FirebaseHelper.getServerTimestamp();
+      pattern.author = FirebaseHelper.getCurrentUser().uid;
+      return db.doc(id).set(pattern)
+        .then(() => {
+          console.log(`Update pattern: ${id}`);
+        })
+        .catch((error) => {
+          console.error(`Error updating pattern: ${id}`, error);
+          throw error;
+        });
     });
 };
 
 ApiService.prototype.deletePattern = function deletePattern(id) {
-  return this.patternsDb.doc(id).delete()
-    .then(() => {
-      console.log(`Deleted pattern: ${id}`);
-    })
-    .catch((error) => {
-      console.error(`Error deleting pattern: ${id}`, error);
-      throw error;
+  return this.getFirestoreCollection()
+    .then((db) => {
+      return db.doc(id).delete()
+        .then(() => {
+          console.log(`Deleted pattern: ${id}`);
+        })
+        .catch((error) => {
+          console.error(`Error deleting pattern: ${id}`, error);
+          throw error;
+        });
     });
 };
 

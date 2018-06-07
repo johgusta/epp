@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import firebase from 'firebase/app';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import LoginCallback from './views/LoginCallback.vue';
@@ -34,12 +33,12 @@ const router = new Router({
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.name !== 'home' && !firebase.auth().currentUser) {
-    next({ name: 'home' });
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   if (to.name !== 'home' && !firebase.auth().currentUser) {
+//     next({ name: 'home' });
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

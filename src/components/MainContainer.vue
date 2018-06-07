@@ -18,14 +18,6 @@
 <script>
 export default {
   name: 'MainContainer',
-  data() {
-    return {
-      currentUserFullName: undefined,
-    };
-  },
-  mounted() {
-    this.currentUserFullName = this.$store.state.userFullName;
-  },
 };
 </script>
 
@@ -38,7 +30,6 @@ export default {
   align-items: center;
   justify-content: center;
 
-  background-color: #efefef;
   background-image: url('/img/hexagon_tile.png');
   background-repeat: repeat;
 
