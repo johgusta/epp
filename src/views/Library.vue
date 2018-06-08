@@ -12,7 +12,8 @@
           <span slot="secondary">Saved: {{pattern.updated}}</span>
         </mdc-list-item>
       </mdc-list>
-      <div v-if="patterns.length ===0" class="no-patterns">
+      <LoadingSpinner v-show="patterns === null"/>
+      <div v-show="patterns && patterns.length === 0" class="no-patterns">
         Create your first pattern!
       </div>
       <mdc-fab class="back-button" icon="arrow_back" @click="goBack"></mdc-fab>
@@ -49,21 +50,27 @@
 </template>
 
 <script>
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MainContainer from '@/components/MainContainer.vue';
-import moment from 'moment';
 import { MDCDialog } from '@material/dialog';
 import PatternHandler from '@/js/patternHandler';
+import { types } from '@/store';
 
 export default {
   name: 'Library',
   components: {
+    LoadingSpinner,
     MainContainer,
   },
   data() {
     return {
-      patterns: [],
       newPatternName: '',
     };
+  },
+  computed: {
+    patterns() {
+      return this.$store.getters.patterns;
+    },
   },
   methods: {
     openPattern(id) {
@@ -83,14 +90,7 @@ export default {
     },
   },
   mounted() {
-    PatternHandler.getPatterns().then((patterns) => {
-      this.patterns = patterns.map(pattern => ({
-        id: pattern.id,
-        title: pattern.title,
-        updated: moment(pattern.updated).fromNow(),
-      }));
-    });
-
+    this.$store.dispatch(types.LOAD_PATTERNS);
     const createPatternEl = this.$el.querySelector('#create-pattern-dialog');
     this.dialog = new MDCDialog(createPatternEl);
 

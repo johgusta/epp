@@ -483,6 +483,10 @@ HexagonBoard.prototype.savePatternAs = function savePatternAs(patternTitle) {
   return PatternHandler.addPattern(patternTitle, serializedPattern);
 };
 
+HexagonBoard.prototype.importPattern = function importPattern(title, stringPattern) {
+  return PatternHandler.addPattern(title, JSON.parse(stringPattern));
+};
+
 HexagonBoard.prototype.deletePattern = function deletePattern() {
   return PatternHandler.deletePattern(this._patternId);
 };

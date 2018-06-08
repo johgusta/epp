@@ -12,7 +12,7 @@ import FirebaseHelper from '@/js/firebaseHelper';
 
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import store, { types } from './store';
 import './registerServiceWorker';
 
 Vue.config.productionTip = false;
@@ -37,10 +37,10 @@ new Vue({
 FirebaseHelper.onAuthStateChanged((user) => {
   if (user) {
     console.log('user is logged in');
-    store.commit('loginUser', user.displayName);
+    store.commit(types.LOGIN_USER, user.displayName);
   } else {
     console.log('log out user and updated state');
-    store.commit('logoutUser');
+    store.commit(types.LOGOUT_USER);
     router.push({ name: 'home' });
   }
 });
