@@ -367,19 +367,18 @@ function _drawHexagon(context, hexagonPosition, color, borderColor) {
 };
 
 HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexagonIndex) {
+  const size = this.getSize();
+  const hexagon = Hexagon.calculateHexagon(size);
+  const halfSize = hexagon.width / 2;
+
   const xIndex = hexagonIndex.x;
   const yIndex = hexagonIndex.y;
 
-  const size = this.getSize();
+  const xOffset = yIndex % 2 !== 0 ? Math.round(halfSize) : 0;
+  const rowHeight = hexagon.height - hexagon.triangleHeight;
 
-  const sideLength = (size / 2) / Math.cos(Math.PI / 6);
-  const triangleHeight = Math.sin(Math.PI / 6) * sideLength;
-  const hexagonHeight = (2 * triangleHeight + sideLength);
-
-  const xOffset = yIndex % 2 !== 0 ? Math.floor(size / 2) : 0;
-
-  const x = xIndex * size + xOffset - this.viewport.x;
-  const y = yIndex * (hexagonHeight - triangleHeight) - this.viewport.y;
+  const x = xIndex * hexagon.width + xOffset - this.viewport.x;
+  const y = yIndex * rowHeight - this.viewport.y;
 
   return {
     x,
@@ -388,38 +387,36 @@ HexagonBoard.prototype._getHexagonPosition = function _getHexagonPosition(hexago
 };
 
 HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(clientX, clientY) {
-  const hexagonSize = this.getSize();
-  const sideLength = (hexagonSize / 2) / Math.cos(Math.PI / 6);
-  const triangleHeight = Math.sin(Math.PI / 6) * sideLength;
+  const size = this.getSize();
+  const hexagon = Hexagon.calculateHexagon(size);
+  const halfSize = hexagon.width / 2;
 
   const x = clientX + this.viewport.x;
   const y = clientY + this.viewport.y;
 
-  const hexagonHeight = (2 * triangleHeight + sideLength);
-
-  const rowHeight = hexagonHeight - triangleHeight;
+  const rowHeight = hexagon.height - hexagon.triangleHeight;
 
   let rowIndex = Math.floor(y / rowHeight);
 
   const isOffsetRow = rowIndex % 2 !== 0;
-  const xOffset = isOffsetRow ? hexagonSize / 2 : 0;
+  const xOffset = isOffsetRow ? Math.round(halfSize) : 0;
 
-  let columnIndex = Math.floor((x - xOffset) / hexagonSize);
+  let columnIndex = Math.floor((x - xOffset) / hexagon.width);
 
-  const innerX = x - (columnIndex * hexagonSize + xOffset);
+  const innerX = x - (columnIndex * hexagon.width + xOffset);
   const innerY = y - (rowIndex * rowHeight);
 
   const tangentForThirtyDeg = Math.tan(Math.PI / 6);
 
-  if (innerY < triangleHeight) {
-    if (innerX < hexagonSize / 2) {
-      if ((triangleHeight - innerY) / innerX > tangentForThirtyDeg) {
+  if (innerY < hexagon.triangleHeight) {
+    if (innerX < hexagon.width / 2) {
+      if ((hexagon.triangleHeight - innerY) / innerX > tangentForThirtyDeg) {
         rowIndex--;
         if (!isOffsetRow) {
           columnIndex--;
         }
       }
-    } else if ((triangleHeight - innerY) / (hexagonSize - innerX) > tangentForThirtyDeg) {
+    } else if ((hexagon.triangleHeight - innerY) / (hexagon.width - innerX) > tangentForThirtyDeg) {
       rowIndex--;
       if (isOffsetRow) {
         columnIndex++;
