@@ -17,9 +17,48 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-const firestore = firebaseApp.firestore();
+let firestore;
+
+const firestoreInitializedCallbacks = [];
+
+function firestoreInitialized() {
+  firestore = firebase.firestore();
+  firestoreInitializedCallbacks.forEach(callback => callback());
+}
+
+function getFirestoreInstance() {
+  return new Promise((resolve) => {
+    if (firestore) {
+      resolve(firestore);
+    } else {
+      firestoreInitializedCallbacks.push(() => resolve(firestore));
+    }
+  });
+}
+
 const settings = { timestampsInSnapshots: true };
-firestore.settings(settings);
+firebase.firestore().settings(settings);
+firebaseApp.firestore()
+  .enablePersistence()
+  .then(() => {
+    // Initialize Cloud Firestore through firebase
+    firestoreInitialized();
+  })
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      // Multiple tabs open, persistence can only be enabled
+      // in one tab at a a time.
+      // ...
+      console.warn('Firebase already enabled in another tab');
+      firestoreInitialized();
+    } else if (err.code === 'unimplemented') {
+      // The current browser does not support all of the
+      // features required to enable persistence
+      // ...
+      console.warn('Browser does not support offline persistence');
+      firestoreInitialized();
+    }
+  });
 
 const CLIENT_ID =
   '36350522881-c9nukpad4d36fqvrsklm1e7kup7uqm6m.apps.googleusercontent.com';
@@ -85,12 +124,12 @@ const FirebaseHelper = {
   getFirestore() {
     return new Promise((resolve, reject) => {
       if (currentUserUid) {
-        resolve(firestore);
+        resolve(getFirestoreInstance());
       } else {
         const callbackPosition = authStateChangedCallbacks.push(() => {
           authStateChangedCallbacks.splice(callbackPosition - 1, 1);
           if (currentUserUid) {
-            resolve(firestore);
+            resolve(getFirestoreInstance());
           } else {
             reject(new Error('No user available'));
           }
