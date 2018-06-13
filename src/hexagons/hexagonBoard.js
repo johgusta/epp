@@ -16,8 +16,8 @@ const DEFAULT_BORDER_COLOR = '#cccccc';
 function HexagonBoard(mainContainer, pattern) {
   this.debug = false;
 
-  const hexagonMatrix = new HexagonMatrix();
-  this._hexagonMatrix = hexagonMatrix;
+  this._hexagonMatrix = new HexagonMatrix();
+  this._selectedHexagons = new HexagonMatrix();
   this._currentColor = DEFAULT_COLOR;
   this._borderColor = DEFAULT_BORDER_COLOR;
 
@@ -79,75 +79,31 @@ function mouseHandler(that) {
       handleZoom(that, ev.x, ev.y, zoom);
     }
 
-    that._clearFocus();
     that.drawBoard();
   });
 
   hammertime.on('tap', (ev) => {
     onClickHandler(ev.center.x, ev.center.y);
   });
-  // that.boardContainer.addEventListener('mousemove', (event) => {
-  //   if (event.changedTouches) {
-  //     console.log('ignore');
-  //     return;
-  //   }
-  //   focusHandler(event.clientX, event.clientY);
-  // });
 
-  // that.boardContainer.addEventListener('mouseleave', () => {
-  //   that._clearFocus();
-  // });
-
-  // function focusHandler(x, y) {
-  //   const hexagonIndex = that.findHexagonIndex(x, y);
-  //
-  //   if (that.overlay.colorPickerOpen) {
-  //     requestAnimationFrame(() => {
-  //       that._clearFocus();
-  //     });
-  //     return;
-  //   }
-  //
-  //   const borderColor = '#000000';
-  //
-  //   const context = that.foregroundCanvas.getContext('2d');
-  //
-  //   const hexagonPosition = that._getHexagonPosition(hexagonIndex);
-  //   requestAnimationFrame(() => {
-  //     that._clearFocus();
-  //     that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
-  //   });
-  // }
+  hammertime.on('press', (ev) => {
+    pressHandler(ev.center.x, ev.center.y);
+  });
 
   function onClickHandler(x, y) {
-    const hexagonIndex = that.findHexagonIndex(x, y);
-
     if (that.overlay.colorPickerOpen) {
       return;
     }
 
-    const hexagonMatrix = that._hexagonMatrix;
-    let hexagon = hexagonMatrix.find(hexagonIndex);
-    if (hexagon === undefined) {
-      console.log('create hexagon', hexagonIndex);
-
-      hexagon = {
-        x: hexagonIndex.x,
-        y: hexagonIndex.y,
-        color: that._currentColor,
-      };
-      hexagonMatrix.add(hexagon);
-    } else if (hexagon.color === that._currentColor) {
-      console.log('delete hexagon', hexagonIndex);
-      hexagonMatrix.remove(hexagonIndex);
+    if (that.isSelecting()) {
+      that.selectHexagon(x, y);
     } else {
-      console.log('change hexagon color', hexagonIndex);
-      hexagon.color = that._currentColor;
+      that.markHexagon(x, y);
     }
-    requestAnimationFrame(() => {
-      that._clearFocus();
-      that.draw();
-    });
+  }
+
+  function pressHandler(x, y) {
+    that.selectHexagon(x, y);
   }
 }
 
@@ -194,6 +150,56 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   this.background = new Background(backgroundCanvas);
 };
 
+HexagonBoard.prototype.markHexagon = function markHexagon(x, y) {
+  const hexagonIndex = this.findHexagonIndex(x, y);
+
+  const hexagonMatrix = this._hexagonMatrix;
+  let hexagon = hexagonMatrix.find(hexagonIndex);
+  if (hexagon === undefined) {
+    console.log('create hexagon', hexagonIndex);
+
+    hexagon = {
+      x: hexagonIndex.x,
+      y: hexagonIndex.y,
+      color: this._currentColor,
+    };
+    hexagonMatrix.add(hexagon);
+  } else if (hexagon.color === this._currentColor) {
+    console.log('delete hexagon', hexagonIndex);
+    hexagonMatrix.remove(hexagonIndex);
+  } else {
+    console.log('change hexagon color', hexagonIndex);
+    hexagon.color = this._currentColor;
+  }
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
+HexagonBoard.prototype.selectHexagon = function selectHexagon(x, y) {
+  const hexagonIndex = this.findHexagonIndex(x, y);
+
+  const selectedHexagons = this._selectedHexagons;
+  let hexagon = selectedHexagons.find(hexagonIndex);
+  if (hexagon === undefined) {
+    hexagon = {
+      x: hexagonIndex.x,
+      y: hexagonIndex.y,
+    };
+    selectedHexagons.add(hexagon);
+  } else {
+    selectedHexagons.remove(hexagon);
+  }
+
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
+HexagonBoard.prototype.isSelecting = function isSelecting() {
+  return !this._selectedHexagons.isEmpty();
+};
+
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
   const newSize = {
     width: this.boardContainer.clientWidth - 4,
@@ -224,6 +230,7 @@ HexagonBoard.prototype.drawBoard = function drawBoard() {
       this._drawCallInQueue = false;
       this._drawBackground();
       this._drawHexagons();
+      this._drawSelections();
     });
   }
 };
@@ -235,6 +242,41 @@ HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
   this._hexagonMatrix.forEach((hexagon) => {
     const color = hexagon.color;
 
+    const hexagonPosition = this._getHexagonPosition(hexagon);
+    this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
+  });
+};
+
+HexagonBoard.prototype._drawSelections = function _drawSelections() {
+  if (this._selectedHexagons.isEmpty()) {
+    if (this._selectionsBeingDrawn) {
+      clearInterval(this._selectionsBeingDrawn);
+      this._selectionsBeingDrawn = undefined;
+      this.foregroundCanvas.width = this.foregroundCanvas.width;
+    }
+  } else if (!this._selectionsBeingDrawn) {
+    const intervalMs = 100;
+    this._selectionOpacity = 0.4;
+    this._selectionOpacityChange = 0.1;
+    this._selectionsBeingDrawn = setInterval(() => {
+      if (this._selectionOpacity <= 0.2 || this._selectionOpacity >= 0.9) {
+        this._selectionOpacityChange = -this._selectionOpacityChange;
+      }
+      this._selectionOpacity += this._selectionOpacityChange;
+
+      this._drawSelectionsLoop(this._selectionOpacity);
+    }, intervalMs);
+  } else {
+    this._drawSelectionsLoop(this._selectionOpacity);
+  }
+};
+
+HexagonBoard.prototype._drawSelectionsLoop = function _drawSelectionsLoop(opacity) {
+  this.foregroundCanvas.width = this.foregroundCanvas.width;
+  const ctx = this.foregroundCanvas.getContext('2d');
+
+  const color = `rgba(0, 0, 0, ${opacity})`;
+  this._selectedHexagons.forEach((hexagon) => {
     const hexagonPosition = this._getHexagonPosition(hexagon);
     this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
   });
@@ -346,10 +388,6 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
   colorList.sort((a, b) => b.count - a.count);
 
   this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
-};
-
-HexagonBoard.prototype._clearFocus = function _clearFocus() {
-  this.foregroundCanvas.width = this.foregroundCanvas.width;
 };
 
 HexagonBoard.prototype.savePattern = function savePattern() {

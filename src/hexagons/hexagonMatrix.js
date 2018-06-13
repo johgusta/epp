@@ -132,4 +132,8 @@ HexagonMatrix.prototype.forEach = function forEach(callback) {
   });
 };
 
+HexagonMatrix.prototype.isEmpty = function isEmpty() {
+  return this._board.length === 0;
+};
+
 export default HexagonMatrix;
