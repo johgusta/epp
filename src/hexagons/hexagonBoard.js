@@ -86,34 +86,38 @@ function mouseHandler(that) {
   hammertime.on('tap', (ev) => {
     onClickHandler(ev.center.x, ev.center.y);
   });
+  // that.boardContainer.addEventListener('mousemove', (event) => {
+  //   if (event.changedTouches) {
+  //     console.log('ignore');
+  //     return;
+  //   }
+  //   focusHandler(event.clientX, event.clientY);
+  // });
 
-  that.boardContainer.addEventListener('mousemove', (event) => {
-    focusHandler(event.clientX, event.clientY);
-  });
-  that.boardContainer.addEventListener('mouseleave', () => {
-    that._clearFocus();
-  });
+  // that.boardContainer.addEventListener('mouseleave', () => {
+  //   that._clearFocus();
+  // });
 
-  function focusHandler(x, y) {
-    const hexagonIndex = that.findHexagonIndex(x, y);
-
-    if (that.overlay.colorPickerOpen) {
-      requestAnimationFrame(() => {
-        that._clearFocus();
-      });
-      return;
-    }
-
-    const borderColor = '#000000';
-
-    const context = that.foregroundCanvas.getContext('2d');
-
-    const hexagonPosition = that._getHexagonPosition(hexagonIndex);
-    requestAnimationFrame(() => {
-      that._clearFocus();
-      that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
-    });
-  }
+  // function focusHandler(x, y) {
+  //   const hexagonIndex = that.findHexagonIndex(x, y);
+  //
+  //   if (that.overlay.colorPickerOpen) {
+  //     requestAnimationFrame(() => {
+  //       that._clearFocus();
+  //     });
+  //     return;
+  //   }
+  //
+  //   const borderColor = '#000000';
+  //
+  //   const context = that.foregroundCanvas.getContext('2d');
+  //
+  //   const hexagonPosition = that._getHexagonPosition(hexagonIndex);
+  //   requestAnimationFrame(() => {
+  //     that._clearFocus();
+  //     that._drawHexagon(context, hexagonPosition, that._currentColor, borderColor);
+  //   });
+  // }
 
   function onClickHandler(x, y) {
     const hexagonIndex = that.findHexagonIndex(x, y);
