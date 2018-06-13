@@ -57,9 +57,6 @@ function scrollHandlers(that) {
     const zoom = Math.exp(wheel * zoomIntensity);
 
     handleZoom(that, event.clientX, event.clientY, zoom);
-
-    that._clearFocus();
-    that.drawBoard();
   }
 
   window.document.addEventListener('wheel', wheelHandler);

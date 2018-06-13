@@ -1,5 +1,4 @@
 
-
 function drawHexagon(context, xParam, yParam, size, borderColor, color) {
   const hexagon = calculateHexagon(size);
   const halfSize = hexagon.width / 2;
@@ -30,49 +29,29 @@ function drawHexagon(context, xParam, yParam, size, borderColor, color) {
   context.restore();
 }
 
-function drawTile(size, borderColor) {
-  const hexagon = calculateHexagon(size);
+function traceTilePattern(context, x, y, hexagon) {
   const halfSize = hexagon.width / 2;
 
-  const x = 0;
-  const y = 0;
+  context.moveTo(x + hexagon.width, y + hexagon.triangleHeight);
+  context.lineTo(x + halfSize, y);
+  context.lineTo(x, y + hexagon.triangleHeight);
+  context.lineTo(x, y + hexagon.triangleHeight + hexagon.sideLength);
+  context.lineTo(x + halfSize, y + hexagon.height);
+  context.lineTo(x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength);
 
-  const patternCanvas = document.createElement('canvas');
-  patternCanvas.width = hexagon.width;
-  patternCanvas.height = hexagon.height + hexagon.sideLength;
-
-  const patternContext = patternCanvas.getContext('2d');
-  patternContext.save();
-
-  patternContext.strokeStyle = borderColor;
-
-  patternContext.beginPath();
-  patternContext.moveTo(x + hexagon.width, y + hexagon.triangleHeight);
-  patternContext.lineTo(x + halfSize, y);
-  patternContext.lineTo(x, y + hexagon.triangleHeight);
-  patternContext.lineTo(x, y + hexagon.triangleHeight + hexagon.sideLength);
-  patternContext.lineTo(x + halfSize, y + hexagon.height);
-  patternContext.lineTo(x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength);
-  patternContext.stroke();
-
-  patternContext.moveTo(x + halfSize, y + hexagon.height);
-  patternContext.lineTo(x + halfSize, y + hexagon.height + hexagon.sideLength);
-  patternContext.stroke();
-
-  patternContext.restore();
-
-  return patternCanvas;
+  context.moveTo(x + halfSize, y + hexagon.height);
+  context.lineTo(x + halfSize, y + hexagon.height + hexagon.sideLength);
 }
 
-function calculateHexagon(size) {
-  const hexagonSize = Math.floor(size);
-  const halfSize = hexagonSize / 2;
-  const topHeight = Math.floor(Math.tan(Math.PI / 6) * halfSize);
-  const sideLength = Math.floor((halfSize) / Math.cos(Math.PI / 6));
+function calculateHexagon(hexagonSize) {
+  const hexagonWidth = hexagonSize;
+  const halfSize = hexagonWidth / 2;
+  const topHeight = Math.tan(Math.PI / 6) * halfSize;
+  const sideLength = (halfSize) / Math.cos(Math.PI / 6);
   const hexagonHeight = topHeight * 2 + sideLength;
 
   return {
-    width: hexagonSize,
+    width: hexagonWidth,
     height: hexagonHeight,
     triangleHeight: topHeight,
     sideLength,
@@ -81,7 +60,7 @@ function calculateHexagon(size) {
 
 const Hexagon = {
   drawHexagon,
-  drawTile,
+  traceTilePattern,
   calculateHexagon,
 };
 export default Hexagon;
