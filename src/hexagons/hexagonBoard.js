@@ -1,5 +1,6 @@
 
 import Hammer from 'hammerjs';
+import panzoom from 'pan-zoom';
 import FileSaver from 'file-saver';
 import _ from 'lodash';
 
@@ -43,23 +44,7 @@ function HexagonBoard(mainContainer, pattern) {
 
   window.addEventListener('resize', _.throttle(actualResizeHandler, 66), false);
 
-  scrollHandlers(this);
   mouseHandler(this);
-}
-
-function scrollHandlers(that) {
-  function wheelHandler(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const zoomIntensity = 0.1;
-    const wheel = event.wheelDelta / 120;
-    const zoom = Math.exp(wheel * zoomIntensity);
-
-    handleZoom(that, event.clientX, event.clientY, zoom);
-  }
-
-  window.document.addEventListener('wheel', wheelHandler);
 }
 
 function handleZoom(that, xPosition, yPosition, zoom) {
@@ -77,87 +62,42 @@ function handleZoom(that, xPosition, yPosition, zoom) {
   that.viewport.x -= (mouseX * scaleChange);
   that.viewport.y -= (mouseY * scaleChange);
   that.viewport.scale = newScale;
-
-  that._clearFocus();
-  that.drawBoard();
 }
 
 function mouseHandler(that) {
-  let isPinching = false;
-
   const hammertime = new Hammer(that.boardContainer);
 
-  hammertime.get('pinch').set({ enable: true });
-  hammertime.on('pinchstart', () => {
-    that.overlay.appendDebugText('first pinch');
-    isPinching = true;
-  });
-  hammertime.on('pinch', (ev) => {
-    let zoom = ev.scale;
-    if (zoom < 1) {
-      zoom = 1 - (1 - zoom) / 10;
-    }
-    if (zoom > 1) {
-      zoom = 1 - (1 - zoom) / 50;
+  panzoom(that.boardContainer, (ev) => {
+    that.viewport.x -= ev.dx;
+    that.viewport.y -= ev.dy;
+
+    if (ev.dz) {
+      const zoomIntensity = 0.1;
+      const wheel = ev.dz / 60;
+      const zoom = 1 / Math.exp(wheel * zoomIntensity);
+
+      handleZoom(that, ev.x, ev.y, zoom);
     }
 
-    handleZoom(that, ev.center.x, ev.center.y, zoom);
-  });
-
-  that.boardContainer.addEventListener('mousedown', mouseDownHandler);
-  that.boardContainer.addEventListener('mousemove', mouseMoveHandler);
-  that.boardContainer.addEventListener('mouseup', mouseUpHandler);
-  that.boardContainer.addEventListener('mouseleave', mouseLeaveHandler);
-
-  that.boardContainer.addEventListener('touchstart', (event) => {
-    const touch = event.changedTouches[0];
-    if (touch) {
-      mouseDownHandler(touch);
-    }
-  });
-  that.boardContainer.addEventListener('touchmove', (event) => {
-    const touch = event.changedTouches[0];
-    if (touch) {
-      mouseMoveHandler(touch);
-    }
+    that._clearFocus();
+    that.drawBoard();
   });
 
-  that.boardContainer.addEventListener('touchend', (event) => {
-    if (isPinching && event.touches.length === 0) {
-      isPinching = false;
-      that.overlay.appendDebugText('pinching finished');
-    }
+  hammertime.on('tap', (ev) => {
+    onClickHandler(ev.center.x, ev.center.y);
   });
 
-  that.boardContainer.addEventListener('touchcancel', (event) => {
-    if (isPinching && event.touches.length === 0) {
-      isPinching = false;
-      that.overlay.appendDebugText('pinching canceled');
-    }
+  that.boardContainer.addEventListener('mousemove', (event) => {
+    focusHandler(event.clientX, event.clientY);
+  });
+  that.boardContainer.addEventListener('mouseleave', () => {
+    that._clearFocus();
   });
 
-  const panThreshold = 10;
+  function focusHandler(x, y) {
+    const hexagonIndex = that.findHexagonIndex(x, y);
 
-  let isMouseDown = false;
-  let mouseStartPosition;
-
-  let hasPerformedPanning = false;
-
-  function mouseDownHandler(event) {
-    if (isPinching) {
-      return;
-    }
-    isMouseDown = true;
-    mouseStartPosition = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-  }
-
-  function focusHandler(event) {
-    const hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
-
-    if (that.overlay.colorPickerOpen || hasPerformedPanning) {
+    if (that.overlay.colorPickerOpen) {
       requestAnimationFrame(() => {
         that._clearFocus();
       });
@@ -175,49 +115,8 @@ function mouseHandler(that) {
     });
   }
 
-  function mouseMoveHandler(event) {
-    if (!isPinching && (!mouseStartPosition || !isMouseDown)) {
-      focusHandler(event);
-    } else {
-      handlePanningMovement(event);
-    }
-  }
-
-  function handlePanningMovement(event) {
-    const currentPosition = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-
-    if (Math.abs(mouseStartPosition.x - currentPosition.x) > panThreshold ||
-                Math.abs(mouseStartPosition.y - currentPosition.y) > panThreshold) {
-      hasPerformedPanning = true;
-
-      const xDiff = currentPosition.x - mouseStartPosition.x;
-      const yDiff = currentPosition.y - mouseStartPosition.y;
-
-      that.viewport.x -= xDiff;
-      that.viewport.y -= yDiff;
-
-      mouseStartPosition = {
-        x: currentPosition.x,
-        y: currentPosition.y,
-      };
-      that.overlay.appendDebugText('perform panning');
-
-      that._clearFocus();
-      that.drawBoard();
-    }
-  }
-
-  function endPanning() {
-    isMouseDown = false;
-    mouseStartPosition = undefined;
-    hasPerformedPanning = false;
-  }
-
-  function onClickHandler(event) {
-    const hexagonIndex = that.findHexagonIndex(event.clientX, event.clientY);
+  function onClickHandler(x, y) {
+    const hexagonIndex = that.findHexagonIndex(x, y);
 
     if (that.overlay.colorPickerOpen) {
       return;
@@ -244,22 +143,6 @@ function mouseHandler(that) {
     requestAnimationFrame(() => {
       that._clearFocus();
       that.draw();
-    });
-  }
-
-  function mouseUpHandler(event) {
-    if (isMouseDown && !hasPerformedPanning) {
-      onClickHandler(event);
-    }
-
-    endPanning();
-    that.overlay.colorPickerOpen = false;
-  }
-
-  function mouseLeaveHandler() {
-    endPanning();
-    requestAnimationFrame(() => {
-      that._clearFocus();
     });
   }
 }
