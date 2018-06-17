@@ -41,7 +41,7 @@ export default {
   font-size: 14px;
   font-family: Roboto sans-serif;
 
-  max-height: calc(100vh - 150px);
+  max-height: calc(100vh - 135px);
   overflow-y: auto;
 
   .colorItem {

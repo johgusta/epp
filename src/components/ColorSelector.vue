@@ -50,8 +50,8 @@ export default {
 
 .colorSelectionContainer {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 0px;
+  bottom: 0px;
 
   display: flex;
   align-items: flex-end;
