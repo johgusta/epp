@@ -101,12 +101,16 @@ function mouseHandler(that) {
       return;
     }
 
+    const hexagonIndex = that.findHexagonIndex(x, y);
     if (that.isSelecting()) {
-      that.selectHexagon(x, y);
+      that.selectHexagon(hexagonIndex);
     } else if (that.isStamping()) {
       that.stampSelection();
     } else {
-      that.markHexagon(x, y);
+      that.markHexagon(hexagonIndex);
+      requestAnimationFrame(() => {
+        that.draw();
+      });
     }
   }
 
@@ -114,7 +118,9 @@ function mouseHandler(that) {
     if (that.isStamping()) {
       return;
     }
-    that.selectHexagon(x, y);
+
+    const hexagonIndex = that.findHexagonIndex(x, y);
+    that.selectHexagon(hexagonIndex);
   }
 }
 
@@ -168,10 +174,10 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   this.background = new Background(backgroundCanvas);
 };
 
-HexagonBoard.prototype.markHexagon = function markHexagon(x, y) {
-  const hexagonIndex = this.findHexagonIndex(x, y);
-
+HexagonBoard.prototype.markHexagon = function markHexagon(hexagonIndex, color) {
   const hexagonMatrix = this._hexagonMatrix;
+  const hexagonColor = color || this._currentColor;
+
   let hexagon = hexagonMatrix.find(hexagonIndex);
   if (hexagon === undefined) {
     console.log('create hexagon', hexagonIndex);
@@ -179,24 +185,19 @@ HexagonBoard.prototype.markHexagon = function markHexagon(x, y) {
     hexagon = {
       x: hexagonIndex.x,
       y: hexagonIndex.y,
-      color: this._currentColor,
+      color: hexagonColor,
     };
     hexagonMatrix.add(hexagon);
-  } else if (hexagon.color === this._currentColor) {
+  } else if (hexagon.color === hexagonColor) {
     console.log('delete hexagon', hexagonIndex);
     hexagonMatrix.remove(hexagonIndex);
   } else {
     console.log('change hexagon color', hexagonIndex);
-    hexagon.color = this._currentColor;
+    hexagon.color = hexagonColor;
   }
-  requestAnimationFrame(() => {
-    this.draw();
-  });
 };
 
-HexagonBoard.prototype.selectHexagon = function selectHexagon(x, y) {
-  const hexagonIndex = this.findHexagonIndex(x, y);
-
+HexagonBoard.prototype.selectHexagon = function selectHexagon(hexagonIndex) {
   const selectedHexagons = this._selectedHexagons;
   let hexagon = selectedHexagons.find(hexagonIndex);
   if (hexagon === undefined) {
@@ -254,12 +255,7 @@ HexagonBoard.prototype.copySelection = function copySelection() {
 HexagonBoard.prototype.stampSelection = function stampSelection() {
   this._copiedHexagons.forEach((hexagon) => {
     const offsetIndex = this._pushHexagonPlacement(hexagon, this._copiedViewport);
-    const newHexagon = {
-      x: offsetIndex.x,
-      y: offsetIndex.y,
-      color: hexagon.color,
-    };
-    this._hexagonMatrix.add(newHexagon);
+    this.markHexagon(offsetIndex, hexagon.color);
   });
 
   requestAnimationFrame(() => {
