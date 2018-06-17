@@ -26,6 +26,12 @@ ColorList.prototype.draw = function draw(colorList, changeColorCallback) {
   colorsCanvas.height = colorItemHeight * colorList.length + padding;
   const context = colorsCanvas.getContext('2d');
 
+  if (colorList.length === 0) {
+    colorsCanvas.style.display = 'none';
+  } else {
+    colorsCanvas.style.display = '';
+  }
+
   context.font = `${fontSize}px sans-serif`;
 
   colorList.forEach((color, index) => {
@@ -66,19 +72,13 @@ ColorList.prototype._handleClick = function _handleClick(event) {
   }
 
   const color = this._colorList[colorIndex];
-  this._changeColorCallback(color.name);
+  if (color) {
+    this._changeColorCallback(color.name);
+  }
 };
 
 function findColorIndex(x, y) {
-  if (x <= padding || x >= itemWidth - padding) {
-    return undefined;
-  }
-
-  const modY = y % colorItemHeight;
-  if (modY <= padding) {
-    return undefined;
-  }
-  const colorIndex = Math.floor(y / colorItemHeight);
+  const colorIndex = Math.floor(y / (colorItemHeight + padding));
   return colorIndex;
 }
 
