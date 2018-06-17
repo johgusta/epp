@@ -20,10 +20,19 @@ export default {
       pattern: undefined,
     };
   },
+  methods: {
+    loadPattern(patternId) {
+      PatternHandler.loadPattern(patternId).then((pattern) => {
+        this.pattern = pattern;
+      });
+    },
+  },
+  beforeRouteUpdate(to) {
+    this.pattern = undefined;
+    this.loadPattern(to.params.id);
+  },
   mounted() {
-    PatternHandler.loadPattern(this.$route.params.id).then((pattern) => {
-      this.pattern = pattern;
-    });
+    this.loadPattern(this.$route.params.id);
   },
 };
 </script>
