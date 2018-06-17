@@ -118,7 +118,6 @@ import { MDCDialog } from '@material/dialog';
 import { MDCTextField } from '@material/textfield';
 
 import FirebaseHelper from '@/js/firebaseHelper';
-import Overlay from '@/hexagons/overlay';
 import ColorSelector from '@/components/ColorSelector.vue';
 
 export default {
@@ -208,10 +207,6 @@ export default {
         });
       }
     });
-
-    this.overlay = new Overlay(this.$el);
-    this.board.overlay = this.overlay;
-    this.$emit('overlay-ready');
   },
 };
 </script>

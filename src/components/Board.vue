@@ -1,8 +1,7 @@
 <template>
   <div id="outer-board-container">
     <div id="main-board"></div>
-    <Overlay v-if="hexagonBoard" :board="hexagonBoard" :pattern="pattern"
-            v-on:overlay-ready="overlayReady"/>
+    <Overlay v-if="hexagonBoard" :board="hexagonBoard" :pattern="pattern"/>
   </div>
 </template>
 
@@ -23,14 +22,10 @@ export default {
       hexagonBoard: undefined,
     };
   },
-  methods: {
-    overlayReady() {
-      this.hexagonBoard.draw();
-    },
-  },
   mounted() {
     const mainBoardEl = this.$el.querySelector('#main-board');
     this.hexagonBoard = new HexagonBoard(mainBoardEl, this.pattern);
+    this.hexagonBoard.drawBoard();
     window.Board = this.hexagonBoard;
   },
 };

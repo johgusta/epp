@@ -8,6 +8,7 @@ import PatternHandler from '@/js/patternHandler';
 import Background from './background';
 import HexagonMatrix from './hexagonMatrix';
 import Hexagon from './hexagon';
+import drawColorsList from './colorList';
 
 const DEFAULT_SIZE = 32;
 const DEFAULT_COLOR = '#ff0000';
@@ -40,7 +41,7 @@ function HexagonBoard(mainContainer, pattern) {
 
   function actualResizeHandler() {
     that.updateBoardSize();
-    that.draw();
+    that.drawBoard();
   }
 
   window.addEventListener('resize', _.throttle(actualResizeHandler, 66), false);
@@ -97,10 +98,6 @@ function mouseHandler(that) {
   });
 
   function onClickHandler(x, y) {
-    if (that.overlay.colorPickerOpen) {
-      return;
-    }
-
     const hexagonIndex = that.findHexagonIndex(x, y);
     if (that.isSelecting()) {
       that.selectHexagon(hexagonIndex);
@@ -109,7 +106,7 @@ function mouseHandler(that) {
     } else {
       that.markHexagon(hexagonIndex);
       requestAnimationFrame(() => {
-        that.draw();
+        that.drawBoard();
       });
     }
   }
@@ -211,7 +208,7 @@ HexagonBoard.prototype.selectHexagon = function selectHexagon(hexagonIndex) {
   }
 
   requestAnimationFrame(() => {
-    this.draw();
+    this.drawBoard();
   });
 };
 
@@ -228,7 +225,7 @@ HexagonBoard.prototype.stopSelection = function stopSelection() {
   this._copiedHexagons.clear();
 
   requestAnimationFrame(() => {
-    this.draw();
+    this.drawBoard();
   });
 };
 
@@ -248,7 +245,7 @@ HexagonBoard.prototype.copySelection = function copySelection() {
   };
 
   requestAnimationFrame(() => {
-    this.draw();
+    this.drawBoard();
   });
 };
 
@@ -279,11 +276,6 @@ HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
 
   this.foregroundCanvas.width = newSize.width;
   this.foregroundCanvas.height = newSize.height;
-};
-
-HexagonBoard.prototype.draw = function draw() {
-  this.drawBoard();
-  this._drawOverlay();
 };
 
 HexagonBoard.prototype._drawBackground = function _drawBackground() {
@@ -472,22 +464,10 @@ function _pushHexagonPlacement(hexagonIndex, offset) {
   };
 };
 
-HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
-  const changeColorCallback = function changeColorCallback(newCurrentColor) {
-    this._currentColor = newCurrentColor;
-    this.drawBoard();
-    this._drawOverlay();
-  }.bind(this);
-
-  const colorList = this.getColorsList();
-
-  this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
-};
-
 HexagonBoard.prototype.setCurrentColor = function setCurrentColor(newColor) {
   this._currentColor = newColor;
   requestAnimationFrame(() => {
-    this.draw();
+    this.drawBoard();
   });
 };
 
@@ -555,11 +535,8 @@ HexagonBoard.prototype.exportPattern = function exportPattern() {
 
   context.drawImage(this.canvas, 0, 0);
 
-  const colorsCanvas = this.overlay.colorList.canvas;
-  context.drawImage(
-    colorsCanvas,
-    canvas.width - colorsCanvas.width, canvas.height - colorsCanvas.height,
-  );
+  const colorsList = this.getColorsList();
+  drawColorsList(context, canvas.width, canvas.height, colorsList);
 
   let fileName = this.patternTitle;
   if (!fileName) {

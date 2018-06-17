@@ -10,18 +10,21 @@ const borderColor = 'rgba(0, 0, 0, 0.2)';
 
 const padding = 6;
 
-function ColorList(canvas) {
-  this.canvas = canvas;
-  this._colorList = [];
-
-  this.canvas.addEventListener('click', this._handleClick.bind(this));
+function drawColorsList(context, width, height, colorsList) {
+  const colorsCanvas = createCanvasColorList(colorsList);
+  context.drawImage(
+    colorsCanvas,
+    width - colorsCanvas.width, height - colorsCanvas.height,
+  );
 }
 
-ColorList.prototype.draw = function draw(colorList, changeColorCallback) {
-  this._colorList = colorList;
-  this._changeColorCallback = changeColorCallback;
+function createCanvasColorList(colorsList) {
+  const canvas = document.createElement('canvas');
+  draw(canvas, colorsList);
+  return canvas;
+}
 
-  const colorsCanvas = this.canvas;
+function draw(colorsCanvas, colorList) {
   colorsCanvas.width = itemWidth;
   colorsCanvas.height = colorItemHeight * colorList.length + padding;
   const context = colorsCanvas.getContext('2d');
@@ -59,27 +62,6 @@ ColorList.prototype.draw = function draw(colorList, changeColorCallback) {
 
     context.restore();
   });
-};
-
-ColorList.prototype._handleClick = function _handleClick(event) {
-  const x = event.offsetX;
-  const y = event.offsetY;
-
-
-  const colorIndex = findColorIndex(x, y);
-  if (colorIndex === undefined) {
-    return;
-  }
-
-  const color = this._colorList[colorIndex];
-  if (color) {
-    this._changeColorCallback(color.name);
-  }
-};
-
-function findColorIndex(x, y) {
-  const colorIndex = Math.floor(y / (colorItemHeight + padding));
-  return colorIndex;
 }
 
-export default ColorList;
+export default drawColorsList;
