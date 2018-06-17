@@ -8,7 +8,7 @@
       </button>
       <div class="copyMenu">
         <mdc-fab icon="file_copy" v-show="isSelecting" @click="copy()"></mdc-fab>
-        <mdc-fab icon="merge_type" v-show="isStamping" @click="stamp()"></mdc-fab>
+        <mdc-fab icon="layers" v-show="isStamping" @click="stamp()"></mdc-fab>
         <mdc-fab icon="close" v-show="isSelecting || isStamping" @click="stopSelection()"></mdc-fab>
       </div>
       <div class="colorSelectionContainer">
