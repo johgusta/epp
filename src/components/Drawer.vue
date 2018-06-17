@@ -108,14 +108,12 @@ export default {
   name: 'Drawer',
   props: {
     board: Object,
-    pattern: Object,
     open: Boolean,
   },
-  data() {
-    return {
-      patternTitle: this.pattern.title,
-      username: this.$store.state.userFullName,
-    };
+  computed: {
+    patternTitle() {
+      return this.$store.getters.pattern.title;
+    },
   },
   watch: {
     open(newValue) {

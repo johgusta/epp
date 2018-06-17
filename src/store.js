@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import moment from 'moment';
 
 import PatternHandler from '@/js/patternHandler';
+import router from '@/router';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ const types = {
   LOGIN_USER: 'loginUser',
   LOGOUT_USER: 'logoutUser',
   LOAD_PATTERNS: 'loadPatterns',
+  LOAD_PATTERN: 'loadPattern',
 };
 
 export { types };
@@ -19,6 +21,7 @@ export default new Vuex.Store({
   state: {
     userFullName: localStorage.getItem(USERNAME_KEY),
     patterns: null,
+    pattern: null,
   },
   getters: {
     userDisplayName: (state) => {
@@ -26,6 +29,9 @@ export default new Vuex.Store({
     },
     patterns: (state) => {
       return state.patterns;
+    },
+    pattern: (state) => {
+      return state.pattern;
     },
   },
   mutations: {
@@ -46,11 +52,29 @@ export default new Vuex.Store({
           return { ...pattern, updated: moment(pattern.updated).fromNow() };
         });
     },
+    [types.LOAD_PATTERN](state, pattern) {
+      state.pattern = pattern;
+    },
   },
   actions: {
-    loadPatterns(context) {
+    [types.LOAD_PATTERNS](context) {
       PatternHandler.getPatterns().then((patterns) => {
         context.commit(types.LOAD_PATTERNS, patterns);
+      }, (error) => {
+        console.error('Error loading patterns', error);
+        if (!context.getters.userDisplayName) {
+          router.push({ name: 'home' });
+        }
+      });
+    },
+    [types.LOAD_PATTERN](context, patternId) {
+      PatternHandler.loadPattern(patternId).then((pattern) => {
+        context.commit(types.LOAD_PATTERN, pattern);
+      }, (error) => {
+        console.error('Error loading single pattern', error);
+        if (!context.getters.userDisplayName) {
+          router.push({ name: 'home' });
+        }
       });
     },
   },

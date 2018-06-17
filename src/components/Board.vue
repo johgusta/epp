@@ -1,7 +1,7 @@
 <template>
   <div id="outer-board-container">
     <div id="main-board"></div>
-    <Overlay v-if="hexagonBoard" :board="hexagonBoard" :pattern="pattern"/>
+    <Overlay v-if="hexagonBoard" :board="hexagonBoard"/>
   </div>
 </template>
 
@@ -11,9 +11,6 @@ import HexagonBoard from '@/hexagons/hexagonBoard';
 
 export default {
   name: 'Board',
-  props: {
-    pattern: Object,
-  },
   components: {
     Overlay,
   },
@@ -21,6 +18,11 @@ export default {
     return {
       hexagonBoard: undefined,
     };
+  },
+  computed: {
+    pattern() {
+      return this.$store.getters.pattern;
+    },
   },
   mounted() {
     const mainBoardEl = this.$el.querySelector('#main-board');

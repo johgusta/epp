@@ -1,37 +1,36 @@
 <template>
   <div id="pattern-container">
     <LoadingSpinner v-if="!pattern"/>
-    <Board v-if="pattern" :pattern="pattern"/>
+    <Board v-if="pattern"/>
   </div>
 </template>
 
 <script>
 import Board from '@/components/Board.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
-import PatternHandler from '@/js/patternHandler';
+import { types } from '@/store';
 
 export default {
   components: {
     Board,
     LoadingSpinner,
   },
-  data() {
-    return {
-      pattern: undefined,
-    };
+  computed: {
+    pattern() {
+      return this.$store.getters.pattern;
+    },
   },
   methods: {
     loadPattern(patternId) {
-      PatternHandler.loadPattern(patternId).then((pattern) => {
-        this.pattern = pattern;
-      });
+      this.$store.dispatch(types.LOAD_PATTERN, patternId);
     },
   },
   beforeRouteUpdate(to) {
-    this.pattern = undefined;
+    this.$store.commit(types.LOAD_PATTERN, null);
     this.loadPattern(to.params.id);
   },
   mounted() {
+    this.$store.commit(types.LOAD_PATTERN, null);
     this.loadPattern(this.$route.params.id);
   },
 };

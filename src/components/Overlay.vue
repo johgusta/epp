@@ -13,7 +13,7 @@
       </div>
       <color-selector :colors="colorsList" :current-color="currentColor"
         @color-changed="selectColor"/>
-      <drawer :open.sync="drawerOpen" :board="board" :pattern="pattern" />
+      <drawer :open.sync="drawerOpen" :board="board" />
   </div>
 </template>
 
@@ -29,12 +29,9 @@ export default {
   },
   props: {
     board: Object,
-    pattern: Object,
   },
   data() {
     return {
-      patternTitle: this.pattern.title,
-      username: this.$store.state.userFullName,
       drawerOpen: false,
       colors: [],
     };
