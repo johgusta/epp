@@ -479,6 +479,23 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     this._drawOverlay();
   }.bind(this);
 
+  const colorList = this.getColorsList();
+
+  this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
+};
+
+HexagonBoard.prototype.setCurrentColor = function setCurrentColor(newColor) {
+  this._currentColor = newColor;
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
+HexagonBoard.prototype.getCurrentColor = function getCurrentColor() {
+  return this._currentColor;
+};
+
+HexagonBoard.prototype.getColorsList = function getColorsList() {
   const colors = {};
 
   this._hexagonMatrix.forEach((hexagon) => {
@@ -493,17 +510,20 @@ HexagonBoard.prototype._drawOverlay = function _drawOverlay() {
     colors[hexagon.color] = color;
   });
 
+  let index = 0;
   const colorList = [];
   _.forIn(colors, (value, key) => {
     colorList.push({
+      id: index,
       name: key,
       count: value,
     });
+    index++;
   });
 
   colorList.sort((a, b) => b.count - a.count);
 
-  this.overlay.redrawColorList(colorList, this._currentColor, changeColorCallback);
+  return colorList;
 };
 
 HexagonBoard.prototype.savePattern = function savePattern() {

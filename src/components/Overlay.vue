@@ -11,13 +11,8 @@
         <mdc-fab icon="layers" v-show="isStamping" @click="stamp"></mdc-fab>
         <mdc-fab icon="close" v-show="isSelecting || isStamping" @click="stopSelection"></mdc-fab>
       </div>
-      <div class="colorSelectionContainer">
-          <div class="mdc-elevation--z2 currentColorSelector">
-              <span>Current color:</span>
-              <input type="text" class="colorPicker" style="display: none;">
-          </div>
-          <canvas id="colorsCanvas" class="mdc-elevation--z2" width="80" height="36"></canvas>
-      </div>
+      <color-selector :colors="colorsList" :current-color="currentColor"
+        @color-changed="selectColor"/>
       <aside id="drawer-menu" class="mdc-drawer mdc-drawer--temporary mdc-typography">
           <nav class="mdc-drawer__drawer">
               <header class="mdc-drawer__header mdc-theme--primary-bg mdc-theme--on-primary">
@@ -124,9 +119,13 @@ import { MDCTextField } from '@material/textfield';
 
 import FirebaseHelper from '@/js/firebaseHelper';
 import Overlay from '@/hexagons/overlay';
+import ColorSelector from '@/components/ColorSelector.vue';
 
 export default {
   name: 'Overlay',
+  components: {
+    'color-selector': ColorSelector,
+  },
   props: {
     board: Object,
     pattern: Object,
@@ -135,6 +134,7 @@ export default {
     return {
       patternTitle: this.pattern.title,
       username: this.$store.state.userFullName,
+      colors: [],
     };
   },
   computed: {
@@ -143,6 +143,12 @@ export default {
     },
     isStamping() {
       return this.board.isStamping();
+    },
+    colorsList() {
+      return this.board.getColorsList();
+    },
+    currentColor() {
+      return this.board.getCurrentColor();
     },
   },
   methods: {
@@ -182,6 +188,9 @@ export default {
       FirebaseHelper.signOut().then(() => {
         this.$router.push({ name: 'home' });
       });
+    },
+    selectColor(colorValue) {
+      this.board.setCurrentColor(colorValue);
     },
   },
   mounted() {
@@ -233,36 +242,6 @@ export default {
     margin: 2px;
     pointer-events: auto;
   }
-}
-
-.colorSelectionContainer {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  pointer-events: auto;
-}
-
-.currentColorSelector {
-  width: 80px;
-  min-height: 25px;
-  margin-bottom: 6px;
-  padding: 5px;
-
-  background: #f6f6f6;
-  border: 1px solid #c2c2c2;
-}
-
-#colorsCanvas {
-  background: #f6f6f6;
-  border: 1px solid #c2c2c2;
-  cursor: pointer;
-}
-
-div.colorInput {
-  display: table;
-  background: #ffffff;
-  border-color: #c2c2c2;
-  border-radius: 4px;
 }
 
 .header-drawer-content {

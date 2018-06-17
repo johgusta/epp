@@ -10,26 +10,28 @@ function Overlay(overlayContainer) {
 
 Overlay.prototype._init = function _init(overlayContainer) {
   const colorsCanvas = overlayContainer.querySelector('#colorsCanvas');
-  this.colorList = new ColorList(colorsCanvas);
+  // this.colorList = new ColorList(colorsCanvas);
 };
 
 Overlay.prototype.redrawColorList =
 function redrawColorList(colorList, currentColor, changeColorCallback) {
-  const that = this;
-  $('.colorPicker').spectrum({
-    color: currentColor,
-    showInitial: true,
-    replacerClassName: 'colorInput',
-    show() {
-      that.colorPickerOpen = true;
-    },
-    change(color) {
-      changeColorCallback(color.toHexString());
-      that.colorPickerOpen = false;
-    },
-  });
+  // const that = this;
+  // $('.colorPicker').spectrum({
+  //   color: currentColor,
+  //   showInitial: true,
+  //   replacerClassName: 'colorInput',
+  //   showInput: true,
+  //   preferredFormat: 'hex',
+  //   show() {
+  //     that.colorPickerOpen = true;
+  //   },
+  //   change(color) {
+  //     changeColorCallback(color.toHexString());
+  //     that.colorPickerOpen = false;
+  //   },
+  // });
 
-  this.colorList.draw(colorList, changeColorCallback);
+  // this.colorList.draw(colorList, changeColorCallback);
 };
 
 Overlay.prototype.appendDebugText = function appendDebugText(text) {
