@@ -36,11 +36,12 @@ export default {
 .currentColorsList {
   background: #f6f6f6;
   border: 1px solid #c2c2c2;
+  pointer-events: auto;
 
   font-size: 14px;
   font-family: Roboto sans-serif;
 
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - 150px);
   overflow-y: auto;
 
   .colorItem {

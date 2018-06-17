@@ -52,13 +52,13 @@ export default {
   position: absolute;
   right: 10px;
   bottom: 10px;
-  pointer-events: auto;
 
   display: flex;
   align-items: flex-end;
 
   .colorPicker {
     margin: 6px 4px;
+    pointer-events: auto;
   }
 
   .currentColors {
@@ -68,6 +68,7 @@ export default {
     .currentColorButton {
       display: block;
       margin: 6px auto;
+      pointer-events: auto;
       cursor: pointer;
     }
   }
