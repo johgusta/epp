@@ -40,6 +40,9 @@ export default {
   font-size: 14px;
   font-family: Roboto sans-serif;
 
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+
   .colorItem {
     border: 1px solid #c2c2c2;
     margin: 8px 4px;
