@@ -63,6 +63,11 @@ function handleZoom(that, xPosition, yPosition, zoom) {
   that.viewport.x -= (mouseX * scaleChange);
   that.viewport.y -= (mouseY * scaleChange);
   that.viewport.scale = newScale;
+
+  if (that._copiedViewport) {
+    that._copiedViewport.x -= ((xPosition + that._copiedViewport.x) / oldScale) * scaleChange;
+    that._copiedViewport.y -= ((yPosition + that._copiedViewport.y) / oldScale) * scaleChange;
+  }
 }
 
 function mouseHandler(that) {
@@ -98,7 +103,9 @@ function mouseHandler(that) {
 
     if (that.isSelecting()) {
       that.selectHexagon(x, y);
-    } else if (!that.isStamping()) {
+    } else if (that.isStamping()) {
+      that.stampSelection();
+    } else {
       that.markHexagon(x, y);
     }
   }
@@ -225,8 +232,6 @@ HexagonBoard.prototype.stopSelection = function stopSelection() {
 };
 
 HexagonBoard.prototype.copySelection = function copySelection() {
-  console.log('copy selection');
-
   this._selectedHexagons.forEach((hexagonIndex) => {
     const coloredHexagon = this._hexagonMatrix.find(hexagonIndex);
     if (coloredHexagon) {
@@ -236,14 +241,9 @@ HexagonBoard.prototype.copySelection = function copySelection() {
 
   this._selectedHexagons.clear();
 
-  this._copiedHexagons.forEach((hexagon) => {
-    console.log('colored hexagon', hexagon);
-  });
-
   this._copiedViewport = {
     x: this.viewport.x,
     y: this.viewport.y,
-    scale: this.viewport.scale,
   };
 
   requestAnimationFrame(() => {
@@ -263,7 +263,11 @@ HexagonBoard.prototype.stampSelection = function stampSelection() {
   });
 
   requestAnimationFrame(() => {
-    this.draw();
+    this._drawHexagons();
+    this.copyStampCanvas.width = this.copyStampCanvas.width;
+    setTimeout(() => {
+      this._drawCopyStamp();
+    }, 300);
   });
 };
 
