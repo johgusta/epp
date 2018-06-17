@@ -6,6 +6,11 @@
               menu
             </span>
       </button>
+      <div class="copyMenu">
+        <mdc-fab icon="file_copy" v-show="isSelecting" @click="copy()"></mdc-fab>
+        <mdc-fab icon="merge_type" v-show="isStamping" @click="stamp()"></mdc-fab>
+        <mdc-fab icon="close" v-show="isSelecting || isStamping" @click="stopSelection()"></mdc-fab>
+      </div>
       <div class="colorSelectionContainer">
           <div class="mdc-elevation--z2 currentColorSelector">
               <span>Current color:</span>
@@ -127,6 +132,25 @@ export default {
       username: this.$store.state.userFullName,
     };
   },
+  computed: {
+    isSelecting() {
+      return this.board.isSelecting();
+    },
+    isStamping() {
+      return this.board.isStamping();
+    },
+  },
+  methods: {
+    copy() {
+      this.board.copySelection();
+    },
+    stamp() {
+      this.board.stampSelection();
+    },
+    stopSelection() {
+      this.board.stopSelection();
+    },
+  },
   mounted() {
     this.overlay = new Overlay(this.$el, this.board);
     this.$emit('overlay-ready');
@@ -153,6 +177,13 @@ export default {
 .menu-drawer-button {
   margin: 4px;
   pointer-events: auto;
+}
+
+.copyMenu {
+  button {
+    margin: 2px;
+    pointer-events: auto;
+  }
 }
 
 .colorSelectionContainer {

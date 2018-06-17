@@ -18,6 +18,7 @@ function HexagonBoard(mainContainer, pattern) {
 
   this._hexagonMatrix = new HexagonMatrix();
   this._selectedHexagons = new HexagonMatrix();
+  this._copiedHexagons = new HexagonMatrix();
   this._currentColor = DEFAULT_COLOR;
   this._borderColor = DEFAULT_BORDER_COLOR;
 
@@ -97,12 +98,15 @@ function mouseHandler(that) {
 
     if (that.isSelecting()) {
       that.selectHexagon(x, y);
-    } else {
+    } else if (!that.isStamping()) {
       that.markHexagon(x, y);
     }
   }
 
   function pressHandler(x, y) {
+    if (that.isStamping()) {
+      return;
+    }
     that.selectHexagon(x, y);
   }
 }
@@ -141,6 +145,13 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   foregroundCanvas.height = canvasSize.height;
   this.foregroundCanvas = foregroundCanvas;
   boardContainer.appendChild(foregroundCanvas);
+
+  const copyStampCanvas = document.createElement('canvas');
+  copyStampCanvas.id = 'copy-stamp-canvas';
+  copyStampCanvas.width = canvasSize.width;
+  copyStampCanvas.height = canvasSize.height;
+  this.copyStampCanvas = copyStampCanvas;
+  boardContainer.appendChild(copyStampCanvas);
 
   // var overlayDiv = document.createElement('div');
   // overlayDiv.className = 'overlayDiv';
@@ -200,6 +211,62 @@ HexagonBoard.prototype.isSelecting = function isSelecting() {
   return !this._selectedHexagons.isEmpty();
 };
 
+HexagonBoard.prototype.isStamping = function isStamping() {
+  return !this._copiedHexagons.isEmpty();
+};
+
+HexagonBoard.prototype.stopSelection = function stopSelection() {
+  this._selectedHexagons.clear();
+  this._copiedHexagons.clear();
+
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
+HexagonBoard.prototype.copySelection = function copySelection() {
+  console.log('copy selection');
+
+  this._selectedHexagons.forEach((hexagonIndex) => {
+    const coloredHexagon = this._hexagonMatrix.find(hexagonIndex);
+    if (coloredHexagon) {
+      this._copiedHexagons.add(coloredHexagon);
+    }
+  });
+
+  this._selectedHexagons.clear();
+
+  this._copiedHexagons.forEach((hexagon) => {
+    console.log('colored hexagon', hexagon);
+  });
+
+  this._copiedViewport = {
+    x: this.viewport.x,
+    y: this.viewport.y,
+    scale: this.viewport.scale,
+  };
+
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
+HexagonBoard.prototype.stampSelection = function stampSelection() {
+  this._copiedHexagons.forEach((hexagon) => {
+    const offsetIndex = this._pushHexagonPlacement(hexagon, this._copiedViewport);
+    const newHexagon = {
+      x: offsetIndex.x,
+      y: offsetIndex.y,
+      color: hexagon.color,
+    };
+    this._hexagonMatrix.add(newHexagon);
+  });
+
+  requestAnimationFrame(() => {
+    this.draw();
+  });
+};
+
 HexagonBoard.prototype.updateBoardSize = function updateBoardSize() {
   const newSize = {
     width: this.boardContainer.clientWidth - 4,
@@ -231,6 +298,7 @@ HexagonBoard.prototype.drawBoard = function drawBoard() {
       this._drawBackground();
       this._drawHexagons();
       this._drawSelections();
+      this._drawCopyStamp();
     });
   }
 };
@@ -280,6 +348,26 @@ HexagonBoard.prototype._drawSelectionsLoop = function _drawSelectionsLoop(opacit
     const hexagonPosition = this._getHexagonPosition(hexagon);
     this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
   });
+};
+
+HexagonBoard.prototype._drawCopyStamp = function _drawCopyStamp() {
+  if (!this._copiedHexagons.isEmpty()) {
+    this.copyStampCanvas.width = this.copyStampCanvas.width;
+    const ctx = this.copyStampCanvas.getContext('2d');
+    const opacity = 0.5;
+
+    const shadowColor = `rgba(0, 0, 0, ${opacity})`;
+
+    this._copiedHexagons.forEach((hexagon) => {
+      const offsetIndex = this._pushHexagonPlacement(hexagon, this._copiedViewport);
+      const hexagonPosition = this._getHexagonPosition(offsetIndex);
+
+      this._drawHexagon(ctx, hexagonPosition, hexagon.color, this._borderColor);
+      this._drawHexagon(ctx, hexagonPosition, shadowColor, this._borderColor);
+    });
+  } else {
+    this.copyStampCanvas.width = this.copyStampCanvas.width;
+  }
 };
 
 HexagonBoard.prototype._drawHexagon =
@@ -353,6 +441,34 @@ HexagonBoard.prototype.findHexagonIndex = function findHexagonIndex(clientX, cli
   return {
     x: columnIndex,
     y: rowIndex,
+  };
+};
+
+HexagonBoard.prototype._pushHexagonPlacement =
+function _pushHexagonPlacement(hexagonIndex, offset) {
+  const size = this.getSize();
+  const hexagon = Hexagon.calculateHexagon(size);
+  const halfSize = hexagon.width / 2;
+
+  const xIndex = hexagonIndex.x;
+  const yIndex = hexagonIndex.y;
+
+  const xOffset = yIndex % 2 !== 0 ? Math.round(halfSize) : 0;
+  const rowHeight = hexagon.height - hexagon.triangleHeight;
+
+  const xOffsetIndex = Math.round((this.viewport.x - offset.x) / hexagon.width);
+  const yOffsetIndex = Math.round((this.viewport.y - offset.y) / rowHeight);
+
+  let xNewIndex = xIndex + xOffsetIndex;
+  const yNewIndex = yIndex + yOffsetIndex;
+
+  if (yNewIndex % 2 === 0 && xOffset !== 0) {
+    xNewIndex += 1;
+  }
+
+  return {
+    x: xNewIndex,
+    y: yNewIndex,
   };
 };
 
