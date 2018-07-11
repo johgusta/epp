@@ -18,7 +18,7 @@ const DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer, pattern) {
   this.debug = false;
-  this.webglEnabled = false;
+  this.webglEnabled = true;
 
   this._hexagonMatrix = new HexagonMatrix();
   this._selectedHexagons = new HexagonMatrix();
@@ -313,7 +313,7 @@ HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
     return;
   }
   const gl = this.webGlCanvas.getContext('webgl');
-  drawWebGlHexagons(gl);
+  drawWebGlHexagons(gl, this._currentColor);
 };
 
 HexagonBoard.prototype._drawHexagons = function _drawHexagons() {

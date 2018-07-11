@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+import tinycolor from 'tinycolor2';
 
 import Hexagon from '@/hexagons/hexagon';
 
@@ -6,7 +7,7 @@ import { initShaderProgram } from './webglHelper';
 import hexagonVertShader from './hexagonVertShader.glsl';
 import hexagonFragShader from './hexagonFragShader.glsl';
 
-function drawWebGlHexagons(gl) {
+function drawWebGlHexagons(gl, currentColor) {
   if (gl === null) {
     console.error('WebGl failed!');
     return;
@@ -25,12 +26,13 @@ function drawWebGlHexagons(gl) {
     },
   };
 
-  const buffers = initBuffers(gl);
+  const buffers = initBuffers(gl, currentColor);
 
   drawScene(gl, programInfo, buffers);
 }
 
-function initBuffers(gl) {
+function initBuffers(gl, currentColor) {
+  const color = tinycolor(currentColor);
   const hexagon = Hexagon.calculateHexagon(2);
   const halfSize = hexagon.width / 2;
 
@@ -42,8 +44,17 @@ function initBuffers(gl) {
     x + halfSize, -(y),
     x + hexagon.width, -(y + hexagon.triangleHeight),
     x, -(y + hexagon.triangleHeight),
-    x + hexagon.width, -(y + hexagon.triangleHeight + hexagon.sideLength),
+
+    x + hexagon.width, -(y + hexagon.triangleHeight),
+    x, -(y + hexagon.triangleHeight),
     x, -(y + hexagon.triangleHeight + hexagon.sideLength),
+
+    x + hexagon.width, -(y + hexagon.triangleHeight),
+    x, -(y + hexagon.triangleHeight + hexagon.sideLength),
+    x + hexagon.width, -(y + hexagon.triangleHeight + hexagon.sideLength),
+
+    x, -(y + hexagon.triangleHeight + hexagon.sideLength),
+    x + hexagon.width, -(y + hexagon.triangleHeight + hexagon.sideLength),
     x + halfSize, -(y + hexagon.height),
   ];
 
@@ -59,14 +70,12 @@ function initBuffers(gl) {
   // JavaScript array, then use it to fill the current buffer.
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-  const colors = [
-    1.0, 1.0, 1.0, 1.0, // white
-    1.0, 0.0, 0.0, 1.0, // red
-    0.0, 0.0, 1.0, 1.0, // blue
-    1.0, 0.0, 0.0, 1.0, // red
-    0.0, 0.0, 1.0, 1.0, // blue
-    0.0, 1.0, 0.0, 1.0, // green
-  ];
+  const colors = [];
+  for (let i = 0; i < 4 * 3; i++) {
+    colors.push(color._r / 255);
+    colors.push(color._g / 255);
+    colors.push(color._b / 255);
+  }
 
   const colorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -149,7 +158,7 @@ function drawScene(gl, programInfo, buffers) {
   // Tell WebGL how to pull out the colors from the color buffer
   // into the vertexColor attribute.
   {
-    const numComponents = 4;
+    const numComponents = 3;
     const type = gl.FLOAT;
     const normalize = false;
     const stride = 0;
@@ -186,7 +195,7 @@ function drawScene(gl, programInfo, buffers) {
   {
     const offset = 0;
     const vertexCount = buffers.verticesCount;
-    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+    gl.drawArrays(gl.TRIANGLES, offset, vertexCount);
   }
 }
 

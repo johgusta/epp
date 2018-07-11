@@ -32,6 +32,7 @@
     "pan-zoom": "^3.1.0",
     "query-string": "^6.1.0",
     "register-service-worker": "^1.0.0",
+    "tinycolor2": "^1.4.1",
     "vue": "^2.5.16",
     "vue-color": "^2.4.6",
     "vue-firestore": "^0.2.9",
