@@ -10,12 +10,15 @@ import HexagonMatrix from './hexagonMatrix';
 import Hexagon from './hexagon';
 import drawColorsList from './colorList';
 
+import drawWebGlHexagons from './webglHexagons';
+
 const DEFAULT_SIZE = 32;
 const DEFAULT_COLOR = '#ff0000';
 const DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer, pattern) {
   this.debug = false;
+  this.webglEnabled = false;
 
   this._hexagonMatrix = new HexagonMatrix();
   this._selectedHexagons = new HexagonMatrix();
@@ -163,6 +166,15 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   this.copyStampCanvas = copyStampCanvas;
   boardContainer.appendChild(copyStampCanvas);
 
+  const webGlCanvas = document.createElement('canvas');
+  webGlCanvas.id = 'webgl-canvas';
+  webGlCanvas.width = canvasSize.width;
+  webGlCanvas.height = canvasSize.height;
+  this.webGlCanvas = webGlCanvas;
+  if (this.webglEnabled) {
+    boardContainer.appendChild(webGlCanvas);
+  }
+
   // var overlayDiv = document.createElement('div');
   // overlayDiv.className = 'overlayDiv';
   // mainContainer.appendChild(overlayDiv);
@@ -291,8 +303,17 @@ HexagonBoard.prototype.drawBoard = function drawBoard() {
       this._drawHexagons();
       this._drawSelections();
       this._drawCopyStamp();
+      this._drawWebGlHexagons();
     });
   }
+};
+
+HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
+  if (!this.webglEnabled) {
+    return;
+  }
+  const gl = this.webGlCanvas.getContext('webgl');
+  drawWebGlHexagons(gl);
 };
 
 HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
