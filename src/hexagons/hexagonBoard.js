@@ -313,7 +313,7 @@ HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
     return;
   }
   const gl = this.webGlCanvas.getContext('webgl');
-  drawWebGlHexagons(gl, this._currentColor);
+  drawWebGlHexagons(gl, this._currentColor, this._borderColor);
 };
 
 HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
