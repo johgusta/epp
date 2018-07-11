@@ -1,6 +1,6 @@
 precision highp float;
 
-attribute vec4 aVertexPosition;
+attribute vec2 aVertexPosition;
 attribute vec3 aVertexColor;
 attribute float aEdgeVertex;
 
@@ -11,7 +11,7 @@ varying lowp vec3 vColor;
 varying float edgeVertex;
 
 void main() {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 0.0, 1.0);
   vColor = aVertexColor;
   edgeVertex = aEdgeVertex;
 }

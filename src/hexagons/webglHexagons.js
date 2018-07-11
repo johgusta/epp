@@ -41,38 +41,38 @@ function drawWebGlHexagons(gl, currentColor, borderColor) {
 
 function initBuffers(gl, currentColor) {
   const color = tinycolor(currentColor);
-  const hexagon = Hexagon.calculateHexagon(2);
+  const hexagon = Hexagon.calculateHexagon(32);
   const halfSize = hexagon.width / 2;
   const halfHeight = hexagon.height / 2;
 
-  const x = -1.0;
-  const y = -1.0;
+  const x = 0;
+  const y = 0;
 
   // Now create an array of positions for the square.
   const positions = [
-    x + halfSize, -(y),
-    x, -(y + hexagon.triangleHeight),
-    x + halfSize, -(y + halfHeight),
+    x + halfSize, y,
+    x, y + hexagon.triangleHeight,
+    x + halfSize, y + halfHeight,
 
-    x + halfSize, -(y + halfHeight),
-    x, -(y + hexagon.triangleHeight),
-    x, -(y + hexagon.triangleHeight + hexagon.sideLength),
+    x + halfSize, y + halfHeight,
+    x, y + hexagon.triangleHeight,
+    x, y + hexagon.triangleHeight + hexagon.sideLength,
 
-    x, -(y + hexagon.triangleHeight + hexagon.sideLength),
-    x + halfSize, -(y + halfHeight),
-    x + halfSize, -(y + hexagon.height),
+    x, y + hexagon.triangleHeight + hexagon.sideLength,
+    x + halfSize, y + halfHeight,
+    x + halfSize, y + hexagon.height,
 
-    x + halfSize, -(y + hexagon.height),
-    x + halfSize, -(y + halfHeight),
-    x + hexagon.width, -(y + hexagon.triangleHeight + hexagon.sideLength),
+    x + halfSize, y + hexagon.height,
+    x + halfSize, y + halfHeight,
+    x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength,
 
-    x + hexagon.width, -(y + hexagon.triangleHeight + hexagon.sideLength),
-    x + halfSize, -(y + halfHeight),
-    x + hexagon.width, -(y + hexagon.triangleHeight),
+    x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength,
+    x + halfSize, y + halfHeight,
+    x + hexagon.width, y + hexagon.triangleHeight,
 
-    x + hexagon.width, -(y + hexagon.triangleHeight),
-    x + halfSize, -(y + halfHeight),
-    x + halfSize, -(y),
+    x + hexagon.width, y + hexagon.triangleHeight,
+    x + halfSize, y + halfHeight,
+    x + halfSize, y,
   ];
 
   // Create a buffer for the square's positions.
@@ -138,7 +138,7 @@ function initBuffers(gl, currentColor) {
 }
 
 function drawScene(gl, programInfo, buffers, borderColor) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+  gl.clearColor(0.0, 0.0, 0.0, 0.0); // Clear to black, fully opaque
   gl.clearDepth(1.0); // Clear everything
   gl.enable(gl.DEPTH_TEST); // Enable depth testing
   gl.depthFunc(gl.LEQUAL); // Near things obscure far things
@@ -154,21 +154,41 @@ function drawScene(gl, programInfo, buffers, borderColor) {
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  const fieldOfView = 45 * Math.PI / 180; // in radians
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
+  // const fieldOfView = 45 * Math.PI / 180; // in radians
+  // const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  const zNear = -100.0;
   const zFar = 100.0;
   const projectionMatrix = mat4.create();
 
+
   // note: glmatrix.js always has the first argument
   // as the destination to receive the result.
-  mat4.perspective(
+  // mat4.perspective(
+  //   projectionMatrix,
+  //   fieldOfView,
+  //   aspect,
+  //   zNear,
+  //   zFar,
+  // );
+
+  mat4.ortho(
     projectionMatrix,
-    fieldOfView,
-    aspect,
+    0,
+    gl.canvas.clientWidth,
+    gl.canvas.clientHeight,
+    0,
     zNear,
     zFar,
   );
+  // mat4.ortho(
+  //   projectionMatrix,
+  //   -1.0,
+  //   1.0,
+  //   -1.0,
+  //   1.0,
+  //   near,
+  //   far,
+  // );
 
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
@@ -177,11 +197,11 @@ function drawScene(gl, programInfo, buffers, borderColor) {
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
 
-  mat4.translate(
-    modelViewMatrix, // destination matrix
-    modelViewMatrix, // matrix to translate
-    [-0.0, 0.0, -6.0],
-  ); // amount to translate
+  // mat4.translate(
+  //   modelViewMatrix, // destination matrix
+  //   modelViewMatrix, // matrix to translate
+  //   [-0.0, 0.0, -0.0],
+  // ); // amount to translate
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute.
