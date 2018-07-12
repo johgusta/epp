@@ -45,86 +45,91 @@ function initBuffers(gl, hexagons, hexagonSize) {
   const halfHeight = hexagon.height / 2;
 
   // Now create an array of positions for the square.
-  const positions = [];
-  const colors = [];
-  const edgeVertices = [];
+  const numberOfVertices = hexagons.length * 6 * 3;
+  const positions = new Float32Array(numberOfVertices * 2);
+  const colors = new Uint8Array(numberOfVertices * 3);
+  const edgeVertices = new Uint8Array(numberOfVertices);
+
+  let positionsIndex = 0;
+  let colorsIndex = 0;
+  let edgeVerticesIndex = 0;
 
   hexagons.forEach((hexagonData) => {
     const x = hexagonData.x;
     const y = hexagonData.y;
 
-    positions.push(x + halfSize);
-    positions.push(y);
-    positions.push(x);
-    positions.push(y + hexagon.triangleHeight);
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y;
+    positions[positionsIndex++] = x;
+    positions[positionsIndex++] = y + hexagon.triangleHeight;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
 
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
-    positions.push(x);
-    positions.push(y + hexagon.triangleHeight);
-    positions.push(x);
-    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
+    positions[positionsIndex++] = x;
+    positions[positionsIndex++] = y + hexagon.triangleHeight;
+    positions[positionsIndex++] = x;
+    positions[positionsIndex++] = y + hexagon.triangleHeight + hexagon.sideLength;
 
-    positions.push(x);
-    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
-    positions.push(x + halfSize);
-    positions.push(y + hexagon.height);
+    positions[positionsIndex++] = x;
+    positions[positionsIndex++] = y + hexagon.triangleHeight + hexagon.sideLength;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + hexagon.height;
 
-    positions.push(x + halfSize);
-    positions.push(y + hexagon.height);
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
-    positions.push(x + hexagon.width);
-    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + hexagon.height;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
+    positions[positionsIndex++] = x + hexagon.width;
+    positions[positionsIndex++] = y + hexagon.triangleHeight + hexagon.sideLength;
 
-    positions.push(x + hexagon.width);
-    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
-    positions.push(x + hexagon.width);
-    positions.push(y + hexagon.triangleHeight);
+    positions[positionsIndex++] = x + hexagon.width;
+    positions[positionsIndex++] = y + hexagon.triangleHeight + hexagon.sideLength;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
+    positions[positionsIndex++] = x + hexagon.width;
+    positions[positionsIndex++] = y + hexagon.triangleHeight;
 
-    positions.push(x + hexagon.width);
-    positions.push(y + hexagon.triangleHeight);
-    positions.push(x + halfSize);
-    positions.push(y + halfHeight);
-    positions.push(x + halfSize);
-    positions.push(y);
+    positions[positionsIndex++] = x + hexagon.width;
+    positions[positionsIndex++] = y + hexagon.triangleHeight;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y + halfHeight;
+    positions[positionsIndex++] = x + halfSize;
+    positions[positionsIndex++] = y;
 
     const color = hexagonData.color;
     for (let i = 0; i < 6 * 3; i++) {
-      colors.push(color.r / 255);
-      colors.push(color.g / 255);
-      colors.push(color.b / 255);
+      colors[colorsIndex++] = color.r;
+      colors[colorsIndex++] = color.g;
+      colors[colorsIndex++] = color.b;
     }
 
-    edgeVertices.push(255);
-    edgeVertices.push(255);
-    edgeVertices.push(0);
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 0;
 
-    edgeVertices.push(0);
-    edgeVertices.push(255);
-    edgeVertices.push(255);
+    edgeVertices[edgeVerticesIndex++] = 0;
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 255;
 
-    edgeVertices.push(255);
-    edgeVertices.push(0);
-    edgeVertices.push(255);
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 0;
+    edgeVertices[edgeVerticesIndex++] = 255;
 
-    edgeVertices.push(255);
-    edgeVertices.push(0);
-    edgeVertices.push(255);
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 0;
+    edgeVertices[edgeVerticesIndex++] = 255;
 
-    edgeVertices.push(255);
-    edgeVertices.push(0);
-    edgeVertices.push(255);
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 0;
+    edgeVertices[edgeVerticesIndex++] = 255;
 
-    edgeVertices.push(255);
-    edgeVertices.push(0);
-    edgeVertices.push(255);
+    edgeVertices[edgeVerticesIndex++] = 255;
+    edgeVertices[edgeVerticesIndex++] = 0;
+    edgeVertices[edgeVerticesIndex++] = 255;
   });
 
   // Create a buffer for the square's positions.
@@ -137,18 +142,18 @@ function initBuffers(gl, hexagons, hexagonSize) {
   // Now pass the list of positions into WebGL to build the
   // shape. We do this by creating a Float32Array from the
   // JavaScript array, then use it to fill the current buffer.
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
   const colorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
   const edgeBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, edgeBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(edgeVertices), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, edgeVertices, gl.STATIC_DRAW);
 
   return {
-    verticesCount: positions.length / 2,
+    verticesCount: numberOfVertices,
     position: positionBuffer,
     color: colorBuffer,
     edgeVertices: edgeBuffer,
@@ -246,8 +251,8 @@ function drawScene(gl, programInfo, buffers, borderColor) {
   // into the vertexColor attribute.
   {
     const numComponents = 3;
-    const type = gl.FLOAT;
-    const normalize = false;
+    const type = gl.UNSIGNED_BYTE;
+    const normalize = true;
     const stride = 0;
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
