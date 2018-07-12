@@ -7,7 +7,7 @@ import { initShaderProgram } from './webglHelper';
 import hexagonVertShader from './hexagonVertShader.glsl';
 import hexagonFragShader from './hexagonFragShader.glsl';
 
-function drawWebGlHexagons(gl, currentColor, borderColor) {
+function drawWebGlHexagons(gl, hexagons, hexagonSize, borderColor) {
   if (gl === null) {
     console.error('WebGl failed!');
     return;
@@ -34,46 +34,98 @@ function drawWebGlHexagons(gl, currentColor, borderColor) {
     },
   };
 
-  const buffers = initBuffers(gl, currentColor);
+  const buffers = initBuffers(gl, hexagons, hexagonSize);
 
   drawScene(gl, programInfo, buffers, borderColor);
 }
 
-function initBuffers(gl, currentColor) {
-  const color = tinycolor(currentColor);
-  const hexagon = Hexagon.calculateHexagon(32);
+function initBuffers(gl, hexagons, hexagonSize) {
+  const hexagon = Hexagon.calculateHexagon(hexagonSize);
   const halfSize = hexagon.width / 2;
   const halfHeight = hexagon.height / 2;
 
-  const x = 0;
-  const y = 0;
-
   // Now create an array of positions for the square.
-  const positions = [
-    x + halfSize, y,
-    x, y + hexagon.triangleHeight,
-    x + halfSize, y + halfHeight,
+  const positions = [];
+  const colors = [];
+  const edgeVertices = [];
 
-    x + halfSize, y + halfHeight,
-    x, y + hexagon.triangleHeight,
-    x, y + hexagon.triangleHeight + hexagon.sideLength,
+  hexagons.forEach((hexagonData) => {
+    const x = hexagonData.x;
+    const y = hexagonData.y;
 
-    x, y + hexagon.triangleHeight + hexagon.sideLength,
-    x + halfSize, y + halfHeight,
-    x + halfSize, y + hexagon.height,
+    positions.push(x + halfSize);
+    positions.push(y);
+    positions.push(x);
+    positions.push(y + hexagon.triangleHeight);
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
 
-    x + halfSize, y + hexagon.height,
-    x + halfSize, y + halfHeight,
-    x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength,
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
+    positions.push(x);
+    positions.push(y + hexagon.triangleHeight);
+    positions.push(x);
+    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
 
-    x + hexagon.width, y + hexagon.triangleHeight + hexagon.sideLength,
-    x + halfSize, y + halfHeight,
-    x + hexagon.width, y + hexagon.triangleHeight,
+    positions.push(x);
+    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
+    positions.push(x + halfSize);
+    positions.push(y + hexagon.height);
 
-    x + hexagon.width, y + hexagon.triangleHeight,
-    x + halfSize, y + halfHeight,
-    x + halfSize, y,
-  ];
+    positions.push(x + halfSize);
+    positions.push(y + hexagon.height);
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
+    positions.push(x + hexagon.width);
+    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
+
+    positions.push(x + hexagon.width);
+    positions.push(y + hexagon.triangleHeight + hexagon.sideLength);
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
+    positions.push(x + hexagon.width);
+    positions.push(y + hexagon.triangleHeight);
+
+    positions.push(x + hexagon.width);
+    positions.push(y + hexagon.triangleHeight);
+    positions.push(x + halfSize);
+    positions.push(y + halfHeight);
+    positions.push(x + halfSize);
+    positions.push(y);
+
+    const color = hexagonData.color;
+    for (let i = 0; i < 6 * 3; i++) {
+      colors.push(color.r / 255);
+      colors.push(color.g / 255);
+      colors.push(color.b / 255);
+    }
+
+    edgeVertices.push(255);
+    edgeVertices.push(255);
+    edgeVertices.push(0);
+
+    edgeVertices.push(0);
+    edgeVertices.push(255);
+    edgeVertices.push(255);
+
+    edgeVertices.push(255);
+    edgeVertices.push(0);
+    edgeVertices.push(255);
+
+    edgeVertices.push(255);
+    edgeVertices.push(0);
+    edgeVertices.push(255);
+
+    edgeVertices.push(255);
+    edgeVertices.push(0);
+    edgeVertices.push(255);
+
+    edgeVertices.push(255);
+    edgeVertices.push(0);
+    edgeVertices.push(255);
+  });
 
   // Create a buffer for the square's positions.
   const positionBuffer = gl.createBuffer();
@@ -87,43 +139,9 @@ function initBuffers(gl, currentColor) {
   // JavaScript array, then use it to fill the current buffer.
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-  const colors = [];
-  for (let i = 0; i < 6 * 3; i++) {
-    colors.push(color._r / 255);
-    colors.push(color._g / 255);
-    colors.push(color._b / 255);
-  }
-
   const colorBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-
-  const edgeVertices = [
-    255,
-    255,
-    0,
-
-    0,
-    255,
-    255,
-
-    255,
-    0,
-    255,
-
-    255,
-    0,
-    255,
-
-    255,
-    0,
-    255,
-
-    255,
-    0,
-    255,
-  ];
 
   const edgeBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, edgeBuffer);

@@ -3,6 +3,7 @@ import Hammer from 'hammerjs';
 import panzoom from 'pan-zoom';
 import FileSaver from 'file-saver';
 import _ from 'lodash';
+import tinycolor from 'tinycolor2';
 
 import PatternHandler from '@/js/patternHandler';
 import Background from './background';
@@ -303,8 +304,15 @@ HexagonBoard.prototype.drawBoard = function drawBoard() {
       this._drawHexagons();
       this._drawSelections();
       this._drawCopyStamp();
-      this._drawWebGlHexagons();
     });
+  }
+};
+
+HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
+  if (this.webglEnabled) {
+    this._drawWebGlHexagons();
+  } else {
+    this._drawCanvasHexagons();
   }
 };
 
@@ -313,10 +321,37 @@ HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
     return;
   }
   const gl = this.webGlCanvas.getContext('webgl');
-  drawWebGlHexagons(gl, this._currentColor, this._borderColor);
+
+  const hexagons = [];
+
+  const colorConversions = {};
+  this._hexagonMatrix.forEach((hexagon) => {
+    let rgbColor = colorConversions[hexagon.color];
+    if (rgbColor === undefined) {
+      const color = tinycolor(hexagon.color);
+      rgbColor = {
+        r: color._r,
+        g: color._g,
+        b: color._b,
+      };
+      colorConversions[hexagon.color] = rgbColor;
+    }
+
+    const hexagonPosition = this._getHexagonPosition(hexagon);
+    const hexagonData = {
+      color: rgbColor,
+      x: hexagonPosition.x,
+      y: hexagonPosition.y,
+    };
+    hexagons.push(hexagonData);
+    // this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
+  });
+
+  const hexagonSize = this.getSize();
+  drawWebGlHexagons(gl, hexagons, hexagonSize, this._borderColor);
 };
 
-HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
+HexagonBoard.prototype._drawCanvasHexagons = function _drawCanvasHexagons() {
   this.canvas.width = this.canvas.width;
   const ctx = this.canvas.getContext('2d');
 
