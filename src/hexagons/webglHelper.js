@@ -15,8 +15,9 @@ function initShaderProgram(gl, vsSource, fsSource) {
   // If creating the shader program failed, alert
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(shaderProgram)}`);
-    return null;
+    const errorMessage = `Unable to initialize the shader program: ${gl.getProgramInfoLog(shaderProgram)}`;
+    console.error(errorMessage);
+    throw new Error(errorMessage);
   }
 
   return shaderProgram;
@@ -40,9 +41,10 @@ function loadShader(gl, type, source) {
   // See if it compiled successfully
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`);
+    const errorMessage = `An error occurred compiling the shaders: ${gl.getShaderInfoLog(shader)}`;
+    console.error(errorMessage);
     gl.deleteShader(shader);
-    return null;
+    throw new Error(errorMessage);
   }
 
   return shader;

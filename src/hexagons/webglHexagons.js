@@ -9,14 +9,12 @@ import hexagonFragShader from './hexagonFragShader.glsl';
 
 function drawWebGlHexagons(gl, hexagons, hexagonSize, borderColor) {
   if (gl === null) {
-    console.error('WebGl failed!');
-    return;
+    throw new Error('Missing WebGl context!');
   }
 
   const extension = gl.getExtension('OES_standard_derivatives');
   if (!extension) {
-    console.error('OES_standard_derivatives extension not found');
-    return;
+    throw new Error('OES_standard_derivatives extension not found');
   }
 
   const shaderProgram = initShaderProgram(gl, hexagonVertShader, hexagonFragShader);

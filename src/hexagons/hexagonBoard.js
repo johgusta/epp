@@ -58,7 +58,7 @@ function handleZoom(that, xPosition, yPosition, zoom) {
   const oldScale = that.viewport.scale;
   const scaleChange = oldScale - newScale;
 
-  if (newScale < 0.2 || newScale > 10) {
+  if (newScale < 0.1 || newScale > 10) {
     return;
   }
 
@@ -153,6 +153,16 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   canvas.height = canvasSize.height;
   boardContainer.appendChild(canvas);
 
+  const webGlCanvas = document.createElement('canvas');
+  webGlCanvas.id = 'webgl-canvas';
+  webGlCanvas.width = canvasSize.width;
+  webGlCanvas.height = canvasSize.height;
+  this.webGlCanvas = webGlCanvas;
+  if (this.webglEnabled) {
+    canvas.style.display = 'none';
+    boardContainer.appendChild(webGlCanvas);
+  }
+
   const foregroundCanvas = document.createElement('canvas');
   foregroundCanvas.id = 'foreground-canvas';
   foregroundCanvas.width = canvasSize.width;
@@ -166,15 +176,6 @@ HexagonBoard.prototype._init = function _init(mainContainer) {
   copyStampCanvas.height = canvasSize.height;
   this.copyStampCanvas = copyStampCanvas;
   boardContainer.appendChild(copyStampCanvas);
-
-  const webGlCanvas = document.createElement('canvas');
-  webGlCanvas.id = 'webgl-canvas';
-  webGlCanvas.width = canvasSize.width;
-  webGlCanvas.height = canvasSize.height;
-  this.webGlCanvas = webGlCanvas;
-  if (this.webglEnabled) {
-    boardContainer.appendChild(webGlCanvas);
-  }
 
   // var overlayDiv = document.createElement('div');
   // overlayDiv.className = 'overlayDiv';
@@ -310,7 +311,15 @@ HexagonBoard.prototype.drawBoard = function drawBoard() {
 
 HexagonBoard.prototype._drawHexagons = function _drawHexagons() {
   if (this.webglEnabled) {
-    this._drawWebGlHexagons();
+    try {
+      this._drawWebGlHexagons();
+    } catch (error) {
+      console.error(error);
+      this.webglEnabled = false;
+      this.webGlCanvas.style.display = 'none';
+      this.canvas.style.display = 'block';
+      this._drawCanvasHexagons();
+    }
   } else {
     this._drawCanvasHexagons();
   }
@@ -320,7 +329,6 @@ HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
   if (!this.webglEnabled) {
     return;
   }
-  const gl = this.webGlCanvas.getContext('webgl');
 
   const hexagons = [];
 
@@ -344,10 +352,11 @@ HexagonBoard.prototype._drawWebGlHexagons = function _drawWebGlHexagons() {
       y: hexagonPosition.y,
     };
     hexagons.push(hexagonData);
-    // this._drawHexagon(ctx, hexagonPosition, color, this._borderColor);
   });
 
   const hexagonSize = this.getSize();
+
+  const gl = this.webGlCanvas.getContext('webgl');
   drawWebGlHexagons(gl, hexagons, hexagonSize, this._borderColor);
 };
 
