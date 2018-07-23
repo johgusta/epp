@@ -19,7 +19,7 @@ const DEFAULT_BORDER_COLOR = '#cccccc';
 
 function HexagonBoard(mainContainer, pattern) {
   this.debug = false;
-  this.webglEnabled = true;
+  this.webglEnabled = false;
 
   this._hexagonMatrix = new HexagonMatrix();
   this._selectedHexagons = new HexagonMatrix();
