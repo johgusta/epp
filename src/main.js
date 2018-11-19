@@ -41,6 +41,6 @@ FirebaseHelper.onAuthStateChanged((user) => {
   } else {
     console.log('log out user and updated state');
     store.commit(types.LOGOUT_USER);
-    router.push({ name: 'home' });
+    // router.push({ name: 'home' });
   }
 });

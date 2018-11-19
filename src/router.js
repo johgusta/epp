@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import Start from './views/Start.vue';
+import Login from './views/Login.vue';
 import LoginCallback from './views/LoginCallback.vue';
 import Library from './views/Library.vue';
 import Pattern from './views/Pattern.vue';
@@ -13,7 +14,12 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: Start
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
     },
     {
       path: '/login/callback',
@@ -30,6 +36,10 @@ const router = new Router({
       name: 'pattern',
       component: Pattern,
     },
+    {
+      path: '*',
+      redirect: '/'
+    }
   ],
 });
 

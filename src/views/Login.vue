@@ -64,6 +64,9 @@ export default {
       if (!this.userDisplayName && !this.authStarted) {
         FirebaseHelper.startAuthUi('#firebaseui-container');
         this.authStarted = true;
+      } else if (this.userDisplayName) {
+        console.log('logged in');
+        this.$router.replace({ name: 'library' });
       }
     },
   },
