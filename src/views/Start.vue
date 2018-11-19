@@ -3,13 +3,10 @@
         <div class="header">
             <span class="menu-title">
                 <img class="menu-logo" src="@/assets/logo.png">
-                <h3 class="title">Hexagons Of Awesome</h3>
+                <h3 class="title">Hexagons of Awesome</h3>
             </span>
 
             <span class="navigation-menu">
-                <mdc-button v-show="userDisplayName" raised @click="openPatternLibrary">
-                    Open pattern library
-                </mdc-button>
                 <span class="login-button">
                     <mdc-button v-show="!userDisplayName" raised @click="logIn">
                         Log in
@@ -19,10 +16,13 @@
                         Log out
                     </mdc-button>
                 </span>
+                <mdc-button v-show="userDisplayName" raised @click="openPatternLibrary">
+                    Open patterns
+                </mdc-button>
             </span>
         </div>
         <div class="main-content">
-            <h1>Hexagons of awesome</h1>
+            <h1>Hexagons of Awesome</h1>
             <div>
                 Much information about english paper piecing
             </div>
@@ -30,7 +30,8 @@
 
 
         <div class="footer">
-            Footer
+            <div>Contact at:</div>
+            <div>hexagons@ofawesome.se</div>
         </div>
     </div>
 </template>
@@ -79,25 +80,29 @@ export default {
     justify-content: space-between;
     align-items: center;
 
-    .menu-logo {
-        width: 40px;
-        margin: 0 20px -12px 0;
-    }
     .menu-title {
-        margin: 0 40px;
+        margin-left: 20px;
 
+        .menu-logo {
+            width: 40px;
+            margin: 12px 20px -12px 0;
+        }
         .title {
             display: inline-block;
         }
     }
     .navigation-menu {
-        margin: 0 40px;
+        margin-right: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
     }
 
     button.mdc-button {
-        margin: 0 10px;
+        margin: 5px;
         background-color: $mdc-theme-secondary;
         color: $mdc-theme-on-secondary;
+        white-space: nowrap;
     }
 }
 .main-content {
@@ -106,8 +111,14 @@ export default {
 }
 .footer {
     flex: none;
-    height: 100px;
+    height: 60px;
+    font-size: 14px;
     background-color: $mdc-theme-primary;
     color: $mdc-theme-on-primary;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 </style>
