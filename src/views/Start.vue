@@ -23,11 +23,30 @@
         </div>
         <div class="main-content">
             <h1>Hexagons of Awesome</h1>
-            <div>
-                Much information about english paper piecing
+            <div class="section">
+                <p>
+                    An online design tool for English Paper Piecing.
+                </p>
+            </div>
+            <div class="section section-with-image">
+                <div class="text-image">Pattern image here</div>
+                <p class="image-text">
+                    Create your own patterns and calculate the number of pieces required.
+                </p>
+            </div>
+
+            <div class="section">
+                <p>This simple, online design tool just works.</p>
+                <ul>
+                    <li>Set out colors to make the patterns in your head.</li>
+                    <li>See the total piece count for each color so you can plan out
+                        your materials.</li>
+                    <li>Save your pattern to edit later.</li>
+                    <li>Export a .png image of your pattern to save and print at home.</li>
+                </ul>
+
             </div>
         </div>
-
 
         <div class="footer">
             <div>Contact at:</div>
@@ -65,14 +84,15 @@ export default {
 
 .start-full-page {
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
+
+    font-size: 20px;
 
     display: flex;
     flex-direction: column;
 }
 .header {
-    height: 105px;
-    flex: none;
+    height: 150px;
     background-color: $mdc-theme-primary-light;
     color: $mdc-theme-on-primary;
 
@@ -106,11 +126,62 @@ export default {
     }
 }
 .main-content {
-    flex: auto;
-    background-color: #fdfdfd;
+    flex: 1;
+    background-color: #f8f8ff;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 5px;
+
+    p {
+        margin: 0;
+    }
+
+    .section {
+        max-width: 600px;
+        margin: 20px 5px;
+        align-self: center;
+
+        ul {
+            margin: 0;
+            padding: 20px;
+            list-style-type: none;
+            font-size: 0.8em;
+
+            li {
+                margin-bottom: 5px;
+            }
+            li:before {
+                display: inline-block;
+                content: "-";
+                width: 1em;
+                margin-left: -1em;
+            }
+        }
+    }
+
+    .section-with-image {
+        display: flex;
+        flex-direction: column;
+
+        @media (min-width: 500px) {
+            flex-direction: row;
+        }
+        .text-image {
+            flex: none;
+            align-self: center;
+            width: 220px;
+            height: 220px;
+            background-color: #cdcdcd;
+        }
+        .image-text {
+            margin: 20px;
+        }
+    }
 }
 .footer {
-    flex: none;
     height: 60px;
     font-size: 14px;
     background-color: $mdc-theme-primary;
