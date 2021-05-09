@@ -27,7 +27,7 @@
     "hammerjs": "^2.0.8",
     "if-env": "^1.0.4",
     "js-cookie": "^2.2.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "moment": "^2.22.2",
     "pan-zoom": "^3.1.0",
     "query-string": "^6.1.0",
